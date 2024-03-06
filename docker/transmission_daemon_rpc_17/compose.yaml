@@ -1,0 +1,33 @@
+---
+version: "3"
+services:
+  transmission-rpc-17:
+    image: linuxserver/transmission:4.0.5-r0-ls224
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - TRANSMISSION_WEB_HOME= #optional
+      - USER=admin #optional
+      - PASS=123456 #optional
+      - WHITELIST= #optional
+      - PEERPORT= #optional
+      - HOST_WHITELIST= #optional
+      - TR_RPC_VERBOSE=1
+    volumes:
+      - cfg_vol:/config
+      - dwd_vol:/downloads
+      - wth_vol:/watch
+    ports:
+      - 9091:9091
+      # - 51413:51413
+      # - 51413:51413/udp
+    restart: no
+
+volumes:
+  cfg_vol:
+    driver: local
+  dwd_vol:
+    driver: local
+  wth_vol:
+    driver: local
