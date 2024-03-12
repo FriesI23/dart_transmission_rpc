@@ -10,6 +10,7 @@ import 'dart:typed_data';
 
 import 'apis/session_get.dart';
 import 'exception.dart';
+import 'logging.dart';
 import 'method.dart';
 import 'request.dart';
 import 'response.dart';
@@ -46,7 +47,8 @@ abstract interface class TransmissionRpcClient {
     int port = 9091,
     String path = "/transmission/rpc",
     int maxRetryCount = 10,
-    int timeout = 10,
+    int timeout = 10000,
+    Logger? log,
   }) =>
       _TransmissionRpcClient(
         url: Uri(scheme: protocol.name, host: host, port: port, path: path),
@@ -55,6 +57,7 @@ abstract interface class TransmissionRpcClient {
         httpClient: HttpClient(),
         maxRetryCount: maxRetryCount,
         timeout: timeout,
+        log: log,
       );
 }
 
@@ -62,6 +65,8 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
   static const defaultCredentialRealm = "Transmission";
   static const defaultSessionId = "0";
   static const sesionIdHeaderKey = "X-Transmission-Session-Id";
+
+  final Logger log;
 
   final HttpClient httpClient;
   @override
@@ -87,8 +92,10 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     required this.password,
     required this.maxRetryCount,
     required this.timeout,
+    Logger? log,
   })  : assert(maxRetryCount >= 0 && maxRetryCount <= 100),
-        assert(timeout > 0) {
+        assert(timeout > 0),
+        log = log ?? Logger("TransmissionRpcClient") {
     _initHttpCredential();
   }
 
@@ -138,7 +145,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     final payload = jsonEncode(request.toRpcJson());
     final body = utf8.encode(payload);
     final resultText =
-        await _doRequest(body, Duration(seconds: timeout ?? this.timeout));
+        await _doRequest(body, Duration(milliseconds: timeout ?? this.timeout));
     final rawText = jsonDecode(resultText);
     return rawText;
   }
@@ -225,7 +232,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     try {
       final reason = p.check();
       if (reason != null && reason.isNotEmpty) {
-        // TODO: warning here.
+        log.warn("per check failed, method: $method, reason: $reason");
       }
     } on TransmissionError catch (e) {
       throw TransmissionCheckError(
@@ -248,7 +255,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       {required RpcTag? tag, required int? timeout}) async {
     final request = TransmissionRpcRequest(
         method: TransmissionRpcMethod.sessionGet, param: p, tag: tag);
-    final rawData = await doRequest(request);
+    final rawData = await doRequest(request, timeout: timeout);
     final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
     final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
     final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
