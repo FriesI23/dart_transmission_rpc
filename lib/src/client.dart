@@ -28,14 +28,15 @@ abstract interface class TransmissionRpcClient {
   String? get password;
   ServerRpcVersion? get serverRpcVersion;
   int get maxRetryCount;
+  int get timeout;
 
   // Get session running stats by given fields
   Future<SessionGetReponse> sessionGet(List<SessionGetArgument>? fields,
-      {RpcTag? tag});
+      {RpcTag? tag, int? timeout});
 
   Future<void> init();
   bool isInited();
-  Future<JsonMap> doRequest(TransmissionRpcRequest request);
+  Future<JsonMap> doRequest(TransmissionRpcRequest request, {int? timeout});
 
   factory TransmissionRpcClient({
     HttpProtocol protocol = HttpProtocol.http,
@@ -45,6 +46,7 @@ abstract interface class TransmissionRpcClient {
     int port = 9091,
     String path = "/transmission/rpc",
     int maxRetryCount = 10,
+    int timeout = 10,
   }) =>
       _TransmissionRpcClient(
         url: Uri(scheme: protocol.name, host: host, port: port, path: path),
@@ -52,6 +54,7 @@ abstract interface class TransmissionRpcClient {
         password: password,
         httpClient: HttpClient(),
         maxRetryCount: maxRetryCount,
+        timeout: timeout,
       );
 }
 
@@ -63,6 +66,8 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
   final HttpClient httpClient;
   @override
   final int maxRetryCount;
+  @override
+  final int timeout;
   @override
   final Uri url;
   @override
@@ -81,7 +86,9 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     required this.username,
     required this.password,
     required this.maxRetryCount,
-  }) : assert(maxRetryCount >= 0 && maxRetryCount <= 100) {
+    required this.timeout,
+  })  : assert(maxRetryCount >= 0 && maxRetryCount <= 100),
+        assert(timeout > 0) {
     _initHttpCredential();
   }
 
@@ -100,7 +107,8 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
           SessionGetArgument.rpcVersion,
           SessionGetArgument.rpcVersionMinimum,
         ]),
-        null);
+        tag: null,
+        timeout: null);
     if (!response.isOk() ||
         response.param?.rpcVersion == null ||
         response.param?.rpcVersionMinimum == null) {
@@ -125,16 +133,20 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
   ServerRpcVersion? get serverRpcVersion => _inited ? _serverRpcVersion : null;
 
   @override
-  Future<JsonMap> doRequest(TransmissionRpcRequest request) async {
+  Future<JsonMap> doRequest(TransmissionRpcRequest request,
+      {int? timeout}) async {
     final payload = jsonEncode(request.toRpcJson());
     final body = utf8.encode(payload);
-    final resultText = await _doRequest(body);
+    final resultText =
+        await _doRequest(body, Duration(seconds: timeout ?? this.timeout));
     final rawText = jsonDecode(resultText);
     return rawText;
   }
 
   Future<String> _doRequest(
-    Uint8List body, {
+    Uint8List body,
+    Duration timeout, {
+    Duration usedTime = Duration.zero,
     int retryCount = 0,
     List<TransmissionRpcRetryReason>? retryReasonList,
   }) async {
@@ -143,13 +155,22 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
           "request retry count overlimit, $retryReasonList", retryCount);
     }
 
+    final lastTime = timeout - usedTime;
+    if (lastTime.isNegative) {
+      throw TransmissionTimeoutError(
+          "timeout with reqeust: ${utf8.decode(body)}");
+    }
+
+    final stopWatch = Stopwatch();
     final HttpClientResponse httpResponse;
+    HttpClientRequest? httpRequest;
 
     try {
-      final httpRequest = await httpClient.postUrl(url);
+      stopWatch.start();
+      httpRequest = await httpClient.postUrl(url);
       httpRequest.headers.add(sesionIdHeaderKey, _sessionId);
       httpRequest.add(body);
-      httpResponse = await httpRequest.close();
+      httpResponse = await httpRequest.close().timeout(lastTime);
     } on HttpException catch (e) {
       throw TranmissionConnectionError(
           "can't connect to transmission server: ${e.toString()}");
@@ -157,8 +178,11 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       throw TranmissionConnectionError(
           "can't connect to transmission server: ${e.toString()}");
     } on TimeoutException catch (e) {
+      httpRequest?.abort();
       throw TransmissionTimeoutError(
           "timeout when try connect to transmission server: ${e.toString()}");
+    } finally {
+      stopWatch.stop();
     }
 
     _sessionId = httpResponse.headers.value(sesionIdHeaderKey) ?? _sessionId;
@@ -175,17 +199,28 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
             retryReasonList.lastOrNull == TransmissionRpcRetryReason.csrf
                 ? retryCount + 1
                 : retryCount;
+        final newUseTime =
+            retryReasonList.lastOrNull == TransmissionRpcRetryReason.csrf
+                ? usedTime + stopWatch.elapsed
+                : usedTime;
         retryReasonList.add(TransmissionRpcRetryReason.csrf);
-        return _doRequest(body,
-            retryCount: newRetryCount, retryReasonList: retryReasonList);
+        return _doRequest(body, timeout,
+            usedTime: newUseTime,
+            retryCount: newRetryCount,
+            retryReasonList: retryReasonList);
     }
 
     return httpResponse.transform(utf8.decoder).join();
   }
 
-  void preCheck(TransmissionRpcMethod method, RequestParam p) {
+  void preCheck(TransmissionRpcMethod method, RequestParam p,
+      {required int? timeout}) {
     if (!isInited()) {
       throw const TransmissionCheckError("Client has not been initialized.");
+    }
+    if (timeout != null && timeout < 0) {
+      throw TransmissionCheckError(
+          "pre check failed, method: $method, reason: timeout $timeout <= 0");
     }
     try {
       final reason = p.check();
@@ -200,17 +235,17 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
 
   @override
   Future<SessionGetReponse> sessionGet(List<SessionGetArgument>? fields,
-      {RpcTag? tag}) {
+      {RpcTag? tag, int? timeout}) {
     final p = SessionGetRequestParam.build(
       version: serverRpcVersion,
       fields: fields,
     );
-    preCheck(TransmissionRpcMethod.sessionGet, p);
-    return _sessionGet(p, tag);
+    preCheck(TransmissionRpcMethod.sessionGet, p, timeout: timeout);
+    return _sessionGet(p, tag: tag, timeout: timeout);
   }
 
-  Future<SessionGetReponse> _sessionGet(
-      SessionGetRequestParam p, RpcTag? tag) async {
+  Future<SessionGetReponse> _sessionGet(SessionGetRequestParam p,
+      {required RpcTag? tag, required int? timeout}) async {
     final request = TransmissionRpcRequest(
         method: TransmissionRpcMethod.sessionGet, param: p, tag: tag);
     final rawData = await doRequest(request);
