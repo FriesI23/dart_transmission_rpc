@@ -20,13 +20,14 @@ import 'version.dart';
 typedef SessionGetReponse = TransmissionRpcResponse<SessionGetResponseParam,
     TransmissionRpcRequest<SessionGetRequestParam>>;
 
-enum TranmissionRpcRetryReason { csrf }
+enum TransmissionRpcRetryReason { csrf }
 
 abstract interface class TransmissionRpcClient {
   Uri get url;
   String? get username;
   String? get password;
   ServerRpcVersion? get serverRpcVersion;
+  int get maxRetryCount;
 
   // Get session running stats by given fields
   Future<SessionGetReponse> sessionGet(List<SessionGetArgument>? fields,
@@ -43,25 +44,25 @@ abstract interface class TransmissionRpcClient {
     String host = "127.0.0.1",
     int port = 9091,
     String path = "/transmission/rpc",
+    int maxRetryCount = 10,
   }) =>
       _TransmissionRpcClient(
-        protocol: protocol,
+        url: Uri(scheme: protocol.name, host: host, port: port, path: path),
         username: username,
         password: password,
-        host: host,
-        port: port,
-        path: path,
+        httpClient: HttpClient(),
+        maxRetryCount: maxRetryCount,
       );
 }
 
 class _TransmissionRpcClient implements TransmissionRpcClient {
   static const defaultCredentialRealm = "Transmission";
   static const defaultSessionId = "0";
-  static const defaultTag = 1;
   static const sesionIdHeaderKey = "X-Transmission-Session-Id";
 
-  final HttpClient _httpClient;
-  final int _maxRetryCount;
+  final HttpClient httpClient;
+  @override
+  final int maxRetryCount;
   @override
   final Uri url;
   @override
@@ -71,21 +72,16 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
 
   late final ServerRpcVersion _serverRpcVersion;
 
-  RpcTag _crtTag = defaultTag;
   String _sessionId = defaultSessionId;
   bool _inited = false;
 
   _TransmissionRpcClient({
-    required HttpProtocol protocol,
-    this.username,
-    this.password,
-    required String host,
-    required int port,
-    required String path,
-    int maxRetryCount = 10,
-  })  : _httpClient = HttpClient(),
-        _maxRetryCount = maxRetryCount,
-        url = Uri(scheme: protocol.name, host: host, port: port, path: path) {
+    required this.url,
+    required this.httpClient,
+    required this.username,
+    required this.password,
+    required this.maxRetryCount,
+  }) : assert(maxRetryCount >= 0 && maxRetryCount <= 100) {
     _initHttpCredential();
   }
 
@@ -93,21 +89,22 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     if (username != null || password != null) {
       final credentials =
           HttpClientBasicCredentials(username ?? '', password ?? '');
-      _httpClient.addCredentials(url, defaultCredentialRealm, credentials);
+      httpClient.addCredentials(url, defaultCredentialRealm, credentials);
     }
   }
 
   @override
   Future<void> init() async {
-    final response =
-        await _sessionGet(SessionGetRequestParam.build(fields: const [
-      SessionGetArgument.rpcVersion,
-      SessionGetArgument.rpcVersionMinimum,
-    ]));
+    final response = await _sessionGet(
+        SessionGetRequestParam.build(fields: const [
+          SessionGetArgument.rpcVersion,
+          SessionGetArgument.rpcVersionMinimum,
+        ]),
+        null);
     if (!response.isOk() ||
         response.param?.rpcVersion == null ||
         response.param?.rpcVersionMinimum == null) {
-      throw const TransmissionError("init client failed");
+      throw TransmissionError("init client failed, reason: ${response.result}");
     }
     _serverRpcVersion = ServerRpcVersion.build(
       response.param!.rpcVersion!,
@@ -127,32 +124,21 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
   @override
   ServerRpcVersion? get serverRpcVersion => _inited ? _serverRpcVersion : null;
 
-  void bumpTag() {
-    if (_crtTag >= kMaxRpcTag) {
-      _crtTag = defaultTag;
-    } else {
-      _crtTag += 1;
-    }
-  }
-
-  RpcTag get currentTag => _crtTag;
-
   @override
   Future<JsonMap> doRequest(TransmissionRpcRequest request) async {
     final payload = jsonEncode(request.toRpcJson());
     final body = utf8.encode(payload);
     final resultText = await _doRequest(body);
     final rawText = jsonDecode(resultText);
-    bumpTag();
     return rawText;
   }
 
   Future<String> _doRequest(
     Uint8List body, {
     int retryCount = 0,
-    List<TranmissionRpcRetryReason>? retryReasonList,
+    List<TransmissionRpcRetryReason>? retryReasonList,
   }) async {
-    if (retryCount > _maxRetryCount) {
+    if (retryCount > maxRetryCount) {
       throw TranmissionMaxRetryRequestError(
           "request retry count overlimit, $retryReasonList", retryCount);
     }
@@ -160,7 +146,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     final HttpClientResponse httpResponse;
 
     try {
-      final httpRequest = await _httpClient.postUrl(url);
+      final httpRequest = await httpClient.postUrl(url);
       httpRequest.headers.add(sesionIdHeaderKey, _sessionId);
       httpRequest.add(body);
       httpResponse = await httpRequest.close();
@@ -184,10 +170,14 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
         throw TransmissionAuthError(
             "transmission server required auth, code: $httpCode");
       case 409:
-        retryReasonList = retryReasonList ?? <TranmissionRpcRetryReason>[];
-        retryReasonList.add(TranmissionRpcRetryReason.csrf);
+        retryReasonList = retryReasonList ?? <TransmissionRpcRetryReason>[];
+        final newRetryCount =
+            retryReasonList.lastOrNull == TransmissionRpcRetryReason.csrf
+                ? retryCount + 1
+                : retryCount;
+        retryReasonList.add(TransmissionRpcRetryReason.csrf);
         return _doRequest(body,
-            retryCount: retryCount + 1, retryReasonList: retryReasonList);
+            retryCount: newRetryCount, retryReasonList: retryReasonList);
     }
 
     return httpResponse.transform(utf8.decoder).join();
@@ -216,16 +206,13 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       fields: fields,
     );
     preCheck(TransmissionRpcMethod.sessionGet, p);
-    return _sessionGet(p);
+    return _sessionGet(p, tag);
   }
 
-  Future<SessionGetReponse> _sessionGet(SessionGetRequestParam p,
-      {RpcTag? tag}) async {
+  Future<SessionGetReponse> _sessionGet(
+      SessionGetRequestParam p, RpcTag? tag) async {
     final request = TransmissionRpcRequest(
-      method: TransmissionRpcMethod.sessionGet,
-      param: p,
-      tag: tag ?? _crtTag,
-    );
+        method: TransmissionRpcMethod.sessionGet, param: p, tag: tag);
     final rawData = await doRequest(request);
     final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
     final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
