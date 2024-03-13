@@ -3,6 +3,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import 'package:flutter_transmission_rpc/src/apis/session_get.dart';
+import 'package:flutter_transmission_rpc/src/apis/session_set.dart';
 import 'package:flutter_transmission_rpc/src/client.dart';
 
 void testSessionGet() async {
@@ -12,6 +14,19 @@ void testSessionGet() async {
   print(result.param?.version);
 }
 
-void main() async {
+void testSessionSet() async {
+  final client = TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result1 = await client.sessionGet([SessionGetArgument.utpEnabled]);
+  print("before: ${result1.param?.utpEnabled}");
+  final result =
+      await client.sessionSet(SessionSetRequestArgs(utpEnabled: true));
+  print("output: ${result.result}");
+  final result2 = await client.sessionGet([SessionGetArgument.utpEnabled]);
+  print("after: ${result2.param?.utpEnabled}");
+}
+
+void main() {
   // testSessionGet();
+  testSessionSet();
 }

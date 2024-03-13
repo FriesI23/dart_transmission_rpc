@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 enum TransmissionRpcMethod {
+  sessionSet(methodName: "session-set"),
   sessionGet(methodName: "session-get");
 
   final String methodName;

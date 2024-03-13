@@ -9,6 +9,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'apis/session_get.dart';
+import 'apis/session_set.dart';
 import 'exception.dart';
 import 'logging.dart';
 import 'method.dart';
@@ -18,8 +19,10 @@ import 'typedef.dart';
 import 'utils.dart';
 import 'version.dart';
 
-typedef SessionGetReponse = TransmissionRpcResponse<SessionGetResponseParam,
+typedef SessionGetResponse = TransmissionRpcResponse<SessionGetResponseParam,
     TransmissionRpcRequest<SessionGetRequestParam>>;
+typedef SessionSetResponse = TransmissionRpcResponse<SessionSetResponseParam,
+    TransmissionRpcRequest<SessionSetRequestParam>>;
 
 enum TransmissionRpcRetryReason { csrf }
 
@@ -32,7 +35,11 @@ abstract interface class TransmissionRpcClient {
   int get timeout;
 
   // Get session running stats by given fields
-  Future<SessionGetReponse> sessionGet(List<SessionGetArgument>? fields,
+  Future<SessionGetResponse> sessionGet(List<SessionGetArgument>? fields,
+      {RpcTag? tag, int? timeout});
+
+  // Set sesion running stats
+  Future<SessionSetResponse> sessionSet(SessionSetRequestArgs args,
       {RpcTag? tag, int? timeout});
 
   Future<void> init();
@@ -241,7 +248,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
   }
 
   @override
-  Future<SessionGetReponse> sessionGet(List<SessionGetArgument>? fields,
+  Future<SessionGetResponse> sessionGet(List<SessionGetArgument>? fields,
       {RpcTag? tag, int? timeout}) {
     final p = SessionGetRequestParam.build(
       version: serverRpcVersion,
@@ -251,7 +258,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     return _sessionGet(p, tag: tag, timeout: timeout);
   }
 
-  Future<SessionGetReponse> _sessionGet(SessionGetRequestParam p,
+  Future<SessionGetResponse> _sessionGet(SessionGetRequestParam p,
       {required RpcTag? tag, required int? timeout}) async {
     final request = TransmissionRpcRequest(
         method: TransmissionRpcMethod.sessionGet, param: p, tag: tag);
@@ -264,6 +271,35 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: rawResult.toString(),
       param: rawParam is JsonMap
           ? SessionGetResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<SessionSetResponse> sessionSet(SessionSetRequestArgs args,
+      {RpcTag? tag, int? timeout}) {
+    final p = SessionSetRequestParam.build(
+      version: serverRpcVersion,
+      args: args,
+    );
+    preCheck(TransmissionRpcMethod.sessionSet, p, timeout: timeout);
+    return _sessionSet(p, tag: tag, timeout: timeout);
+  }
+
+  Future<SessionSetResponse> _sessionSet(SessionSetRequestParam p,
+      {required RpcTag? tag, required int? timeout}) async {
+    final request = TransmissionRpcRequest(
+        method: TransmissionRpcMethod.sessionSet, param: p, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    return TransmissionRpcResponse(
+      request: request,
+      result: rawResult.toString(),
+      param: rawParam is JsonMap
+          ? SessionSetResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );
