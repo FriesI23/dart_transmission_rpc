@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'apis/blocklist_update.dart';
 import 'apis/session_get.dart';
 import 'apis/session_set.dart';
 import 'apis/session_stats.dart';
@@ -30,6 +31,10 @@ typedef SessionSetResponse = TransmissionRpcResponse<SessionSetResponseParam,
 typedef SessionStatsResponse = TransmissionRpcResponse<
     SessionStatsResponseParam,
     TransmissionRpcRequest<SessionStatsRequestParam>>;
+// blocklist-update
+typedef BlocklistUpdateResponse = TransmissionRpcResponse<
+    BlocklistUpdateResponseParam,
+    TransmissionRpcRequest<BlocklistUpdateRequestParam>>;
 
 enum TransmissionRpcRetryReason { csrf }
 
@@ -51,6 +56,9 @@ abstract interface class TransmissionRpcClient {
 
   // Get sssion statistics
   Future<SessionStatsResponse> sessionStats({RpcTag? tag, int? timeout});
+
+  // Update blocklist (if setting blocklist-url)
+  Future<BlocklistUpdateResponse> blocklistUpdate({RpcTag? tag, int? timeout});
 
   Future<void> init();
   bool isInited();
@@ -334,6 +342,30 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: rawResult.toString(),
       param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
           ? SessionStatsResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<BlocklistUpdateResponse> blocklistUpdate({RpcTag? tag, int? timeout}) {
+    preCheck(TransmissionRpcMethod.blocklistUpdate, null, timeout: timeout);
+    return _blocklistUpdate(tag: tag, timeout: timeout);
+  }
+
+  Future<BlocklistUpdateResponse> _blocklistUpdate(
+      {required RpcTag? tag, required int? timeout}) async {
+    final request = TransmissionRpcRequest<BlocklistUpdateRequestParam>(
+        method: TransmissionRpcMethod.blocklistUpdate, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    return TransmissionRpcResponse(
+      request: request,
+      result: rawResult.toString(),
+      param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
+          ? BlocklistUpdateResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );
