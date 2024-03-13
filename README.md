@@ -11,6 +11,33 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages).
 -->
 
+- [ ] torrent
+  - [ ] torrent-start
+  - [ ] torrent-start-now
+  - [ ] torrent-stop
+  - [ ] torrent-verify
+  - [ ] torrent-reannounce
+  - [ ] torrent-set
+  - [ ] torrent-get
+  - [ ] torrent-add
+  - [ ] torrent-remove
+  - [ ] torrent-set-location
+  - [ ] torrent-rename-path
+- [ ] session
+  - [x] session-get
+  - [x] session-set
+  - [x] session-stats
+  - [x] blocklist-update
+  - [ ] port-test
+  - [ ] session-close
+  - [ ] queue-move-top
+  - [ ] queue-move-up
+  - [ ] queue-move-down
+  - [ ] queue-move-bottom
+  - [ ] free-space
+  - [ ] group-set
+  - [ ] group-get
+
 TODO: Put a short description of the package here that helps potential users
 know whether this package might be useful for them.
 
