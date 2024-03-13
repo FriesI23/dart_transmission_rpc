@@ -21,6 +21,7 @@ enum TransmissionRpcResponseKey {
 abstract interface class TransmissionRpcResponse<T extends ResponseParam,
     V extends TransmissionRpcRequest> {
   static const unknownResult = "failed with unknown reason";
+  static const successResult = "success";
 
   V get request;
   String get result;
@@ -59,6 +60,9 @@ abstract interface class TransmissionRpcResponse<T extends ResponseParam,
     final arguments = rawArguments is JsonMap ? rawArguments : null;
     return arguments;
   }
+
+  static bool isSucceed(String? result) =>
+      result != null && result == successResult;
 }
 
 class _TransmissionRpcResponse<T extends ResponseParam,
@@ -80,5 +84,5 @@ class _TransmissionRpcResponse<T extends ResponseParam,
   });
 
   @override
-  bool isOk() => result == "success";
+  bool isOk() => TransmissionRpcResponse.isSucceed(result);
 }

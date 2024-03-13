@@ -26,7 +26,15 @@ void testSessionSet() async {
   print("after: ${result2.param?.utpEnabled}");
 }
 
-void main() {
+Future<void> testSessionStats() async {
+  final client = TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result = await client.sessionStats();
+  print(result.param);
+}
+
+void main() async {
   // testSessionGet();
-  testSessionSet();
+  // testSessionSet();
+  await testSessionStats();
 }

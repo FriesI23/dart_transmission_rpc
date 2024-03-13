@@ -10,6 +10,7 @@ import 'dart:typed_data';
 
 import 'apis/session_get.dart';
 import 'apis/session_set.dart';
+import 'apis/session_stats.dart';
 import 'exception.dart';
 import 'logging.dart';
 import 'method.dart';
@@ -19,10 +20,16 @@ import 'typedef.dart';
 import 'utils.dart';
 import 'version.dart';
 
+// session-get
 typedef SessionGetResponse = TransmissionRpcResponse<SessionGetResponseParam,
     TransmissionRpcRequest<SessionGetRequestParam>>;
+// session-set
 typedef SessionSetResponse = TransmissionRpcResponse<SessionSetResponseParam,
     TransmissionRpcRequest<SessionSetRequestParam>>;
+// session-stats
+typedef SessionStatsResponse = TransmissionRpcResponse<
+    SessionStatsResponseParam,
+    TransmissionRpcRequest<SessionStatsRequestParam>>;
 
 enum TransmissionRpcRetryReason { csrf }
 
@@ -41,6 +48,9 @@ abstract interface class TransmissionRpcClient {
   // Set sesion running stats
   Future<SessionSetResponse> sessionSet(SessionSetRequestArgs args,
       {RpcTag? tag, int? timeout});
+
+  // Get sssion statistics
+  Future<SessionStatsResponse> sessionStats({RpcTag? tag, int? timeout});
 
   Future<void> init();
   bool isInited();
@@ -227,7 +237,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     return httpResponse.transform(utf8.decoder).join();
   }
 
-  void preCheck(TransmissionRpcMethod method, RequestParam p,
+  void preCheck(TransmissionRpcMethod method, RequestParam? p,
       {required int? timeout}) {
     if (!isInited()) {
       throw const TransmissionCheckError("Client has not been initialized.");
@@ -237,7 +247,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
           "pre check failed, method: $method, reason: timeout $timeout <= 0");
     }
     try {
-      final reason = p.check();
+      final reason = p?.check();
       if (reason != null && reason.isNotEmpty) {
         log.warn("per check failed, method: $method, reason: $reason");
       }
@@ -269,7 +279,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     return TransmissionRpcResponse(
       request: request,
       result: rawResult.toString(),
-      param: rawParam is JsonMap
+      param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
           ? SessionGetResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
@@ -298,8 +308,32 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     return TransmissionRpcResponse(
       request: request,
       result: rawResult.toString(),
-      param: rawParam is JsonMap
+      param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
           ? SessionSetResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<SessionStatsResponse> sessionStats({RpcTag? tag, int? timeout}) {
+    preCheck(TransmissionRpcMethod.sessionStats, null, timeout: timeout);
+    return _sessionStats(tag: tag, timeout: timeout);
+  }
+
+  Future<SessionStatsResponse> _sessionStats(
+      {required RpcTag? tag, required int? timeout}) async {
+    final request = TransmissionRpcRequest<SessionStatsRequestParam>(
+        method: TransmissionRpcMethod.sessionStats, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    return TransmissionRpcResponse(
+      request: request,
+      result: rawResult.toString(),
+      param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
+          ? SessionStatsResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );

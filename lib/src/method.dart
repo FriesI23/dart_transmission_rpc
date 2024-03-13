@@ -5,7 +5,8 @@
 
 enum TransmissionRpcMethod {
   sessionSet(methodName: "session-set"),
-  sessionGet(methodName: "session-get");
+  sessionGet(methodName: "session-get"),
+  sessionStats(methodName: "session-stats");
 
   final String methodName;
 

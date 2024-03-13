@@ -13,10 +13,6 @@
     ".fvm",
   ],
   "dartImport.fixOnSave": true,
-  "java.configuration.updateBuildConfiguration": "automatic",
-  "java.project.resourceFilters": [
-    ".flutter"
-  ],
   "search.exclude": {
     "**/.fvm": true,
     "**/.flutter": true
