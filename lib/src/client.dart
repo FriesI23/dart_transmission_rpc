@@ -8,14 +8,16 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'model/blocklist_update.dart';
-import 'model/port_test.dart';
-import 'model/session_get.dart';
-import 'model/session_set.dart';
-import 'model/session_stats.dart';
 import 'exception.dart';
 import 'logging.dart';
 import 'method.dart';
+import 'model/blocklist_update.dart';
+import 'model/port_test.dart';
+import 'model/queue_move.dart';
+import 'model/session_get.dart';
+import 'model/session_set.dart';
+import 'model/session_stats.dart';
+import 'model/torrent.dart';
 import 'request.dart';
 import 'response.dart';
 import 'typedef.dart';
@@ -39,6 +41,10 @@ typedef BlocklistUpdateResponse = TransmissionRpcResponse<
 // port-test
 typedef PortTestResponse = TransmissionRpcResponse<PortTestResponseParam,
     TransmissionRpcRequest<PortTestReqeustParam>>;
+// queue-move-*
+typedef QueueMoveResponse<T extends QueueMoveRequestParam>
+    = TransmissionRpcResponse<QueueMoveResponseParam,
+        TransmissionRpcRequest<T>>;
 
 enum TransmissionRpcRetryReason { csrf }
 
@@ -66,6 +72,34 @@ abstract interface class TransmissionRpcClient {
 
   // Test to see if your incoming peer port is accessible.
   Future<PortTestResponse> portTest({RpcTag? tag, int? timeout});
+
+  // move torretns at top of queue
+  Future<QueueMoveResponse<QueueMoveTopReqeustParam>> queueMoveTop(
+    TorrentIds ids, {
+    RpcTag? tag,
+    int? timeout,
+  });
+
+  // move torrents up from queue
+  Future<QueueMoveResponse<QueueMoveUpReqeustParam>> queueMoveUp(
+    TorrentIds ids, {
+    RpcTag? tag,
+    int? timeout,
+  });
+
+  // move torrent down from queue
+  Future<QueueMoveResponse<QueueMoveDownReqeustParam>> queueMoveDown(
+    TorrentIds ids, {
+    RpcTag? tag,
+    int? timeout,
+  });
+
+  // move torrent at bottom of queue
+  Future<QueueMoveResponse<QueueMoveBottomReqeustParam>> queueMoveBottom(
+    TorrentIds ids, {
+    RpcTag? tag,
+    int? timeout,
+  });
 
   Future<void> init();
   bool isInited();
@@ -398,6 +432,74 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: result,
       param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
           ? PortTestResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<QueueMoveResponse<QueueMoveBottomReqeustParam>> queueMoveBottom(
+    TorrentIds ids, {
+    RpcTag? tag,
+    int? timeout,
+  }) {
+    const method = TransmissionRpcMethod.queueMoveBottom;
+    final p = QueueMoveBottomReqeustParam(ids: ids);
+    preCheck(method, p, timeout: timeout);
+    return _queueMove(method, p, tag: tag, timeout: timeout);
+  }
+
+  @override
+  Future<QueueMoveResponse<QueueMoveDownReqeustParam>> queueMoveDown(
+    TorrentIds ids, {
+    RpcTag? tag,
+    int? timeout,
+  }) {
+    const method = TransmissionRpcMethod.queueMoveDown;
+    final p = QueueMoveDownReqeustParam(ids: ids);
+    preCheck(method, p, timeout: timeout);
+    return _queueMove(method, p, tag: tag, timeout: timeout);
+  }
+
+  @override
+  Future<QueueMoveResponse<QueueMoveTopReqeustParam>> queueMoveTop(
+    TorrentIds ids, {
+    RpcTag? tag,
+    int? timeout,
+  }) {
+    const method = TransmissionRpcMethod.queueMoveTop;
+    final p = QueueMoveTopReqeustParam(ids: ids);
+    preCheck(method, p, timeout: timeout);
+    return _queueMove(method, p, tag: tag, timeout: timeout);
+  }
+
+  @override
+  Future<QueueMoveResponse<QueueMoveUpReqeustParam>> queueMoveUp(
+    TorrentIds ids, {
+    RpcTag? tag,
+    int? timeout,
+  }) {
+    const method = TransmissionRpcMethod.queueMoveUp;
+    final p = QueueMoveUpReqeustParam(ids: ids);
+    preCheck(method, p, timeout: timeout);
+    return _queueMove(method, p, tag: tag, timeout: timeout);
+  }
+
+  Future<QueueMoveResponse<T>> _queueMove<T extends QueueMoveRequestParam>(
+      TransmissionRpcMethod method, T p,
+      {required RpcTag? tag, required int? timeout}) async {
+    final request =
+        TransmissionRpcRequest<T>(param: p, method: method, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    final result = rawResult.toString();
+    return TransmissionRpcResponse(
+      request: request,
+      result: result,
+      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
+          ? QueueMoveResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );

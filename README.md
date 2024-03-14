@@ -30,10 +30,10 @@ and the Flutter guide for
   - [x] blocklist-update
   - [x] port-test
   - [ ] session-close
-  - [ ] queue-move-top
-  - [ ] queue-move-up
-  - [ ] queue-move-down
-  - [ ] queue-move-bottom
+  - [x] queue-move-top
+  - [x] queue-move-up
+  - [x] queue-move-down
+  - [x] queue-move-bottom
   - [ ] free-space
   - [ ] group-set
   - [ ] group-get
