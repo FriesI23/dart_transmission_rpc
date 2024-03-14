@@ -80,6 +80,17 @@ Future<void> testFreeSpace() async {
   print(result.param?.totalSize);
 }
 
+Future<void> testGroupGet() async {
+  final client = TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result1 = await client.groupGet(null);
+  print(result1.result);
+  print(result1.param?.group);
+  final result2 = await client.groupGet(["test2"]);
+  print(result2.result);
+  print(result2.param?.group);
+}
+
 void main() async {
   // testSessionGet();
   // testSessionSet();
@@ -87,5 +98,6 @@ void main() async {
   // await testBlocklistUpdate();
   // await testPortTest();
   // await testQueueMove();
-  await testFreeSpace();
+  // await testFreeSpace();
+  // await testGroupGet();
 }

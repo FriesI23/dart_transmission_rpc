@@ -13,6 +13,7 @@ import 'logging.dart';
 import 'method.dart';
 import 'model/blocklist_update.dart';
 import 'model/free_space.dart';
+import 'model/group_get.dart';
 import 'model/port_test.dart';
 import 'model/queue_move.dart';
 import 'model/session_get.dart';
@@ -24,31 +25,6 @@ import 'response.dart';
 import 'typedef.dart';
 import 'utils.dart';
 import 'version.dart';
-
-// session-get
-typedef SessionGetResponse = TransmissionRpcResponse<SessionGetResponseParam,
-    TransmissionRpcRequest<SessionGetRequestParam>>;
-// session-set
-typedef SessionSetResponse = TransmissionRpcResponse<SessionSetResponseParam,
-    TransmissionRpcRequest<SessionSetRequestParam>>;
-// session-stats
-typedef SessionStatsResponse = TransmissionRpcResponse<
-    SessionStatsResponseParam,
-    TransmissionRpcRequest<SessionStatsRequestParam>>;
-// blocklist-update
-typedef BlocklistUpdateResponse = TransmissionRpcResponse<
-    BlocklistUpdateResponseParam,
-    TransmissionRpcRequest<BlocklistUpdateRequestParam>>;
-// port-test
-typedef PortTestResponse = TransmissionRpcResponse<PortTestResponseParam,
-    TransmissionRpcRequest<PortTestReqeustParam>>;
-// queue-move-*
-typedef QueueMoveResponse<T extends QueueMoveRequestParam>
-    = TransmissionRpcResponse<QueueMoveResponseParam,
-        TransmissionRpcRequest<T>>;
-// free-space
-typedef FreeSpaceResponse = TransmissionRpcResponse<FreeSpaceResponseParam,
-    TransmissionRpcRequest<FreeSpaceRequestParam>>;
 
 enum TransmissionRpcRetryReason { csrf }
 
@@ -107,6 +83,12 @@ abstract interface class TransmissionRpcClient {
 
   // Tests how much free space is available in a client-specified folder
   Future<FreeSpaceResponse> freeSpace(String path, {RpcTag? tag, int? timeout});
+
+  // Get bandwidth group
+  Future<GroupGetResponse> groupGet(List<String>? group,
+      {RpcTag? tag, int? timeout});
+
+  // Set bandwith group
 
   Future<void> init();
   bool isInited();
@@ -427,7 +409,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
 
   Future<PortTestResponse> _portTest(
       {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest<PortTestReqeustParam>(
+    final request = TransmissionRpcRequest<PorTestRequestParam>(
         method: TransmissionRpcMethod.portTest, tag: tag);
     final rawData = await doRequest(request, timeout: timeout);
     final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
@@ -537,6 +519,36 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: result,
       param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
           ? FreeSpaceResponseParam.fromJson(rawParam, v: v)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<GroupGetResponse> groupGet(List<String>? group,
+      {RpcTag? tag, int? timeout}) {
+    final p = GroupGetRequestParam.build(
+      version: serverRpcVersion,
+      group: group,
+    );
+    preCheck(TransmissionRpcMethod.groupGet, p, timeout: timeout);
+    return _groupGet(p, tag: tag, timeout: timeout);
+  }
+
+  Future<GroupGetResponse> _groupGet(GroupGetRequestParam p,
+      {required RpcTag? tag, required int? timeout}) async {
+    final request = TransmissionRpcRequest(
+        param: p, method: TransmissionRpcMethod.groupGet, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    final result = rawResult.toString();
+    return TransmissionRpcResponse(
+      request: request,
+      result: result,
+      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
+          ? GroupGetResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );

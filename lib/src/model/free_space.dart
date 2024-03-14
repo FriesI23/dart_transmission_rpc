@@ -27,11 +27,11 @@ abstract class FreeSpaceRequestParam implements RequestParam {
   factory FreeSpaceRequestParam.build(
       {required ServerRpcVersion? version, required String path}) {
     if (version == null) {
-      return _FreeSpaceRequestParam(path);
+      return const _FreeSpaceRequestParam();
     } else if (version.checkApiVersionValidate(v: 15)) {
       return _FreeSpaceRequstParamRpc15(path);
     } else if (version.checkApiVersionValidate()) {
-      return _FreeSpaceRequestParam(path);
+      return const _FreeSpaceRequestParam();
     } else {
       throw TransmissionVersionError("Incompatible API version on free-space",
           version.rpcVersion, version.minRpcVersion);
@@ -40,7 +40,7 @@ abstract class FreeSpaceRequestParam implements RequestParam {
 }
 
 class _FreeSpaceRequestParam extends FreeSpaceRequestParam {
-  const _FreeSpaceRequestParam(super.path);
+  const _FreeSpaceRequestParam() : super("");
 
   @override
   String? check() => "free-space need rpc verion >= 15";

@@ -16,7 +16,7 @@ enum PortTestArgument {
 }
 
 // TODO: add ipProtocol support, which added after rpc-version 18.
-class PortTestReqeustParam implements RequestParam {
+class PorTestRequestParam implements RequestParam {
   @override
   String? check() => null;
 
