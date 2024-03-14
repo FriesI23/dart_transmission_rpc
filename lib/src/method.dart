@@ -14,7 +14,8 @@ enum TransmissionRpcMethod {
   queueMoveDown(methodName: "queue-move-down"),
   queueMoveBottom(methodName: "queue-move-bottom"),
   freeSpace(methodName: "free-space"),
-  groupGet(methodName: "group-get");
+  groupGet(methodName: "group-get"),
+  groupSet(methodName: "group-set");
 
   final String methodName;
 

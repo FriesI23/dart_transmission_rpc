@@ -214,7 +214,7 @@ mixin SessionSetRequestArgsDefine {
   bool? get utpEnabled;
 }
 
-class SessionSetRequestArgs implements SessionSetRequestArgsDefine {
+class SessionSetRequestArgs with SessionSetRequestArgsDefine {
   @override
   final num? altSpeedDown;
   @override
@@ -365,156 +365,158 @@ class SessionSetRequestArgs implements SessionSetRequestArgsDefine {
 }
 
 abstract class SessionSetRequestParam
-    implements RequestParam, SessionSetRequestArgsDefine {
-  final SessionSetRequestArgs args;
+    with SessionSetRequestArgsDefine
+    implements RequestParam {
+  final SessionSetRequestArgs _args;
 
   @override
-  num? get altSpeedDown => args.altSpeedDown;
+  num? get altSpeedDown => _args.altSpeedDown;
 
   @override
-  bool? get altSpeedEnabled => args.altSpeedEnabled;
+  bool? get altSpeedEnabled => _args.altSpeedEnabled;
 
   @override
-  num? get altSpeedTimeBegin => args.altSpeedTimeBegin;
+  num? get altSpeedTimeBegin => _args.altSpeedTimeBegin;
 
   @override
-  num? get altSpeedTimeDay => args.altSpeedTimeDay;
+  num? get altSpeedTimeDay => _args.altSpeedTimeDay;
 
   @override
-  bool? get altSpeedTimeEnabled => args.altSpeedTimeEnabled;
+  bool? get altSpeedTimeEnabled => _args.altSpeedTimeEnabled;
 
   @override
-  num? get altSpeedTimeEnd => args.altSpeedTimeEnd;
+  num? get altSpeedTimeEnd => _args.altSpeedTimeEnd;
 
   @override
-  num? get altSpeedUp => args.altSpeedUp;
+  num? get altSpeedUp => _args.altSpeedUp;
 
   @override
-  bool? get blocklistEnabled => args.blocklistEnabled;
+  bool? get blocklistEnabled => _args.blocklistEnabled;
 
   @override
-  String? get blocklistUrl => args.blocklistUrl;
+  String? get blocklistUrl => _args.blocklistUrl;
 
   @override
-  num? get cacheSizeMb => args.cacheSizeMb;
+  num? get cacheSizeMb => _args.cacheSizeMb;
 
   @override
-  String? get defaultTrackers => args.defaultTrackers;
+  String? get defaultTrackers => _args.defaultTrackers;
 
   @override
-  bool? get dhtEnabled => args.dhtEnabled;
+  bool? get dhtEnabled => _args.dhtEnabled;
 
   @override
-  String? get downloadDir => args.downloadDir;
+  String? get downloadDir => _args.downloadDir;
 
   @override
-  num? get downloadDirFreeSpace => args.downloadDirFreeSpace;
+  num? get downloadDirFreeSpace => _args.downloadDirFreeSpace;
 
   @override
-  bool? get downloadQueueEnabled => args.downloadQueueEnabled;
+  bool? get downloadQueueEnabled => _args.downloadQueueEnabled;
 
   @override
-  num? get downloadQueueSize => args.downloadQueueSize;
+  num? get downloadQueueSize => _args.downloadQueueSize;
 
   @override
-  String? get encryption => args.encryption;
+  String? get encryption => _args.encryption;
 
   @override
-  num? get idleSeedingLimit => args.idleSeedingLimit;
+  num? get idleSeedingLimit => _args.idleSeedingLimit;
 
   @override
-  bool? get idleSeedingLimitEnabled => args.idleSeedingLimitEnabled;
+  bool? get idleSeedingLimitEnabled => _args.idleSeedingLimitEnabled;
 
   @override
-  String? get incompleteDir => args.incompleteDir;
+  String? get incompleteDir => _args.incompleteDir;
 
   @override
-  bool? get incompleteDirEnabled => args.incompleteDirEnabled;
+  bool? get incompleteDirEnabled => _args.incompleteDirEnabled;
 
   @override
-  bool? get lpdEnabled => args.lpdEnabled;
+  bool? get lpdEnabled => _args.lpdEnabled;
 
   @override
-  num? get peerLimitGlobal => args.peerLimitGlobal;
+  num? get peerLimitGlobal => _args.peerLimitGlobal;
 
   @override
-  num? get peerLimitPerTorrent => args.peerLimitPerTorrent;
+  num? get peerLimitPerTorrent => _args.peerLimitPerTorrent;
 
   @override
-  num? get peerPort => args.peerPort;
+  num? get peerPort => _args.peerPort;
 
   @override
-  bool? get peerPortRandomOnStart => args.peerPortRandomOnStart;
+  bool? get peerPortRandomOnStart => _args.peerPortRandomOnStart;
 
   @override
-  bool? get pexEnabled => args.pexEnabled;
+  bool? get pexEnabled => _args.pexEnabled;
 
   @override
-  bool? get portForwardingEnabled => args.portForwardingEnabled;
+  bool? get portForwardingEnabled => _args.portForwardingEnabled;
 
   @override
-  bool? get queueStalledEnabled => args.queueStalledEnabled;
+  bool? get queueStalledEnabled => _args.queueStalledEnabled;
 
   @override
-  num? get queueStalledMinutes => args.queueStalledMinutes;
+  num? get queueStalledMinutes => _args.queueStalledMinutes;
 
   @override
-  bool? get renamePartialFiles => args.renamePartialFiles;
+  bool? get renamePartialFiles => _args.renamePartialFiles;
 
   @override
-  bool? get scriptTorrentAddedEnabled => args.scriptTorrentAddedEnabled;
+  bool? get scriptTorrentAddedEnabled => _args.scriptTorrentAddedEnabled;
 
   @override
-  String? get scriptTorrentAddedFilename => args.scriptTorrentAddedFilename;
+  String? get scriptTorrentAddedFilename => _args.scriptTorrentAddedFilename;
 
   @override
-  bool? get scriptTorrentDoneEnabled => args.scriptTorrentDoneEnabled;
+  bool? get scriptTorrentDoneEnabled => _args.scriptTorrentDoneEnabled;
 
   @override
-  String? get scriptTorrentDoneFilename => args.scriptTorrentDoneFilename;
+  String? get scriptTorrentDoneFilename => _args.scriptTorrentDoneFilename;
 
   @override
   bool? get scriptTorrentDoneSeedingEnabled =>
-      args.scriptTorrentDoneSeedingEnabled;
+      _args.scriptTorrentDoneSeedingEnabled;
 
   @override
   String? get scriptTorrentDoneSeedingFilename =>
-      args.scriptTorrentDoneSeedingFilename;
+      _args.scriptTorrentDoneSeedingFilename;
 
   @override
-  bool? get seedQueueEnabled => args.seedQueueEnabled;
+  bool? get seedQueueEnabled => _args.seedQueueEnabled;
 
   @override
-  num? get seedQueueSize => args.seedQueueSize;
+  num? get seedQueueSize => _args.seedQueueSize;
 
   @override
-  num? get seedRatioLimit => args.seedRatioLimit;
+  num? get seedRatioLimit => _args.seedRatioLimit;
 
   @override
-  bool? get seedRatioLimited => args.seedRatioLimited;
+  bool? get seedRatioLimited => _args.seedRatioLimited;
 
   @override
-  num? get speedLimitDown => args.speedLimitDown;
+  num? get speedLimitDown => _args.speedLimitDown;
 
   @override
-  bool? get speedLimitDownEnabled => args.speedLimitDownEnabled;
+  bool? get speedLimitDownEnabled => _args.speedLimitDownEnabled;
 
   @override
-  num? get speedLimitUp => args.speedLimitUp;
+  num? get speedLimitUp => _args.speedLimitUp;
 
   @override
-  bool? get speedLimitUpEnabled => args.speedLimitUpEnabled;
+  bool? get speedLimitUpEnabled => _args.speedLimitUpEnabled;
 
   @override
-  bool? get startAddedTorrents => args.startAddedTorrents;
+  bool? get startAddedTorrents => _args.startAddedTorrents;
 
   @override
-  bool? get trashOriginalTorrentFiles => args.trashOriginalTorrentFiles;
+  bool? get trashOriginalTorrentFiles => _args.trashOriginalTorrentFiles;
 
   @override
-  bool? get utpEnabled => args.utpEnabled;
+  bool? get utpEnabled => _args.utpEnabled;
 
-  const SessionSetRequestParam({required this.args});
+  const SessionSetRequestParam({required SessionSetRequestArgs args})
+      : _args = args;
 
   factory SessionSetRequestParam.build({
     ServerRpcVersion? version,

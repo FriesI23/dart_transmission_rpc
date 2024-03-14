@@ -23,20 +23,20 @@ and the Flutter guide for
   - [ ] torrent-remove
   - [ ] torrent-set-location
   - [ ] torrent-rename-path
-- [ ] session
+- [x] session
   - [x] session-get
   - [x] session-set
   - [x] session-stats
   - [x] blocklist-update
   - [x] port-test
-  - [ ] session-close
+  - [ ] ~session-close~
   - [x] queue-move-top
   - [x] queue-move-up
   - [x] queue-move-down
   - [x] queue-move-bottom
-  - [ ] free-space
-  - [ ] group-set
-  - [ ] group-get
+  - [x] free-space
+  - [x] group-set
+  - [x] group-get
 
 TODO: Put a short description of the package here that helps potential users
 know whether this package might be useful for them.

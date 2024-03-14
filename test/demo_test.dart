@@ -5,6 +5,8 @@
 
 // ignore_for_file: avoid_print
 
+import 'package:flutter_transmission_rpc/src/model/group_get.dart';
+import 'package:flutter_transmission_rpc/src/model/group_set.dart';
 import 'package:flutter_transmission_rpc/src/model/session_get.dart';
 import 'package:flutter_transmission_rpc/src/model/session_set.dart';
 import 'package:flutter_transmission_rpc/src/client.dart';
@@ -23,7 +25,7 @@ void testSessionSet() async {
   final result1 = await client.sessionGet([SessionGetArgument.utpEnabled]);
   print("before: ${result1.param?.utpEnabled}");
   final result =
-      await client.sessionSet(SessionSetRequestArgs(utpEnabled: true));
+      await client.sessionSet(const SessionSetRequestArgs(utpEnabled: true));
   print("output: ${result.result}");
   final result2 = await client.sessionGet([SessionGetArgument.utpEnabled]);
   print("after: ${result2.param?.utpEnabled}");
@@ -91,6 +93,30 @@ Future<void> testGroupGet() async {
   print(result2.param?.group);
 }
 
+Future<void> testGroupSet() async {
+  final client = TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result = await client.groupSet(const GroupSetRequestArgs(
+      name: "test2",
+      speedLimitDownEnabled: true,
+      speedLimitDown: 1000,
+      speedLimitUp: 2000));
+  print(result.result);
+  print(result.param);
+  final result2 = await client.groupGet(["test2"]);
+  print(result2.result);
+  for (var p in result2.param?.group ?? <GroupDesc>[]) {
+    if (p.name == 'test2') {
+      print(p.name);
+      print(p.honorsSessionLimits);
+      print(p.speedLimitDownEnabled);
+      print(p.speedLimitDown);
+      print(p.speedLimitUpEnabled);
+      print(p.speedLimitUp);
+    }
+  }
+}
+
 void main() async {
   // testSessionGet();
   // testSessionSet();
@@ -100,4 +126,5 @@ void main() async {
   // await testQueueMove();
   // await testFreeSpace();
   // await testGroupGet();
+  // await testGroupSet();
 }

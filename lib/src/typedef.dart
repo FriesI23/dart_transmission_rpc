@@ -6,6 +6,7 @@
 import 'model/blocklist_update.dart';
 import 'model/free_space.dart';
 import 'model/group_get.dart';
+import 'model/group_set.dart';
 import 'model/port_test.dart';
 import 'model/queue_move.dart';
 import 'model/session_get.dart';
@@ -44,3 +45,6 @@ typedef FreeSpaceResponse
 // group-get
 typedef GroupGetResponse
     = _ApiResponse<GroupGetRequestParam, GroupGetResponseParam>;
+// group-set
+typedef GroupSetResponse
+    = _ApiResponse<GroupSetRequestParam, GroupSetResponseParam>;

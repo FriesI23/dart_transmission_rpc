@@ -14,6 +14,7 @@ import 'method.dart';
 import 'model/blocklist_update.dart';
 import 'model/free_space.dart';
 import 'model/group_get.dart';
+import 'model/group_set.dart';
 import 'model/port_test.dart';
 import 'model/queue_move.dart';
 import 'model/session_get.dart';
@@ -89,6 +90,8 @@ abstract interface class TransmissionRpcClient {
       {RpcTag? tag, int? timeout});
 
   // Set bandwith group
+  Future<GroupSetResponse> groupSet(GroupSetRequestArgs args,
+      {RpcTag? tag, int? timeout});
 
   Future<void> init();
   bool isInited();
@@ -549,6 +552,33 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: result,
       param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
           ? GroupGetResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<GroupSetResponse> groupSet(GroupSetRequestArgs args,
+      {RpcTag? tag, int? timeout}) {
+    final p = GroupSetRequestParam.build(version: serverRpcVersion, args: args);
+    preCheck(TransmissionRpcMethod.groupSet, p, timeout: timeout);
+    return _groupSet(p, tag: tag, timeout: timeout);
+  }
+
+  Future<GroupSetResponse> _groupSet(GroupSetRequestParam p,
+      {required RpcTag? tag, required int? timeout}) async {
+    final request = TransmissionRpcRequest(
+        param: p, method: TransmissionRpcMethod.groupSet, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    final result = rawResult.toString();
+    return TransmissionRpcResponse(
+      request: request,
+      result: result,
+      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
+          ? GroupSetResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );

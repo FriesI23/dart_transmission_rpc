@@ -3,6 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
@@ -33,8 +34,11 @@ abstract class GroupGetRequestParam implements RequestParam {
       return const _GroupGetRequestParam();
     } else if (version.checkApiVersionValidate(v: 17)) {
       return _GroupGetRequestParamRpc17(group);
-    } else {
+    } else if (version.checkApiVersionValidate()) {
       return const _GroupGetRequestParam();
+    } else {
+      throw TransmissionVersionError("Incompatible API version on group-get",
+          version.rpcVersion, version.minRpcVersion);
     }
   }
 }
