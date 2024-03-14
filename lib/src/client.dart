@@ -12,6 +12,7 @@ import 'exception.dart';
 import 'logging.dart';
 import 'method.dart';
 import 'model/blocklist_update.dart';
+import 'model/free_space.dart';
 import 'model/port_test.dart';
 import 'model/queue_move.dart';
 import 'model/session_get.dart';
@@ -45,6 +46,9 @@ typedef PortTestResponse = TransmissionRpcResponse<PortTestResponseParam,
 typedef QueueMoveResponse<T extends QueueMoveRequestParam>
     = TransmissionRpcResponse<QueueMoveResponseParam,
         TransmissionRpcRequest<T>>;
+// free-space
+typedef FreeSpaceResponse = TransmissionRpcResponse<FreeSpaceResponseParam,
+    TransmissionRpcRequest<FreeSpaceRequestParam>>;
 
 enum TransmissionRpcRetryReason { csrf }
 
@@ -73,33 +77,36 @@ abstract interface class TransmissionRpcClient {
   // Test to see if your incoming peer port is accessible.
   Future<PortTestResponse> portTest({RpcTag? tag, int? timeout});
 
-  // move torretns at top of queue
+  // Move torretns at top of queue
   Future<QueueMoveResponse<QueueMoveTopReqeustParam>> queueMoveTop(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // move torrents up from queue
+  // Move torrents up from queue
   Future<QueueMoveResponse<QueueMoveUpReqeustParam>> queueMoveUp(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // move torrent down from queue
+  // Move torrent down from queue
   Future<QueueMoveResponse<QueueMoveDownReqeustParam>> queueMoveDown(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // move torrent at bottom of queue
+  // Move torrent at bottom of queue
   Future<QueueMoveResponse<QueueMoveBottomReqeustParam>> queueMoveBottom(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
+
+  // Tests how much free space is available in a client-specified folder
+  Future<FreeSpaceResponse> freeSpace(String path, {RpcTag? tag, int? timeout});
 
   Future<void> init();
   bool isInited();
@@ -500,6 +507,36 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: result,
       param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
           ? QueueMoveResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<FreeSpaceResponse> freeSpace(String path,
+      {RpcTag? tag, int? timeout}) {
+    final v = serverRpcVersion;
+    final p = FreeSpaceRequestParam.build(path: path, version: v);
+    preCheck(TransmissionRpcMethod.freeSpace, p, timeout: timeout);
+    return _freeSpace(p, tag: tag, timeout: timeout, v: v);
+  }
+
+  Future<FreeSpaceResponse> _freeSpace(FreeSpaceRequestParam p,
+      {required RpcTag? tag,
+      required int? timeout,
+      required ServerRpcVersion? v}) async {
+    final request = TransmissionRpcRequest(
+        param: p, method: TransmissionRpcMethod.freeSpace, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    final result = rawResult.toString();
+    return TransmissionRpcResponse(
+      request: request,
+      result: result,
+      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
+          ? FreeSpaceResponseParam.fromJson(rawParam, v: v)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );

@@ -3,6 +3,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// ignore_for_file: avoid_print
+
 import 'package:flutter_transmission_rpc/src/model/session_get.dart';
 import 'package:flutter_transmission_rpc/src/model/session_set.dart';
 import 'package:flutter_transmission_rpc/src/client.dart';
@@ -68,11 +70,22 @@ Future<void> testQueueMove() async {
   print(result4.request.method);
 }
 
+Future<void> testFreeSpace() async {
+  final client = TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result = await client.freeSpace("/config");
+  print(result.result);
+  print(result.param?.path);
+  print(result.param?.sizeBytes);
+  print(result.param?.totalSize);
+}
+
 void main() async {
   // testSessionGet();
   // testSessionSet();
   // await testSessionStats();
   // await testBlocklistUpdate();
   // await testPortTest();
-  await testQueueMove();
+  // await testQueueMove();
+  await testFreeSpace();
 }
