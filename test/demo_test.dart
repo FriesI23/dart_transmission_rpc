@@ -3,8 +3,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import 'package:flutter_transmission_rpc/src/apis/session_get.dart';
-import 'package:flutter_transmission_rpc/src/apis/session_set.dart';
+import 'package:flutter_transmission_rpc/src/model/session_get.dart';
+import 'package:flutter_transmission_rpc/src/model/session_set.dart';
 import 'package:flutter_transmission_rpc/src/client.dart';
 
 void testSessionGet() async {
@@ -55,5 +55,5 @@ void main() async {
   // testSessionSet();
   // await testSessionStats();
   // await testBlocklistUpdate();
-  await testPortTest();
+  // await testPortTest();
 }

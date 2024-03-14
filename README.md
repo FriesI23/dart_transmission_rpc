@@ -28,7 +28,7 @@ and the Flutter guide for
   - [x] session-set
   - [x] session-stats
   - [x] blocklist-update
-  - [ ] port-test
+  - [x] port-test
   - [ ] session-close
   - [ ] queue-move-top
   - [ ] queue-move-up

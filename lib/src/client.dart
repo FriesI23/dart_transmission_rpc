@@ -8,11 +8,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'apis/blocklist_update.dart';
-import 'apis/port_test.dart';
-import 'apis/session_get.dart';
-import 'apis/session_set.dart';
-import 'apis/session_stats.dart';
+import 'model/blocklist_update.dart';
+import 'model/port_test.dart';
+import 'model/session_get.dart';
+import 'model/session_set.dart';
+import 'model/session_stats.dart';
 import 'exception.dart';
 import 'logging.dart';
 import 'method.dart';

@@ -6,7 +6,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_transmission_rpc/src/apis/session_get.dart';
+import 'package:flutter_transmission_rpc/src/model/session_get.dart';
 import 'package:flutter_transmission_rpc/src/client.dart';
 import 'package:flutter_transmission_rpc/src/exception.dart';
 import 'package:flutter_transmission_rpc/src/response.dart';
