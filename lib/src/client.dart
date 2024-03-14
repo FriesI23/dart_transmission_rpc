@@ -9,6 +9,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'apis/blocklist_update.dart';
+import 'apis/port_test.dart';
 import 'apis/session_get.dart';
 import 'apis/session_set.dart';
 import 'apis/session_stats.dart';
@@ -35,6 +36,9 @@ typedef SessionStatsResponse = TransmissionRpcResponse<
 typedef BlocklistUpdateResponse = TransmissionRpcResponse<
     BlocklistUpdateResponseParam,
     TransmissionRpcRequest<BlocklistUpdateRequestParam>>;
+// port-test
+typedef PortTestResponse = TransmissionRpcResponse<PortTestResponseParam,
+    TransmissionRpcRequest<PortTestReqeustParam>>;
 
 enum TransmissionRpcRetryReason { csrf }
 
@@ -59,6 +63,9 @@ abstract interface class TransmissionRpcClient {
 
   // Update blocklist (if setting blocklist-url)
   Future<BlocklistUpdateResponse> blocklistUpdate({RpcTag? tag, int? timeout});
+
+  // Test to see if your incoming peer port is accessible.
+  Future<PortTestResponse> portTest({RpcTag? tag, int? timeout});
 
   Future<void> init();
   bool isInited();
@@ -366,6 +373,31 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: rawResult.toString(),
       param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
           ? BlocklistUpdateResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<PortTestResponse> portTest({RpcTag? tag, int? timeout}) {
+    preCheck(TransmissionRpcMethod.portTest, null, timeout: timeout);
+    return _portTest(tag: tag, timeout: timeout);
+  }
+
+  Future<PortTestResponse> _portTest(
+      {required RpcTag? tag, required int? timeout}) async {
+    final request = TransmissionRpcRequest<PortTestReqeustParam>(
+        method: TransmissionRpcMethod.portTest, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    final result = rawResult.toString();
+    return TransmissionRpcResponse(
+      request: request,
+      result: result,
+      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
+          ? PortTestResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );

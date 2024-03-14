@@ -7,7 +7,8 @@ enum TransmissionRpcMethod {
   sessionSet(methodName: "session-set"),
   sessionGet(methodName: "session-get"),
   sessionStats(methodName: "session-stats"),
-  blocklistUpdate(methodName: "blocklist-update");
+  blocklistUpdate(methodName: "blocklist-update"),
+  portTest(methodName: "port-test");
 
   final String methodName;
 

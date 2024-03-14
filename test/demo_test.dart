@@ -42,9 +42,18 @@ Future<void> testBlocklistUpdate() async {
   print(result.isOk());
 }
 
+Future<void> testPortTest() async {
+  final client = TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result = await client.portTest();
+  print(result.result);
+  print(result.param?.portIsOpen);
+}
+
 void main() async {
   // testSessionGet();
   // testSessionSet();
   // await testSessionStats();
-  await testBlocklistUpdate();
+  // await testBlocklistUpdate();
+  await testPortTest();
 }
