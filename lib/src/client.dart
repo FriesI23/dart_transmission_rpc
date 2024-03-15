@@ -179,6 +179,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
 
   String _sessionId = defaultSessionId;
   bool _inited = false;
+  Future? _initIsWorking;
 
   _TransmissionRpcClient({
     required this.url,
@@ -204,6 +205,19 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
 
   @override
   Future<void> init() async {
+    if (isInited()) {
+      throw const TransmissionError("don't repeated init");
+    }
+    if (_initIsWorking != null) {
+      log.info("already in init progress, waiting complete...",
+          args: [_sessionId, _inited]);
+      await _initIsWorking;
+      return;
+    }
+
+    final completer = Completer();
+    _initIsWorking = completer.future;
+
     final response = await _sessionGet(
         SessionGetRequestParam.build(fields: const [
           SessionGetArgument.rpcVersion,
@@ -211,21 +225,28 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
         ]),
         tag: null,
         timeout: null);
+
+    completer.complete();
+    _initIsWorking = null;
+
     if (!response.isOk() ||
         response.param?.rpcVersion == null ||
         response.param?.rpcVersionMinimum == null) {
       throw TransmissionError("init client failed, reason: ${response.result}");
     }
-    _serverRpcVersion = ServerRpcVersion.build(
+    final serverRpcVersion = ServerRpcVersion.build(
       response.param!.rpcVersion!,
       response.param!.rpcVersionMinimum!,
     );
-    if (!_serverRpcVersion.isValidateServerVersion()) {
+    if (!serverRpcVersion.isValidateServerVersion()) {
       throw TransmissionVersionError("init server check failed",
-          _serverRpcVersion.rpcVersion, _serverRpcVersion.minRpcVersion);
+          serverRpcVersion.rpcVersion, serverRpcVersion.minRpcVersion);
     }
     // init completed
+    _serverRpcVersion = serverRpcVersion;
     _inited = true;
+    log.debug("init complete",
+        args: [_sessionId, _serverRpcVersion, _initIsWorking]);
   }
 
   @override
@@ -239,8 +260,10 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       {int? timeout}) async {
     final payload = jsonEncode(request.toRpcJson());
     final body = utf8.encode(payload);
+    log.debug("doReqeust", args: [request.hashCode, _sessionId, payload]);
     final resultText =
         await _doRequest(body, Duration(milliseconds: timeout ?? this.timeout));
+    log.debug("on doReqeust", args: [request.hashCode, _sessionId, resultText]);
     final rawText = jsonDecode(resultText);
     return rawText;
   }
@@ -287,6 +310,8 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       stopWatch.stop();
     }
 
+    log.debug("on http request complete",
+        args: [_sessionId, httpResponse.statusCode, httpRequest.uri]);
     _sessionId = httpResponse.headers.value(sesionIdHeaderKey) ?? _sessionId;
 
     final httpCode = httpResponse.statusCode;
@@ -306,6 +331,8 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
                 ? usedTime + stopWatch.elapsed
                 : usedTime;
         retryReasonList.add(TransmissionRpcRetryReason.csrf);
+        log.info("409 resend reqeust",
+            args: [_sessionId, retryReasonList, httpRequest.uri]);
         return _doRequest(body, timeout,
             usedTime: newUseTime,
             retryCount: newRetryCount,

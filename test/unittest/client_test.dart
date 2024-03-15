@@ -82,6 +82,8 @@ void testTransmissionRpcClientInit() =>
         httpRequest = MockHttpClientRequest();
         httpResponse = MockHttpClientResponse();
         when(httpClient!.postUrl(any)).thenAnswer((invo) {
+          when(httpRequest!.uri).thenAnswer(
+              (_) => Uri.dataFromString("http://localhost:90901/rpc"));
           when(httpRequest!.headers).thenReturn(httpHeaders);
           when(httpHeaders.value("X-Transmission-Session-Id")).thenReturn("0");
           when(httpRequest!.close())
@@ -115,43 +117,48 @@ void testTransmissionRpcClientInit() =>
           createHttpClient: (_) => httpClient!,
         );
       });
-      test("version failed", () {
+      test("version failed: rpc version to low", () {
         HttpOverrides.runZoned(
           () async {
-            for (var testcase in [
-              [
-                {
-                  TransmissionRpcResponseKey.result.keyName: "success",
-                  TransmissionRpcResponseKey.arguments.keyName: {
-                    SessionGetArgument.rpcVersion.argName:
-                        kMinimumSupportRpcVersion - 1,
-                    SessionGetArgument.rpcVersionMinimum.argName: 1,
-                  },
+            when(httpResponse!.transform(utf8.decoder)).thenAnswer((_) {
+              return Stream.value(jsonEncode({
+                TransmissionRpcResponseKey.result.keyName: "success",
+                TransmissionRpcResponseKey.arguments.keyName: {
+                  SessionGetArgument.rpcVersion.argName:
+                      kMinimumSupportRpcVersion - 1,
+                  SessionGetArgument.rpcVersionMinimum.argName: 1,
                 },
-                (e) => e is TransmissionVersionError,
-                {
-                  TransmissionRpcResponseKey.result.keyName: "success",
-                  TransmissionRpcResponseKey.arguments.keyName: {
-                    SessionGetArgument.rpcVersion.argName:
-                        kMinimumSupportRpcVersion + 1,
-                    SessionGetArgument.rpcVersionMinimum.argName: -1,
-                  },
-                },
-                (e) => e is AssertionError,
-              ],
-            ]) {
-              when(httpResponse!.transform(utf8.decoder)).thenAnswer((_) {
-                return Stream.value(jsonEncode(testcase[0]));
-              });
+              }));
+            });
 
-              final client = TransmissionRpcClient();
-              expect(client.init(), throwsA(predicate(testcase[1] as dynamic)),
-                  reason: "failed, case: $testcase");
-              expect(client.isInited(), false,
-                  reason: "failed, case: $testcase");
-              expect(client.serverRpcVersion, isNull,
-                  reason: "failed, case: $testcase");
-            }
+            final client = TransmissionRpcClient();
+            await expectLater(client.init(),
+                throwsA(const TypeMatcher<TransmissionVersionError>()));
+            expect(client.isInited(), false);
+            expect(client.serverRpcVersion, isNull);
+          },
+          createHttpClient: (_) => httpClient!,
+        );
+      });
+      test("version failed: negative version", () {
+        HttpOverrides.runZoned(
+          () async {
+            when(httpResponse!.transform(utf8.decoder)).thenAnswer((_) {
+              return Stream.value(jsonEncode({
+                TransmissionRpcResponseKey.result.keyName: "success",
+                TransmissionRpcResponseKey.arguments.keyName: {
+                  SessionGetArgument.rpcVersion.argName:
+                      kMinimumSupportRpcVersion + 1,
+                  SessionGetArgument.rpcVersionMinimum.argName: -1,
+                },
+              }));
+            });
+
+            final client = TransmissionRpcClient();
+            await expectLater(client.init(),
+                throwsA(const TypeMatcher<TransmissionVersionError>()));
+            expect(client.isInited(), false);
+            expect(client.serverRpcVersion, isNull);
           },
           createHttpClient: (_) => httpClient!,
         );
@@ -189,7 +196,7 @@ void testTransmissionRpcClientInit() =>
               });
 
               final client = TransmissionRpcClient();
-              expect(client.init(),
+              await expectLater(client.init(),
                   throwsA(predicate((e) => e is TransmissionError)),
                   reason: "failed, case: $testcase");
               expect(client.isInited(), false,

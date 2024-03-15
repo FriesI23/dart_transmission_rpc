@@ -20,10 +20,16 @@ class ServerRpcVersion {
       : updateDate = DateTime.now().toUtc(),
         assert(rpcVersion >= minRpcVersion);
 
-  bool isValidateServerVersion() => rpcVersion >= kMinimumSupportRpcVersion;
+  bool isValidateServerVersion() =>
+      rpcVersion >= kMinimumSupportRpcVersion &&
+      rpcVersion > 0 &&
+      minRpcVersion > 0;
 
   bool checkApiVersionValidate({num? v}) {
     final vv = v ?? kMinimumSupportRpcVersion;
     return vv >= minRpcVersion && vv <= rpcVersion;
   }
+
+  @override
+  String toString() => "Version: {v: $rpcVersion, mv: $minRpcVersion}";
 }

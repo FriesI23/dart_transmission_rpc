@@ -5,6 +5,7 @@
 
 // ignore_for_file: avoid_print
 
+import 'package:flutter_transmission_rpc/src/logging.dart';
 import 'package:flutter_transmission_rpc/src/model/group_get.dart';
 import 'package:flutter_transmission_rpc/src/model/group_set.dart';
 import 'package:flutter_transmission_rpc/src/model/session_get.dart';
@@ -12,14 +13,16 @@ import 'package:flutter_transmission_rpc/src/model/session_set.dart';
 import 'package:flutter_transmission_rpc/src/client.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent.dart';
 
-void testSessionGet() async {
+Future<void> testSessionGet() async {
   final client = TransmissionRpcClient(username: "admin", password: "123456");
+  client.init();
+  client.init();
   await client.init();
   final result = await client.sessionGet(null, timeout: 5000);
   print(result.param?.version);
 }
 
-void testSessionSet() async {
+Future<void> testSessionSet() async {
   final client = TransmissionRpcClient(username: "admin", password: "123456");
   await client.init();
   final result1 = await client.sessionGet([SessionGetArgument.utpEnabled]);
@@ -162,8 +165,9 @@ Future<void> testTorrentReannounce({TransmissionRpcClient? c}) async {
 }
 
 void main() async {
-  // testSessionGet();
-  // testSessionSet();
+  Logger("TransmissionRpcClient", showLevel: LogLevel.debug);
+  await testSessionGet();
+  // await testSessionSet();
   // await testSessionStats();
   // await testBlocklistUpdate();
   // await testPortTest();

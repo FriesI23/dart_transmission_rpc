@@ -24,27 +24,34 @@ abstract class Logger {
   Zone? get zone;
   set zone(Zone? newZone);
 
-  void debug(String message);
-  void info(String message);
-  void warn(String message);
-  void error(String message, {Object? error});
-  void trace(String message, {Object? error, StackTrace? stackTrace});
+  void debug(String message, {List<dynamic>? args});
+  void info(String message, {List<dynamic>? args});
+  void warn(String message, {List<dynamic>? args});
+  void error(String message, {List<dynamic>? args, Object? error});
+  void trace(String message,
+      {List<dynamic>? args, Object? error, StackTrace? stackTrace});
 
-  factory Logger(String name) =>
-      _loggers.putIfAbsent(name, () => Logger._named(name));
+  factory Logger(String name, {LogLevel showLevel = LogLevel.info}) => _loggers
+      .putIfAbsent(name, () => Logger._named(name, showLevel: showLevel));
 
-  factory Logger._named(String name) => _Logger(name);
+  factory Logger._named(String name, {required LogLevel showLevel}) =>
+      _Logger(name, showLevel: showLevel);
 }
 
 class _Logger implements Logger {
   int seq = 0;
+
+  final LogLevel showLevel;
 
   @override
   Zone? zone;
   @override
   final String name;
 
-  _Logger(this.name);
+  _Logger(
+    this.name, {
+    required this.showLevel,
+  });
 
   void _log(String message, LogLevel level,
       {Object? error, StackTrace? stackTrace}) {
@@ -58,20 +65,40 @@ class _Logger implements Logger {
     seq += 1;
   }
 
-  @override
-  void debug(String message) => _log(message, LogLevel.debug);
+  bool shouldShowLog(LogLevel logLevel) {
+    return logLevel.number <= showLevel.number;
+  }
+
+  String join(message, List<dynamic>? args) =>
+      message + (args != null ? "|" : " + ") + (args?.join("|") ?? "");
 
   @override
-  void info(String message) => _log(message, LogLevel.info);
+  void debug(String message, {List<dynamic>? args}) =>
+      shouldShowLog(LogLevel.debug)
+          ? _log(join(message, args), LogLevel.debug)
+          : null;
 
   @override
-  void warn(String message) => _log(message, LogLevel.warn);
+  void info(String message, {List<dynamic>? args}) =>
+      shouldShowLog(LogLevel.info)
+          ? _log(join(message, args), LogLevel.info)
+          : null;
 
   @override
-  void error(String message, {Object? error}) =>
-      _log(message, LogLevel.error, error: error);
+  void warn(String message, {List<dynamic>? args}) =>
+      shouldShowLog(LogLevel.warn)
+          ? _log(join(message, args), LogLevel.warn)
+          : null;
 
   @override
-  void trace(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.error, error: error, stackTrace: stackTrace);
+  void error(String message, {List<dynamic>? args, Object? error}) =>
+      trace(message, args: args, error: error);
+
+  @override
+  void trace(String message,
+          {List<dynamic>? args, Object? error, StackTrace? stackTrace}) =>
+      shouldShowLog(LogLevel.error)
+          ? _log(join(message, args), LogLevel.error,
+              error: error, stackTrace: stackTrace)
+          : null;
 }
