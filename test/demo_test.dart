@@ -12,6 +12,7 @@ import 'package:flutter_transmission_rpc/src/model/session_get.dart';
 import 'package:flutter_transmission_rpc/src/model/session_set.dart';
 import 'package:flutter_transmission_rpc/src/client.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent.dart';
+import 'package:flutter_transmission_rpc/src/model/torrent_get.dart';
 
 Future<void> testSessionGet() async {
   final client = TransmissionRpcClient(username: "admin", password: "123456");
@@ -123,7 +124,7 @@ Future<void> testGroupSet() async {
 Future<void> testTorrentStop({TransmissionRpcClient? c}) async {
   final client =
       c ?? TransmissionRpcClient(username: "admin", password: "123456");
-  await client.init();
+  if (c == null) await client.init();
   final result = await client.torrentStop(const TorrentIds([TorrentId(id: 2)]));
   print(result.result);
 }
@@ -131,7 +132,7 @@ Future<void> testTorrentStop({TransmissionRpcClient? c}) async {
 Future<void> testTorrentSart({TransmissionRpcClient? c}) async {
   final client =
       c ?? TransmissionRpcClient(username: "admin", password: "123456");
-  await client.init();
+  if (c == null) await client.init();
   final result =
       await client.torrentStart(const TorrentIds([TorrentId(id: 2)]));
   print(result.result);
@@ -140,7 +141,7 @@ Future<void> testTorrentSart({TransmissionRpcClient? c}) async {
 Future<void> testTorrentSartNow({TransmissionRpcClient? c}) async {
   final client =
       c ?? TransmissionRpcClient(username: "admin", password: "123456");
-  await client.init();
+  if (c == null) await client.init();
   final result =
       await client.torrentStartNow(const TorrentIds([TorrentId(id: 2)]));
   print(result.result);
@@ -149,7 +150,7 @@ Future<void> testTorrentSartNow({TransmissionRpcClient? c}) async {
 Future<void> testTorrentVerify({TransmissionRpcClient? c}) async {
   final client =
       c ?? TransmissionRpcClient(username: "admin", password: "123456");
-  await client.init();
+  if (c == null) await client.init();
   final result =
       await client.torrentVerify(const TorrentIds([TorrentId(id: 2)]));
   print(result.result);
@@ -158,15 +159,58 @@ Future<void> testTorrentVerify({TransmissionRpcClient? c}) async {
 Future<void> testTorrentReannounce({TransmissionRpcClient? c}) async {
   final client =
       c ?? TransmissionRpcClient(username: "admin", password: "123456");
-  await client.init();
+  if (c == null) await client.init();
   final result =
       await client.torrentReannounce(const TorrentIds([TorrentId(id: 2)]));
   print(result.result);
 }
 
+Future<void> testTorrentGet({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  if (c == null) await client.init();
+  final result = await client.torrentGet([
+    TorrentGetArgument.name,
+    TorrentGetArgument.id,
+    TorrentGetArgument.addedDate
+  ]);
+  print(result.result);
+  print('------ torrents -----------');
+  for (var p in result.param!.torrents) {
+    print(p.name);
+    print(p.id);
+    print(p.addedDate);
+  }
+  print('--------- removed ---------');
+  for (var p in result.param!.removed) {
+    print(p.hashStr);
+    print(p.id);
+  }
+}
+
+Future<void> testTorrentGetAll({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  if (c == null) await client.init();
+  final result =
+      await client.torrentGetAll(const TorrentIds([TorrentId(id: 1)]));
+  print(result.result);
+  print('------ torrents -----------');
+  for (var p in result.param!.torrents) {
+    print(p.name);
+    print(p.id);
+    print(p.addedDate);
+  }
+  print('--------- removed ---------');
+  for (var p in result.param!.removed) {
+    print(p.hashStr);
+    print(p.id);
+  }
+}
+
 void main() async {
   Logger("TransmissionRpcClient", showLevel: LogLevel.debug);
-  await testSessionGet();
+  // await testSessionGet();
   // await testSessionSet();
   // await testSessionStats();
   // await testBlocklistUpdate();
@@ -181,4 +225,8 @@ void main() async {
   // await testTorrentSartNow();
   // await testTorrentVerify();
   // await testTorrentReannounce();
+  final c = TransmissionRpcClient(
+      host: "192.168.0.191", username: "zoltan", password: "0309QZZ0111yj");
+  await c.init();
+  await testTorrentGetAll(c: c);
 }

@@ -13,6 +13,7 @@ import 'model/session_get.dart';
 import 'model/session_set.dart';
 import 'model/session_stats.dart';
 import 'model/torrent_action.dart';
+import 'model/torrent_get.dart';
 import 'request.dart';
 import 'response.dart';
 
@@ -25,6 +26,9 @@ typedef _ApiResponse<T extends RequestParam, V extends ResponseParam>
 // torrent-<action>
 typedef TorrentActionResponse<T extends TorrentActionReqeustParam>
     = _ApiResponse<T, TorrentActionResponseParam>;
+// torrent-get
+typedef TorrentGetResponse
+    = _ApiResponse<TorrentGetRequestParam, TorrentGetResponseParam>;
 // session-get
 typedef SessionGetResponse
     = _ApiResponse<SessionGetRequestParam, SessionGetResponseParam>;

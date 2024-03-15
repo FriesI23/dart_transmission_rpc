@@ -9,6 +9,7 @@ enum TransmissionRpcMethod {
   torrentStop(methodName: "torrent-stop"),
   torrentVerify(methodName: "torrent-verify"),
   torrentReannounce(methodName: "torrent-reannounce"),
+  torrentGet(methodName: "torrent-get"),
   sessionSet(methodName: "session-set"),
   sessionGet(methodName: "session-get"),
   sessionStats(methodName: "session-stats"),

@@ -4,13 +4,13 @@
 // https://opensource.org/licenses/MIT
 
 class TorrentId {
-  final String? hasString;
+  final String? hashStr;
   final int? id;
 
-  const TorrentId({this.hasString, this.id})
-      : assert(!(hasString == null && id == null));
+  const TorrentId({this.hashStr, this.id})
+      : assert(!(hashStr == null && id == null));
 
-  dynamic toRpcJson() => hasString ?? id!;
+  dynamic toRpcJson() => hashStr ?? id!;
 }
 
 class TorrentIds {
