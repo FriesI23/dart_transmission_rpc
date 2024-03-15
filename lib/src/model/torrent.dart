@@ -24,7 +24,7 @@ class TorrentIds {
 
   bool get isNotEmpty => !isEmpty;
 
-  dynamic toRpcJson() => ids.map((e) => e.toRpcJson());
+  dynamic toRpcJson() => ids.map((e) => e.toRpcJson()).toList();
 }
 
 class RecentlyActiveTorrentIds implements TorrentIds {

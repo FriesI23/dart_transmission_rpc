@@ -12,11 +12,11 @@ and the Flutter guide for
 -->
 
 - [ ] torrent
-  - [ ] torrent-start
-  - [ ] torrent-start-now
-  - [ ] torrent-stop
-  - [ ] torrent-verify
-  - [ ] torrent-reannounce
+  - [x] torrent-start
+  - [x] torrent-start-now
+  - [x] torrent-stop
+  - [x] torrent-verify
+  - [x] torrent-reannounce
   - [ ] torrent-set
   - [ ] torrent-get
   - [ ] torrent-add

@@ -4,6 +4,11 @@
 // https://opensource.org/licenses/MIT
 
 enum TransmissionRpcMethod {
+  torrentStart(methodName: "torrent-start"),
+  torrentStartNow(methodName: "torrent-start-now"),
+  torrentStop(methodName: "torrent-stop"),
+  torrentVerify(methodName: "torrent-verify"),
+  torrentReannounce(methodName: "torrent-reannounce"),
   sessionSet(methodName: "session-set"),
   sessionGet(methodName: "session-get"),
   sessionStats(methodName: "session-stats"),

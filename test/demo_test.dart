@@ -117,6 +117,50 @@ Future<void> testGroupSet() async {
   }
 }
 
+Future<void> testTorrentStop({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result = await client.torrentStop(const TorrentIds([TorrentId(id: 2)]));
+  print(result.result);
+}
+
+Future<void> testTorrentSart({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result =
+      await client.torrentStart(const TorrentIds([TorrentId(id: 2)]));
+  print(result.result);
+}
+
+Future<void> testTorrentSartNow({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result =
+      await client.torrentStartNow(const TorrentIds([TorrentId(id: 2)]));
+  print(result.result);
+}
+
+Future<void> testTorrentVerify({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result =
+      await client.torrentVerify(const TorrentIds([TorrentId(id: 2)]));
+  print(result.result);
+}
+
+Future<void> testTorrentReannounce({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result =
+      await client.torrentReannounce(const TorrentIds([TorrentId(id: 2)]));
+  print(result.result);
+}
+
 void main() async {
   // testSessionGet();
   // testSessionSet();
@@ -127,4 +171,10 @@ void main() async {
   // await testFreeSpace();
   // await testGroupGet();
   // await testGroupSet();
+
+  // await testTorrentStop();
+  // await testTorrentSart();
+  // await testTorrentSartNow();
+  // await testTorrentVerify();
+  // await testTorrentReannounce();
 }

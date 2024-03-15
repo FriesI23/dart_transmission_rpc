@@ -12,6 +12,7 @@ import 'model/queue_move.dart';
 import 'model/session_get.dart';
 import 'model/session_set.dart';
 import 'model/session_stats.dart';
+import 'model/torrent_action.dart';
 import 'request.dart';
 import 'response.dart';
 
@@ -21,6 +22,9 @@ typedef RpcTag = num;
 // api
 typedef _ApiResponse<T extends RequestParam, V extends ResponseParam>
     = TransmissionRpcResponse<V, TransmissionRpcRequest<T>>;
+// torrent-<action>
+typedef TorrentActionResponse<T extends TorrentActionReqeustParam>
+    = _ApiResponse<T, TorrentActionResponseParam>;
 // session-get
 typedef SessionGetResponse
     = _ApiResponse<SessionGetRequestParam, SessionGetResponseParam>;
