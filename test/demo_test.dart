@@ -13,6 +13,7 @@ import 'package:flutter_transmission_rpc/src/model/session_set.dart';
 import 'package:flutter_transmission_rpc/src/client.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_get.dart';
+import 'package:flutter_transmission_rpc/src/model/torrent_set.dart';
 
 Future<void> testSessionGet() async {
   final client = TransmissionRpcClient(username: "admin", password: "123456");
@@ -208,6 +209,28 @@ Future<void> testTorrentGetAll({TransmissionRpcClient? c}) async {
   }
 }
 
+Future<void> testTorrentSet({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  if (c == null) await client.init();
+  final r1 = await client.torrentGetAll(const TorrentIds.empty());
+  print(r1.param!.torrents[0].id);
+  print(r1.param!.torrents[0].name);
+  print(r1.param!.torrents[0].labels);
+  print(r1.param!.torrents[0].seedIdleMode);
+  final r2 = await client.torrentSet(const TorrentSetRequestArgs(
+    // ids: TorrentIds.torrentSetForAll(),
+    // ids: TorrentIds([TorrentId(id: 2)]),
+    ids: TorrentIds.empty(),
+    labels: ["test", "foo", "bar", "new"],
+    seedIdleMode: 1,
+  ));
+  print(r2.result);
+  final r3 = await client.torrentGetAll(const TorrentIds.empty());
+  print(r3.param!.torrents[0].labels);
+  print(r3.param!.torrents[0].seedIdleMode);
+}
+
 void main() async {
   Logger("TransmissionRpcClient", showLevel: LogLevel.debug);
   // await testSessionGet();
@@ -225,8 +248,6 @@ void main() async {
   // await testTorrentSartNow();
   // await testTorrentVerify();
   // await testTorrentReannounce();
-  final c = TransmissionRpcClient(
-      host: "192.168.0.191", username: "zoltan", password: "0309QZZ0111yj");
-  await c.init();
-  await testTorrentGetAll(c: c);
+  // await testTorrentGetAll();
+  // await testTorrentSet();
 }

@@ -191,6 +191,7 @@ void _testSessionGetRequestParamRpc17Imp() =>
           final p = SessionGetRequestParam.build(
               version: sv,
               fields: SessionGetArgument.values
+                  // ignore: deprecated_member_use_from_same_package
                   .where((e) => e != SessionGetArgument.downloadDirFreeSpace)
                   .toList());
           final r = p.check();
@@ -260,6 +261,7 @@ void testSessionGetResponseParam() => group("test SessionGetResponseParam", () {
         expect(sessionParam.defaultTrackers, isNull);
         expect(sessionParam.dhtEnabled, isNull);
         expect(sessionParam.downloadDir, isNull);
+        // ignore: deprecated_member_use_from_same_package
         expect(sessionParam.downloadDirFreeSpace, isNull);
         expect(sessionParam.downloadQueueEnabled, isNull);
         expect(sessionParam.downloadQueueSize, isNull);
@@ -344,6 +346,7 @@ void testSessionGetResponseParam() => group("test SessionGetResponseParam", () {
                 "https://tracker1.com,https://tracker2.com",
             SessionGetArgument.dhtEnabled.argName: true,
             SessionGetArgument.downloadDir.argName: "/path/to/downloads",
+            // ignore: deprecated_member_use_from_same_package
             SessionGetArgument.downloadDirFreeSpace.argName: 1024,
             SessionGetArgument.downloadQueueEnabled.argName: false,
             SessionGetArgument.downloadQueueSize.argName: 5,
@@ -414,6 +417,7 @@ void testSessionGetResponseParam() => group("test SessionGetResponseParam", () {
               equals("https://tracker1.com,https://tracker2.com"));
           expect(p.dhtEnabled, equals(true));
           expect(p.downloadDir, equals("/path/to/downloads"));
+          // ignore: deprecated_member_use_from_same_package
           expect(p.downloadDirFreeSpace, equals(1024));
           expect(p.downloadQueueEnabled, equals(false));
           expect(p.downloadQueueSize, equals(5));

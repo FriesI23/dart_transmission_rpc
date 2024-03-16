@@ -23,6 +23,7 @@ import 'model/session_stats.dart';
 import 'model/torrent.dart';
 import 'model/torrent_action.dart';
 import 'model/torrent_get.dart';
+import 'model/torrent_set.dart';
 import 'request.dart';
 import 'response.dart';
 import 'typedef.dart';
@@ -78,6 +79,10 @@ abstract interface class TransmissionRpcClient {
   // Get torrents info
   Future<TorrentGetResponse> torrentGet(List<TorrentGetArgument> fields,
       {TorrentIds? ids, RpcTag? tag, int? timeout});
+
+  // Set torrents info
+  Future<TorrentSetResponse> torrentSet(TorrentSetRequestArgs args,
+      {RpcTag? tag, int? timeout});
 
   // Get session running stats by given fields
   Future<SessionGetResponse> sessionGet(List<SessionGetArgument>? fields,
@@ -266,10 +271,22 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       {int? timeout}) async {
     final payload = jsonEncode(request.toRpcJson());
     final body = utf8.encode(payload);
-    log.debug("doReqeust", args: [request.hashCode, _sessionId, payload]);
+    log.debug("doReqeust", args: [
+      request.hashCode,
+      request.method,
+      request.param,
+      _sessionId,
+      payload
+    ]);
     final resultText =
         await _doRequest(body, Duration(milliseconds: timeout ?? this.timeout));
-    log.debug("on doReqeust", args: [request.hashCode, _sessionId, resultText]);
+    log.debug("on doReqeust", args: [
+      request.hashCode,
+      request.method,
+      request.param,
+      _sessionId,
+      resultText
+    ]);
     final rawText = jsonDecode(resultText);
     return rawText;
   }
@@ -751,6 +768,36 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: result,
       param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
           ? TorrentGetResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<TorrentSetResponse> torrentSet(TorrentSetRequestArgs args,
+      {RpcTag? tag, int? timeout}) {
+    final p = TorrentSetRequestParam.build(
+      version: serverRpcVersion,
+      args: args,
+    );
+    preCheck(TransmissionRpcMethod.torrentSet, p, timeout: timeout);
+    return _torrentSet(p, tag: tag, timeout: timeout);
+  }
+
+  Future<TorrentSetResponse> _torrentSet(TorrentSetRequestParam p,
+      {required RpcTag? tag, required int? timeout}) async {
+    final request = TransmissionRpcRequest(
+        param: p, method: TransmissionRpcMethod.torrentSet, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    final result = rawResult.toString();
+    return TransmissionRpcResponse(
+      request: request,
+      result: result,
+      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
+          ? TorrentSetResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );

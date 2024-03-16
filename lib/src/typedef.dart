@@ -14,6 +14,7 @@ import 'model/session_set.dart';
 import 'model/session_stats.dart';
 import 'model/torrent_action.dart';
 import 'model/torrent_get.dart';
+import 'model/torrent_set.dart';
 import 'request.dart';
 import 'response.dart';
 
@@ -29,6 +30,9 @@ typedef TorrentActionResponse<T extends TorrentActionReqeustParam>
 // torrent-get
 typedef TorrentGetResponse
     = _ApiResponse<TorrentGetRequestParam, TorrentGetResponseParam>;
+// torretn-set
+typedef TorrentSetResponse
+    = _ApiResponse<TorrentSetRequestParam, TorrentSetResponseParam>;
 // session-get
 typedef SessionGetResponse
     = _ApiResponse<SessionGetRequestParam, SessionGetResponseParam>;

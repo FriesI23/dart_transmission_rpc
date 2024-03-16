@@ -13,23 +13,28 @@ class TorrentId {
   dynamic toRpcJson() => hashStr ?? id!;
 }
 
-class TorrentIds {
-  final List<TorrentId> ids;
+class TorrentIds<T extends TorrentId> with Iterable<T> {
+  final List<T> ids;
 
   const TorrentIds(this.ids);
 
+  const TorrentIds.empty() : ids = const [];
+
   factory TorrentIds.recently() => RecentlyActiveTorrentIds();
 
-  bool get isEmpty => ids.isEmpty;
-
-  bool get isNotEmpty => !isEmpty;
+  factory TorrentIds.torrentSetForAll() => const TorrentIds.empty();
 
   dynamic toRpcJson() => ids.map((e) => e.toRpcJson()).toList();
+
+  @override
+  Iterator<T> get iterator => ids.iterator;
 }
 
-class RecentlyActiveTorrentIds implements TorrentIds {
+class RecentlyActiveTorrentIds<T extends TorrentId>
+    with Iterable<T>
+    implements TorrentIds<T> {
   @override
-  List<TorrentId> get ids => [];
+  List<T> get ids => const [];
 
   @override
   bool get isEmpty => false;
@@ -39,4 +44,22 @@ class RecentlyActiveTorrentIds implements TorrentIds {
 
   @override
   String toRpcJson() => "recently-active";
+
+  @override
+  Iterator<T> get iterator => ids.iterator;
+}
+
+class FileIndices with Iterable<int> {
+  final List<int> indices;
+
+  const FileIndices(this.indices);
+
+  const FileIndices.empty() : indices = const [];
+
+  factory FileIndices.torrentSetForAll() => const FileIndices.empty();
+
+  dynamic toRpcJson() => indices;
+
+  @override
+  Iterator<int> get iterator => indices.iterator;
 }

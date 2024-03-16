@@ -3,6 +3,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
@@ -55,7 +57,7 @@ enum SessionGetArgument {
   // default path to download torrents
   downloadDir(argName: "download-dir"),
 
-  // DEPRECATED: Use the `free-space` method instead.
+  @Deprecated("deprecated rpc-version>=17, Use \"free-space\" method instead.")
   downloadDirFreeSpace(argName: "download-dir-free-space"),
 
   // if true, limit how many torrents can be downloaded at once

@@ -122,7 +122,7 @@ abstract class TorrentGetRequestParam implements RequestParam {
     } else if (version.checkApiVersionValidate()) {
       return _TorrentGetRequestParam(fields, ids);
     } else {
-      throw TransmissionVersionError("Incompatible API version on session-get",
+      throw TransmissionVersionError("Incompatible API version on torrent-get",
           version.rpcVersion, version.minRpcVersion);
     }
   }
@@ -887,6 +887,12 @@ class TrackerStat {
   });
 
   factory TrackerStat.fromJson(JsonMap rawData) {
+    bool handleNumOrBoolToBool(dynamic rawVal) {
+      if (rawVal is bool) return rawVal;
+      if (rawVal is num || rawVal is int) return rawVal != 0;
+      return false;
+    }
+
     return TrackerStat(
       announceState: rawData['announceState'] as num,
       announce: rawData['announce'] as String,
@@ -901,12 +907,15 @@ class TrackerStat {
       lastAnnounceStartTime: rawData['lastAnnounceStartTime'] as num,
       lastAnnounceSucceeded: rawData['lastAnnounceSucceeded'] as bool,
       lastAnnounceTime: rawData['lastAnnounceTime'] as num,
-      lastAnnounceTimedOut: rawData['lastAnnounceTimedOut'] as bool,
+      // lastAnnounceTimedOut return int whtn rpc<16 and return bool currently.
+      lastAnnounceTimedOut:
+          handleNumOrBoolToBool(rawData['lastAnnounceTimedOut']),
       lastScrapeResult: rawData['lastScrapeResult'] as String,
       lastScrapeStartTime: rawData['lastScrapeStartTime'] as num,
       lastScrapeSucceeded: rawData['lastScrapeSucceeded'] as bool,
       lastScrapeTime: rawData['lastScrapeTime'] as num,
-      lastScrapeTimedOut: rawData['lastScrapeTimedOut'] as bool,
+      // lastScrapeTimedOut return int before rpc<16 and return bool currently.
+      lastScrapeTimedOut: handleNumOrBoolToBool(rawData['lastScrapeTimedOut']),
       leecherCount: rawData['leecherCount'] as num,
       nextAnnounceTime: rawData['nextAnnounceTime'] as num,
       nextScrapeTime: rawData['nextScrapeTime'] as num,
