@@ -5,13 +5,17 @@
 
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+import "dart:io" as io;
+
+import 'package:flutter_transmission_rpc/src/client.dart';
 import 'package:flutter_transmission_rpc/src/logging.dart';
 import 'package:flutter_transmission_rpc/src/model/group_get.dart';
 import 'package:flutter_transmission_rpc/src/model/group_set.dart';
 import 'package:flutter_transmission_rpc/src/model/session_get.dart';
 import 'package:flutter_transmission_rpc/src/model/session_set.dart';
-import 'package:flutter_transmission_rpc/src/client.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent.dart';
+import 'package:flutter_transmission_rpc/src/model/torrent_add.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_get.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_set.dart';
 
@@ -243,6 +247,23 @@ Future<void> testTorrentRemove({TransmissionRpcClient? c}) async {
   print(result.param);
 }
 
+Future<void> testTorrentAdd({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  if (c == null) await client.init();
+  final result = await client.torrentAdd(
+    TorrentAddRequestArgs(
+      metainfo:
+          base64Encode(io.File("test/demo_test.torrent").readAsBytesSync()),
+      downloadDir: "/downloads/complete",
+    ),
+  );
+  print(result.result);
+  print(result.param?.isDuplicated);
+  print(result.param?.torrent?.id);
+  print(result.param?.torrent?.name);
+}
+
 void main() async {
   Logger("TransmissionRpcClient", showLevel: LogLevel.debug);
   // await testSessionGet();
@@ -263,4 +284,5 @@ void main() async {
   // await testTorrentGetAll();
   // await testTorrentSet();
   // await testTorrentRemove();
+  // await testTorrentAdd();
 }

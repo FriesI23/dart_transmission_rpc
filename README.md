@@ -17,10 +17,10 @@ and the Flutter guide for
   - [x] torrent-stop
   - [x] torrent-verify
   - [x] torrent-reannounce
-  - [ ] torrent-set
-  - [ ] torrent-get
-  - [ ] torrent-add
-  - [ ] torrent-remove
+  - [x] torrent-set
+  - [x] torrent-get
+  - [x] torrent-add
+  - [x] torrent-remove
   - [ ] torrent-set-location
   - [ ] torrent-rename-path
 - [x] session

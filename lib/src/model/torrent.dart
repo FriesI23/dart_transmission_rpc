@@ -11,6 +11,9 @@ class TorrentId {
       : assert(!(hashStr == null && id == null));
 
   dynamic toRpcJson() => hashStr ?? id!;
+
+  @override
+  String toString() => "TorrentId: {id: $id, hash: $hashStr}";
 }
 
 class TorrentIds<T extends TorrentId> with Iterable<T> {

@@ -63,3 +63,83 @@ class _TransmissionRpcRequest<T extends RequestParam>
         if (tag != null) TransmissionRpcRequestJsonKey.tag.keyName: tag,
       };
 }
+
+abstract interface class RequestParamChecker<T> {
+  RequestParamCheckResult<T> check();
+}
+
+class RequestParamCheckResult<T> {
+  final Set<T> checkNotAllowedFields;
+  final Set<T> checkDeprecatedFields;
+
+  const RequestParamCheckResult({
+    this.checkNotAllowedFields = const {},
+    this.checkDeprecatedFields = const {},
+  });
+
+  List<String> get checkResult {
+    String? notAllowedFieldsCheckResult() => checkNotAllowedFields.isNotEmpty
+        ? "missing: $checkNotAllowedFields"
+        : null;
+
+    String? deprecatedFieldsCheckResult() => checkDeprecatedFields.isNotEmpty
+        ? "deprecated: $checkDeprecatedFields"
+        : null;
+
+    final nr = notAllowedFieldsCheckResult();
+    final dr = deprecatedFieldsCheckResult();
+    return [
+      if (nr != null) nr,
+      if (dr != null) dr,
+    ];
+  }
+}
+
+class RequestParamArgsChecker<T> implements RequestParamChecker {
+  final Set<T> _notAllowedFields;
+  final Set<T> _deprecatedFields;
+  final bool Function(T f)? checkNotAllowedFields;
+  final bool Function(T f)? checkDeprecatedFields;
+
+  RequestParamArgsChecker({
+    required Set<T> notAllowedFields,
+    required Set<T> deprecatedFields,
+    this.checkNotAllowedFields,
+    this.checkDeprecatedFields,
+  })  : _notAllowedFields = notAllowedFields,
+        _deprecatedFields = deprecatedFields;
+
+  bool _defaultCheckField(T f) => false;
+
+  @override
+  RequestParamCheckResult<T> check() {
+    final Set<T> mFields = {};
+    for (var f in _notAllowedFields) {
+      if ((checkNotAllowedFields ?? _defaultCheckField)(f)) mFields.add(f);
+    }
+    final Set<T> dFields = {};
+    for (var f in _deprecatedFields) {
+      if ((checkDeprecatedFields ?? _defaultCheckField)(f)) dFields.add(f);
+    }
+    return RequestParamCheckResult(
+      checkNotAllowedFields: mFields,
+      checkDeprecatedFields: dFields,
+    );
+  }
+
+  RequestParamArgsChecker<T> copyWith({
+    Set<T>? notAllowedFields,
+    Set<T>? deprecatedFields,
+    bool Function(T f)? checkNotAllowedFields,
+    bool Function(T f)? checkDeprecatedFields,
+  }) {
+    return RequestParamArgsChecker<T>(
+      notAllowedFields: notAllowedFields ?? _notAllowedFields,
+      deprecatedFields: deprecatedFields ?? _deprecatedFields,
+      checkNotAllowedFields:
+          checkNotAllowedFields ?? this.checkNotAllowedFields,
+      checkDeprecatedFields:
+          checkDeprecatedFields ?? this.checkDeprecatedFields,
+    );
+  }
+}

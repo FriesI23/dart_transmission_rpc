@@ -22,6 +22,7 @@ import 'model/session_set.dart';
 import 'model/session_stats.dart';
 import 'model/torrent.dart';
 import 'model/torrent_action.dart';
+import 'model/torrent_add.dart';
 import 'model/torrent_get.dart';
 import 'model/torrent_remove.dart';
 import 'model/torrent_set.dart';
@@ -88,6 +89,10 @@ abstract interface class TransmissionRpcClient {
   // Removing a torrent
   Future<TorrentRemoveResponse> torrentRemove(TorrentIds ids,
       {bool? deleteLocalData, RpcTag? tag, int? timeout});
+
+  // Add a torrent
+  Future<TorrentAddResponse> torrentAdd(TorrentAddRequestArgs args,
+      {RpcTag? tag, int? timeout});
 
   // Get session running stats by given fields
   Future<SessionGetResponse> sessionGet(List<SessionGetArgument>? fields,
@@ -833,6 +838,36 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: result,
       param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
           ? TorrentRemoveResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<TorrentAddResponse> torrentAdd(TorrentAddRequestArgs args,
+      {RpcTag? tag, int? timeout}) {
+    final v = serverRpcVersion;
+    final p = TorrentAddRequestParam.build(args: args, version: v);
+    preCheck(TransmissionRpcMethod.torrentAdd, p, timeout: timeout);
+    return _torrentAdd(p, tag: tag, timeout: timeout, v: v);
+  }
+
+  Future<TorrentAddResponse> _torrentAdd(TorrentAddRequestParam p,
+      {required RpcTag? tag,
+      required int? timeout,
+      required ServerRpcVersion? v}) async {
+    final request = TransmissionRpcRequest(
+        param: p, method: TransmissionRpcMethod.torrentAdd, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    final result = rawResult.toString();
+    return TransmissionRpcResponse(
+      request: request,
+      result: result,
+      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
+          ? TorrentAddResponseParam.fromJson(rawParam, version: v)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );
