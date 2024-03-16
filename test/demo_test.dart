@@ -231,6 +231,18 @@ Future<void> testTorrentSet({TransmissionRpcClient? c}) async {
   print(r3.param!.torrents[0].seedIdleMode);
 }
 
+Future<void> testTorrentRemove({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  if (c == null) await client.init();
+  final r1 = await client.torrentGetAll(const TorrentIds.empty());
+  final r1id = r1.param!.torrents[0].id;
+  final result =
+      await client.torrentRemove(TorrentIds([TorrentId(id: r1id!.toInt())]));
+  print(result.result);
+  print(result.param);
+}
+
 void main() async {
   Logger("TransmissionRpcClient", showLevel: LogLevel.debug);
   // await testSessionGet();
@@ -250,4 +262,5 @@ void main() async {
   // await testTorrentReannounce();
   // await testTorrentGetAll();
   // await testTorrentSet();
+  // await testTorrentRemove();
 }

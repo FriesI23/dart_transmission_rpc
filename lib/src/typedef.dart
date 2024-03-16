@@ -14,6 +14,7 @@ import 'model/session_set.dart';
 import 'model/session_stats.dart';
 import 'model/torrent_action.dart';
 import 'model/torrent_get.dart';
+import 'model/torrent_remove.dart';
 import 'model/torrent_set.dart';
 import 'request.dart';
 import 'response.dart';
@@ -33,6 +34,9 @@ typedef TorrentGetResponse
 // torretn-set
 typedef TorrentSetResponse
     = _ApiResponse<TorrentSetRequestParam, TorrentSetResponseParam>;
+// torrent-remove
+typedef TorrentRemoveResponse
+    = _ApiResponse<TorrentRemoveRequestParam, TorrentRemoveResponseParam>;
 // session-get
 typedef SessionGetResponse
     = _ApiResponse<SessionGetRequestParam, SessionGetResponseParam>;
