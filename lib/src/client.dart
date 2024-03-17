@@ -26,6 +26,7 @@ import 'model/torrent_add.dart';
 import 'model/torrent_get.dart';
 import 'model/torrent_move.dart';
 import 'model/torrent_remove.dart';
+import 'model/torrent_rename.dart';
 import 'model/torrent_set.dart';
 import 'request.dart';
 import 'response.dart';
@@ -98,6 +99,12 @@ abstract interface class TransmissionRpcClient {
   // Moving a torrent
   Future<TorrentSetLocationResponse> torrentSetLocation(
       TorrentSetLocationArgs args,
+      {RpcTag? tag,
+      int? timeout});
+
+  // Renaming a torrent's path
+  Future<TorrentRenamePathResponse> torrentRenamePath(
+      TorrentRenamePathArgs args,
       {RpcTag? tag,
       int? timeout});
 
@@ -907,6 +914,38 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: result,
       param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
           ? TorrentSetLocationResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<TorrentRenamePathResponse> torrentRenamePath(
+      TorrentRenamePathArgs args,
+      {RpcTag? tag,
+      int? timeout}) {
+    final p = TorrentRenamePathRequestParam.build(
+        args: args, version: serverRpcVersion);
+    preCheck(TransmissionRpcMethod.torrentRenamePath, p, timeout: timeout);
+    return _torrentRenamePath(p, tag: tag, timeout: timeout);
+  }
+
+  Future<TorrentRenamePathResponse> _torrentRenamePath(
+      TorrentRenamePathRequestParam p,
+      {required RpcTag? tag,
+      required int? timeout}) async {
+    final request = TransmissionRpcRequest(
+        param: p, method: TransmissionRpcMethod.torrentRenamePath, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    final result = rawResult.toString();
+    return TransmissionRpcResponse(
+      request: request,
+      result: result,
+      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
+          ? TorrentRenamePathResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );

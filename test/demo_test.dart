@@ -18,6 +18,7 @@ import 'package:flutter_transmission_rpc/src/model/torrent.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_add.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_get.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_move.dart';
+import 'package:flutter_transmission_rpc/src/model/torrent_rename.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_set.dart';
 
 Future<void> testSessionGet() async {
@@ -290,6 +291,39 @@ Future<void> testTorrentSetLocation({TransmissionRpcClient? c}) async {
   print(result2.param?.torrents.firstOrNull?.downloadDir);
 }
 
+Future<void> testTorrentRenamePath({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  if (c == null) await client.init();
+  final result1 = await client.torrentAdd(
+    TorrentAddRequestArgs(
+      metainfo:
+          base64Encode(io.File("test/demo_test_2.torrent").readAsBytesSync()),
+      downloadDir: "/downloads/complete",
+    ),
+  );
+  final ids =
+      TorrentIds([TorrentId(id: result1.param!.torrent!.id.id!.toInt())]);
+  final result2 = await client.torrentGet(
+      [TorrentGetArgument.files, TorrentGetArgument.fileStats],
+      ids: ids);
+  print(result2.param?.torrents.first.files?.first);
+  print(result2.param?.torrents.first.fileStats?.first);
+  final result3 = await client.torrentRenamePath(TorrentRenamePathArgs(
+      id: ids.first,
+      oldPath: "Scavengers.Reign.S01.1080p.MAX.WEB-DL.x265-Protozoan-test",
+      newName: "Scavengers.Reign.S01.1080p.MAX.WEB-DL.x265-Protozoan-test-2"));
+  print(result3.result);
+  print(result3.param?.id);
+  print(result3.param?.path);
+  print(result3.param?.name);
+  final result4 = await client.torrentGet(
+      [TorrentGetArgument.files, TorrentGetArgument.fileStats],
+      ids: ids);
+  print(result4.param?.torrents.first.files?.first);
+  print(result4.param?.torrents.first.fileStats?.first);
+}
+
 void main() async {
   Logger("TransmissionRpcClient", showLevel: LogLevel.debug);
   // await testSessionGet();
@@ -311,5 +345,6 @@ void main() async {
   // await testTorrentSet();
   // await testTorrentRemove();
   // await testTorrentAdd();
-  await testTorrentSetLocation();
+  // await testTorrentSetLocation();
+  // await testTorrentRenamePath();
 }

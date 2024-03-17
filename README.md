@@ -21,8 +21,8 @@ and the Flutter guide for
   - [x] torrent-get
   - [x] torrent-add
   - [x] torrent-remove
-  - [ ] torrent-set-location
-  - [ ] torrent-rename-path
+  - [x] torrent-set-location
+  - [x] torrent-rename-path
 - [x] session
   - [x] session-get
   - [x] session-set

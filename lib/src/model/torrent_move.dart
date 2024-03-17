@@ -75,8 +75,10 @@ class TorrentSetLocationRequestParam
     } else if (version.checkApiVersionValidate()) {
       return normalBuilder();
     } else {
-      throw TransmissionVersionError("Incompatible API version on session-get",
-          version.rpcVersion, version.minRpcVersion);
+      throw TransmissionVersionError(
+          "Incompatible API version on torrent-set-location",
+          version.rpcVersion,
+          version.minRpcVersion);
     }
   }
 

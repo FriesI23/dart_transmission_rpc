@@ -13,7 +13,7 @@ class TorrentId {
   dynamic toRpcJson() => hashStr ?? id!;
 
   @override
-  String toString() => "TorrentId: {id: $id, hash: $hashStr}";
+  String toString() => "TorrentId {id: $id, hash: $hashStr}";
 }
 
 class TorrentIds<T extends TorrentId> with Iterable<T> {

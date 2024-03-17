@@ -644,6 +644,11 @@ class File {
         beginPiece: rawData["beginPiece"] as num?,
         endPiece: rawData["endPiece"] as num?,
       );
+
+  @override
+  String toString() =>
+      'File {name: $name, bytesCompleted: $bytesCompleted, length: $length, '
+      'beginPiece: $beginPiece, endPiece: $endPiece}';
 }
 
 class FileStat {
@@ -662,6 +667,11 @@ class FileStat {
         wanted: rawData["wanted"] as bool,
         priority: rawData["priority"] as num,
       );
+
+  @override
+  String toString() =>
+      'FileStat {bytesCompleted: $bytesCompleted, wanted: $wanted, '
+      'priority: $priority}';
 }
 
 class Peer {

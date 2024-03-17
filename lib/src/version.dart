@@ -31,5 +31,5 @@ class ServerRpcVersion {
   }
 
   @override
-  String toString() => "Version: {v: $rpcVersion, mv: $minRpcVersion}";
+  String toString() => "Version {v: $rpcVersion, mv: $minRpcVersion}";
 }
