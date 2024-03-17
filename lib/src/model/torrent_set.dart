@@ -384,25 +384,23 @@ abstract class TorrentSetRequestParam
     }
   }
 
-  Set<TorrentSetArgument> get allowedField;
-  Set<TorrentSetArgument> get deprecatedField;
+  Set<TorrentSetArgument> get allowedFields;
+  Set<TorrentSetArgument> get deprecatedFields;
 
   @override
   String? check() {
-    final Set<TorrentSetArgument> mFields = {};
-    final Set<TorrentSetArgument> dFields = {};
-    final lastFields = TorrentSetArgument.allFieldsSet.difference(allowedField);
-    for (var f in lastFields) {
-      if (_args.getValueByArgument(f) != null) mFields.add(f);
-    }
-    for (var f in deprecatedField) {
-      if (_args.getValueByArgument(f) != null) dFields.add(f);
-    }
-    if (mFields.isNotEmpty || dFields.isNotEmpty) {
-      return "got possibly imcompatible fields, "
-          "missing: $mFields, deprecated: $dFields";
-    }
-    return null;
+    final notAllowedChecker = RequestParamArgsChecker<TorrentSetArgument>(
+        label: "$runtimeType.prohibited",
+        fields: TorrentSetArgument.allFieldsSet.difference(allowedFields),
+        failedChecker: (f) => _args.getValueByArgument(f) != null);
+    final deprecatedChecker = RequestParamArgsChecker<TorrentSetArgument>(
+        label: "$runtimeType.deprecated",
+        fields: deprecatedFields,
+        failedChecker: (f) => _args.getValueByArgument(f) != null);
+    return RequestParam.buildCheckResult([
+      notAllowedChecker.check(),
+      deprecatedChecker.check(),
+    ]);
   }
 }
 
@@ -435,10 +433,10 @@ class _TorrentSetRequestParam extends TorrentSetRequestParam {
   const _TorrentSetRequestParam({required super.args});
 
   @override
-  Set<TorrentSetArgument> get allowedField => _allowedFields;
+  Set<TorrentSetArgument> get allowedFields => _allowedFields;
 
   @override
-  Set<TorrentSetArgument> get deprecatedField => {};
+  Set<TorrentSetArgument> get deprecatedFields => {};
 
   @override
   JsonMap toRpcJson() => {
@@ -495,7 +493,7 @@ class _TorrentSetRequestParamRpc16 extends _TorrentSetRequestParam {
   const _TorrentSetRequestParamRpc16({required super.args});
 
   @override
-  Set<TorrentSetArgument> get allowedField => _allowedFields;
+  Set<TorrentSetArgument> get allowedFields => _allowedFields;
 
   @override
   JsonMap toRpcJson() => super.toRpcJson()
@@ -521,10 +519,10 @@ class _TorrentSetRequestParamRpc17 extends _TorrentSetRequestParamRpc16 {
   const _TorrentSetRequestParamRpc17({required super.args});
 
   @override
-  Set<TorrentSetArgument> get allowedField => _allowedFields;
+  Set<TorrentSetArgument> get allowedFields => _allowedFields;
 
   @override
-  Set<TorrentSetArgument> get deprecatedField => _deprecatedFields;
+  Set<TorrentSetArgument> get deprecatedFields => _deprecatedFields;
 
   @override
   JsonMap toRpcJson() => super.toRpcJson()
@@ -537,15 +535,14 @@ class _TorrentSetRequestParamRpc17 extends _TorrentSetRequestParamRpc16 {
 
 class _TorrentSetRequestParamRpc18 extends _TorrentSetRequestParamRpc17 {
   static final _allowedFields =
-      _TorrentSetRequestParamRpc16._allowedFields.union({
-    TorrentSetArgument.group,
+      _TorrentSetRequestParamRpc17._allowedFields.union({
     TorrentSetArgument.sequentialDownload,
   });
 
   _TorrentSetRequestParamRpc18({required super.args});
 
   @override
-  Set<TorrentSetArgument> get allowedField => _allowedFields;
+  Set<TorrentSetArgument> get allowedFields => _allowedFields;
 
   @override
   JsonMap toRpcJson() => super.toRpcJson()

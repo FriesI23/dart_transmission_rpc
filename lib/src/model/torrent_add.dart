@@ -241,19 +241,18 @@ class _TorrentAddRequestParam extends TorrentAddRequestParam {
 
   @override
   String? check() {
-    final checker = RequestParamArgsChecker<TorrentAddArgument>(
-      notAllowedFields:
-          TorrentAddArgument.allFieldsSet.difference(allowedFields),
-      deprecatedFields: deprecatedFields,
-      checkNotAllowedFields: (f) => _args.getValueByArgument(f) != null,
-      checkDeprecatedFields: (f) => _args.getValueByArgument(f) != null,
-    );
-    final result = checker.check();
-    final checkResult = result.checkResult;
-    if (checkResult.isNotEmpty) {
-      return "got possibly imcompatible fields, ${checkResult.join(", ")}";
-    }
-    return null;
+    final notAllowedChecker = RequestParamArgsChecker<TorrentAddArgument>(
+        label: "$runtimeType.prohibited",
+        fields: TorrentAddArgument.allFieldsSet.difference(allowedFields),
+        failedChecker: (f) => _args.getValueByArgument(f) != null);
+    final deprecatedChecker = RequestParamArgsChecker<TorrentAddArgument>(
+        label: "$runtimeType.deprecated",
+        fields: deprecatedFields,
+        failedChecker: (f) => _args.getValueByArgument(f) != null);
+    return RequestParam.buildCheckResult([
+      notAllowedChecker.check(),
+      deprecatedChecker.check(),
+    ]);
   }
 
   @override

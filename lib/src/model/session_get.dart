@@ -227,7 +227,7 @@ class _SessionGetRequestParam extends SessionGetRequestParam {
 }
 
 class _SessionGetRequestPramRpc16 extends SessionGetRequestParam {
-  static const _allowedFields = {
+  static final _allowedFields = {
     SessionGetArgument.altSpeedDown,
     SessionGetArgument.altSpeedEnabled,
     SessionGetArgument.altSpeedTimeBegin,
@@ -288,17 +288,18 @@ class _SessionGetRequestPramRpc16 extends SessionGetRequestParam {
   @override
   String? check() {
     if (fields == null) return null;
-    final Set<SessionGetArgument> mFields = {};
-    final Set<SessionGetArgument> dFields = {};
-    for (var f in fields!) {
-      if (!allowedFields.contains(f)) mFields.add(f);
-      if (deprecatedFields.contains(f)) dFields.add(f);
-    }
-    if (mFields.isNotEmpty || dFields.isNotEmpty) {
-      return "got possibly imcompatible fields, "
-          "missing: $mFields, deprecated: $dFields";
-    }
-    return null;
+    final allowedChecker = RequestParamArgsChecker<SessionGetArgument>(
+        label: "$runtimeType.prohibited",
+        fields: fields!,
+        failedChecker: (f) => !allowedFields.contains(f));
+    final deprecatedChecker = RequestParamArgsChecker<SessionGetArgument>(
+        label: "$runtimeType.deprecated",
+        fields: fields!,
+        failedChecker: (f) => deprecatedFields.contains(f));
+    return RequestParam.buildCheckResult([
+      allowedChecker.check(),
+      deprecatedChecker.check(),
+    ]);
   }
 
   @override
@@ -312,65 +313,16 @@ class _SessionGetRequestPramRpc16 extends SessionGetRequestParam {
 }
 
 class _SessionGetRequestPramRpc17 extends _SessionGetRequestPramRpc16 {
-  static const _allowedFields = {
-    SessionGetArgument.altSpeedDown,
-    SessionGetArgument.altSpeedEnabled,
-    SessionGetArgument.altSpeedTimeBegin,
-    SessionGetArgument.altSpeedTimeDay,
-    SessionGetArgument.altSpeedTimeEnabled,
-    SessionGetArgument.altSpeedTimeEnd,
-    SessionGetArgument.altSpeedUp,
-    SessionGetArgument.blocklistEnabled,
-    SessionGetArgument.blocklistSize,
-    SessionGetArgument.blocklistUrl,
-    SessionGetArgument.cacheSizeMb,
-    SessionGetArgument.configDir,
-    SessionGetArgument.defaultTrackers, // new arg
-    SessionGetArgument.dhtEnabled,
-    SessionGetArgument.downloadDir,
-    SessionGetArgument.downloadDirFreeSpace,
-    SessionGetArgument.downloadQueueEnabled,
-    SessionGetArgument.downloadQueueSize,
-    SessionGetArgument.encryption,
-    SessionGetArgument.idleSeedingLimitEnabled,
-    SessionGetArgument.idleSeedingLimit,
-    SessionGetArgument.incompleteDirEnabled,
-    SessionGetArgument.incompleteDir,
-    SessionGetArgument.lpdEnabled,
-    SessionGetArgument.peerLimitGlobal,
-    SessionGetArgument.peerLimitPerTorrent,
-    SessionGetArgument.peerPortRandomOnStart,
-    SessionGetArgument.peerPort,
-    SessionGetArgument.pexEnabled,
-    SessionGetArgument.portForwardingEnabled,
-    SessionGetArgument.queueStalledEnabled,
-    SessionGetArgument.queueStalledMinutes,
-    SessionGetArgument.renamePartialFiles,
-    SessionGetArgument.rpcVersionMinimum, // new arg
+  static final _allowedFields =
+      _SessionGetRequestPramRpc16._allowedFields.union({
+    SessionGetArgument.defaultTrackers,
     SessionGetArgument.rpcVersionSemver,
-    SessionGetArgument.rpcVersion,
-    SessionGetArgument.scriptTorrentAddedEnabled, // new arg
-    SessionGetArgument.scriptTorrentAddedFilename, // new arg
-    SessionGetArgument.scriptTorrentDoneEnabled,
-    SessionGetArgument.scriptTorrentDoneFilename,
-    SessionGetArgument.scriptTorrentDoneSeedingEnabled, // new arg
-    SessionGetArgument.scriptTorrentDoneSeedingFilename, // new arg
-    SessionGetArgument.seedQueueEnabled,
-    SessionGetArgument.seedQueueSize,
-    SessionGetArgument.seedRatioLimit,
-    SessionGetArgument.seedRatioLimited,
-    SessionGetArgument.sessionId,
-    SessionGetArgument.speedLimitDownEnabled,
-    SessionGetArgument.speedLimitDown,
-    SessionGetArgument.speedLimitUpEnabled,
-    SessionGetArgument.speedLimitUp,
-    SessionGetArgument.startAddedTorrents,
-    SessionGetArgument.trashOriginalTorrentFiles,
-    SessionGetArgument.units,
-    SessionGetArgument.utpEnabled,
-    SessionGetArgument.version,
-  };
-  static const _deprecatedFields = {
+    SessionGetArgument.scriptTorrentAddedEnabled,
+    SessionGetArgument.scriptTorrentAddedFilename,
+    SessionGetArgument.scriptTorrentDoneSeedingEnabled,
+    SessionGetArgument.scriptTorrentDoneSeedingFilename,
+  });
+  static final _deprecatedFields = {
     SessionGetArgument.downloadDirFreeSpace,
   };
 

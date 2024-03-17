@@ -136,17 +136,18 @@ abstract class TorrentGetRequestParam implements RequestParam {
     if (fields!.isEmpty) {
       throw const TransmissionCheckError("fields should not be empty");
     }
-    final Set<TorrentGetArgument> mFields = {};
-    final Set<TorrentGetArgument> dFields = {};
-    for (var f in fields!) {
-      if (!allowedFields.contains(f)) mFields.add(f);
-      if (deprecatedFields.contains(f)) dFields.add(f);
-    }
-    if (mFields.isNotEmpty || dFields.isNotEmpty) {
-      return "got possibly imcompatible fields, "
-          "missing: $mFields, deprecated: $dFields";
-    }
-    return null;
+    final allowedChecker = RequestParamArgsChecker<TorrentGetArgument>(
+        label: "$runtimeType.prohibited",
+        fields: fields!,
+        failedChecker: (f) => !allowedFields.contains(f));
+    final deprecatedChecker = RequestParamArgsChecker<TorrentGetArgument>(
+        label: "$runtimeType.deprecated",
+        fields: fields!,
+        failedChecker: (f) => deprecatedFields.contains(f));
+    return RequestParam.buildCheckResult([
+      allowedChecker.check(),
+      deprecatedChecker.check(),
+    ]);
   }
 
   @override
@@ -161,7 +162,7 @@ abstract class TorrentGetRequestParam implements RequestParam {
 }
 
 class _TorrentGetRequestParam extends TorrentGetRequestParam {
-  static const _allowedFields = {
+  static final _allowedFields = {
     TorrentGetArgument.addedDate,
     TorrentGetArgument.activityDate,
     TorrentGetArgument.bandwidthPriority,
@@ -240,171 +241,28 @@ class _TorrentGetRequestParam extends TorrentGetRequestParam {
   Set<TorrentGetArgument> get deprecatedFields => {};
 }
 
-class _TorrentGetRequestParamRpc15 extends TorrentGetRequestParam {
-  static const _allowedFields = {
-    TorrentGetArgument.addedDate,
-    TorrentGetArgument.activityDate,
-    TorrentGetArgument.bandwidthPriority,
-    TorrentGetArgument.comment,
-    TorrentGetArgument.corruptEver,
-    TorrentGetArgument.creator,
-    TorrentGetArgument.dateCreated,
-    TorrentGetArgument.desiredAvailable,
-    TorrentGetArgument.doneDate,
-    TorrentGetArgument.downloadDir,
-    TorrentGetArgument.downloadedEver,
-    TorrentGetArgument.downloadLimit,
-    TorrentGetArgument.downloadLimited,
-    TorrentGetArgument.error,
-    TorrentGetArgument.errorString,
-    TorrentGetArgument.eta,
-    TorrentGetArgument.files,
-    TorrentGetArgument.fileStats,
-    TorrentGetArgument.hashString,
-    TorrentGetArgument.haveUnchecked,
-    TorrentGetArgument.haveValid,
-    TorrentGetArgument.honorsSessionLimits,
-    TorrentGetArgument.id,
-    TorrentGetArgument.isFinished,
-    TorrentGetArgument.isPrivate,
-    TorrentGetArgument.isStalled,
-    TorrentGetArgument.leftUntilDone,
-    TorrentGetArgument.magnetLink,
-    TorrentGetArgument.manualAnnounceTime,
-    TorrentGetArgument.maxConnectedPeers,
-    TorrentGetArgument.metadataPercentComplete,
-    TorrentGetArgument.name,
-    TorrentGetArgument.peerLimit,
-    TorrentGetArgument.peers,
-    TorrentGetArgument.peersConnected,
-    TorrentGetArgument.peersFrom,
-    TorrentGetArgument.peersGettingFromUs,
-    TorrentGetArgument.peersSendingToUs,
-    TorrentGetArgument.percentDone,
-    TorrentGetArgument.pieces,
-    TorrentGetArgument.pieceCount,
-    TorrentGetArgument.pieceSize,
-    TorrentGetArgument.priorities,
-    TorrentGetArgument.queuePosition,
-    TorrentGetArgument.rateDownload,
-    TorrentGetArgument.rateUpload,
-    TorrentGetArgument.recheckProgress,
-    TorrentGetArgument.secondsDownloading,
-    TorrentGetArgument.secondsSeeding,
-    TorrentGetArgument.seedIdleLimit,
-    TorrentGetArgument.seedIdleMode,
-    TorrentGetArgument.seedRatioLimit,
-    TorrentGetArgument.seedRatioMode,
-    TorrentGetArgument.sizeWhenDone,
-    TorrentGetArgument.startDate,
-    TorrentGetArgument.status,
-    TorrentGetArgument.trackers,
-    TorrentGetArgument.trackerStats,
-    TorrentGetArgument.totalSize,
-    TorrentGetArgument.torrentFile,
-    TorrentGetArgument.uploadedEver,
-    TorrentGetArgument.uploadLimit,
-    TorrentGetArgument.uploadLimited,
-    TorrentGetArgument.uploadRatio,
-    TorrentGetArgument.wanted,
-    TorrentGetArgument.webseeds,
-    TorrentGetArgument.webseedsSendingToUs,
-    // rpc15 new
+class _TorrentGetRequestParamRpc15 extends _TorrentGetRequestParam {
+  static final _allowedFields = _TorrentGetRequestParam._allowedFields.union({
     TorrentGetArgument.etaIdle,
-  };
+  });
 
   const _TorrentGetRequestParamRpc15(super.fields, super.ids);
 
   @override
   Set<TorrentGetArgument> get allowedFields => _allowedFields;
-
-  @override
-  Set<TorrentGetArgument> get deprecatedFields => {};
 }
 
 class _TorrentGetRequestParamRpc16 extends _TorrentGetRequestParamRpc15 {
-  static const _allowedFields = {
-    TorrentGetArgument.addedDate,
-    TorrentGetArgument.activityDate,
-    TorrentGetArgument.bandwidthPriority,
-    TorrentGetArgument.comment,
-    TorrentGetArgument.corruptEver,
-    TorrentGetArgument.creator,
-    TorrentGetArgument.dateCreated,
-    TorrentGetArgument.desiredAvailable,
-    TorrentGetArgument.doneDate,
-    TorrentGetArgument.downloadDir,
-    TorrentGetArgument.downloadedEver,
-    TorrentGetArgument.downloadLimit,
-    TorrentGetArgument.downloadLimited,
-    TorrentGetArgument.error,
-    TorrentGetArgument.errorString,
-    TorrentGetArgument.eta,
-    TorrentGetArgument.files,
-    TorrentGetArgument.fileStats,
-    TorrentGetArgument.hashString,
-    TorrentGetArgument.haveUnchecked,
-    TorrentGetArgument.haveValid,
-    TorrentGetArgument.honorsSessionLimits,
-    TorrentGetArgument.id,
-    TorrentGetArgument.isFinished,
-    TorrentGetArgument.isPrivate,
-    TorrentGetArgument.isStalled,
-    TorrentGetArgument.leftUntilDone,
-    TorrentGetArgument.magnetLink,
-    TorrentGetArgument.manualAnnounceTime,
-    TorrentGetArgument.maxConnectedPeers,
-    TorrentGetArgument.metadataPercentComplete,
-    TorrentGetArgument.name,
-    TorrentGetArgument.peerLimit,
-    TorrentGetArgument.peers,
-    TorrentGetArgument.peersConnected,
-    TorrentGetArgument.peersFrom,
-    TorrentGetArgument.peersGettingFromUs,
-    TorrentGetArgument.peersSendingToUs,
-    TorrentGetArgument.percentDone,
-    TorrentGetArgument.pieces,
-    TorrentGetArgument.pieceCount,
-    TorrentGetArgument.pieceSize,
-    TorrentGetArgument.priorities,
-    TorrentGetArgument.queuePosition,
-    TorrentGetArgument.rateDownload,
-    TorrentGetArgument.rateUpload,
-    TorrentGetArgument.recheckProgress,
-    TorrentGetArgument.secondsDownloading,
-    TorrentGetArgument.secondsSeeding,
-    TorrentGetArgument.seedIdleLimit,
-    TorrentGetArgument.seedIdleMode,
-    TorrentGetArgument.seedRatioLimit,
-    TorrentGetArgument.seedRatioMode,
-    TorrentGetArgument.sizeWhenDone,
-    TorrentGetArgument.startDate,
-    TorrentGetArgument.status,
-    TorrentGetArgument.trackers,
-    TorrentGetArgument.trackerStats,
-    TorrentGetArgument.totalSize,
-    TorrentGetArgument.torrentFile,
-    TorrentGetArgument.uploadedEver,
-    TorrentGetArgument.uploadLimit,
-    TorrentGetArgument.uploadLimited,
-    TorrentGetArgument.uploadRatio,
-    TorrentGetArgument.wanted,
-    TorrentGetArgument.webseeds,
-    TorrentGetArgument.webseedsSendingToUs,
-    // rpc15 new
-    TorrentGetArgument.etaIdle,
-    // rpc16 new
+  static final _allowedFields =
+      _TorrentGetRequestParamRpc15._allowedFields.union({
     TorrentGetArgument.labels,
     TorrentGetArgument.editDate,
-  };
+  });
 
   const _TorrentGetRequestParamRpc16(super.fields, super.ids);
 
   @override
   Set<TorrentGetArgument> get allowedFields => _allowedFields;
-
-  @override
-  Set<TorrentGetArgument> get deprecatedFields => {};
 
   @override
   JsonMap toRpcJson() {
@@ -416,189 +274,32 @@ class _TorrentGetRequestParamRpc16 extends _TorrentGetRequestParamRpc15 {
 }
 
 class _TorrentGetRequestParamRpc17 extends _TorrentGetRequestParamRpc16 {
-  static const _allowedFields = {
-    TorrentGetArgument.addedDate,
-    TorrentGetArgument.activityDate,
-    TorrentGetArgument.bandwidthPriority,
-    TorrentGetArgument.comment,
-    TorrentGetArgument.corruptEver,
-    TorrentGetArgument.creator,
-    TorrentGetArgument.dateCreated,
-    TorrentGetArgument.desiredAvailable,
-    TorrentGetArgument.doneDate,
-    TorrentGetArgument.downloadDir,
-    TorrentGetArgument.downloadedEver,
-    TorrentGetArgument.downloadLimit,
-    TorrentGetArgument.downloadLimited,
-    TorrentGetArgument.error,
-    TorrentGetArgument.errorString,
-    TorrentGetArgument.eta,
-    TorrentGetArgument.files,
-    TorrentGetArgument.fileStats,
-    TorrentGetArgument.hashString,
-    TorrentGetArgument.haveUnchecked,
-    TorrentGetArgument.haveValid,
-    TorrentGetArgument.honorsSessionLimits,
-    TorrentGetArgument.id,
-    TorrentGetArgument.isFinished,
-    TorrentGetArgument.isPrivate,
-    TorrentGetArgument.isStalled,
-    TorrentGetArgument.leftUntilDone,
-    TorrentGetArgument.magnetLink,
-    TorrentGetArgument.manualAnnounceTime,
-    TorrentGetArgument.maxConnectedPeers,
-    TorrentGetArgument.metadataPercentComplete,
-    TorrentGetArgument.name,
-    TorrentGetArgument.peerLimit,
-    TorrentGetArgument.peers,
-    TorrentGetArgument.peersConnected,
-    TorrentGetArgument.peersFrom,
-    TorrentGetArgument.peersGettingFromUs,
-    TorrentGetArgument.peersSendingToUs,
-    TorrentGetArgument.percentDone,
-    TorrentGetArgument.pieces,
-    TorrentGetArgument.pieceCount,
-    TorrentGetArgument.pieceSize,
-    TorrentGetArgument.priorities,
-    TorrentGetArgument.queuePosition,
-    TorrentGetArgument.rateDownload,
-    TorrentGetArgument.rateUpload,
-    TorrentGetArgument.recheckProgress,
-    TorrentGetArgument.secondsDownloading,
-    TorrentGetArgument.secondsSeeding,
-    TorrentGetArgument.seedIdleLimit,
-    TorrentGetArgument.seedIdleMode,
-    TorrentGetArgument.seedRatioLimit,
-    TorrentGetArgument.seedRatioMode,
-    TorrentGetArgument.sizeWhenDone,
-    TorrentGetArgument.startDate,
-    TorrentGetArgument.status,
-    TorrentGetArgument.trackers,
-    TorrentGetArgument.trackerStats,
-    TorrentGetArgument.totalSize,
-    TorrentGetArgument.torrentFile,
-    TorrentGetArgument.uploadedEver,
-    TorrentGetArgument.uploadLimit,
-    TorrentGetArgument.uploadLimited,
-    TorrentGetArgument.uploadRatio,
-    TorrentGetArgument.wanted,
-    TorrentGetArgument.webseeds,
-    TorrentGetArgument.webseedsSendingToUs,
-    // rpc15 new
-    TorrentGetArgument.etaIdle,
-    // rpc16 new
-    TorrentGetArgument.labels,
-    TorrentGetArgument.editDate,
-    // rpc17 new
+  static final _allowedFields =
+      _TorrentGetRequestParamRpc16._allowedFields.union({
     TorrentGetArgument.availability,
     TorrentGetArgument.fileCount,
     TorrentGetArgument.group,
     TorrentGetArgument.percentComplete,
     TorrentGetArgument.primaryMimeType,
     TorrentGetArgument.trackerList,
-  };
+  });
 
   const _TorrentGetRequestParamRpc17(super.fields, super.ids);
 
   @override
   Set<TorrentGetArgument> get allowedFields => _allowedFields;
-
-  @override
-  Set<TorrentGetArgument> get deprecatedFields => {};
 }
 
 class _TorrentGetRequestParamRpc18 extends _TorrentGetRequestParamRpc17 {
-  static const _allowedFields = {
-    TorrentGetArgument.addedDate,
-    TorrentGetArgument.activityDate,
-    TorrentGetArgument.bandwidthPriority,
-    TorrentGetArgument.comment,
-    TorrentGetArgument.corruptEver,
-    TorrentGetArgument.creator,
-    TorrentGetArgument.dateCreated,
-    TorrentGetArgument.desiredAvailable,
-    TorrentGetArgument.doneDate,
-    TorrentGetArgument.downloadDir,
-    TorrentGetArgument.downloadedEver,
-    TorrentGetArgument.downloadLimit,
-    TorrentGetArgument.downloadLimited,
-    TorrentGetArgument.error,
-    TorrentGetArgument.errorString,
-    TorrentGetArgument.eta,
-    TorrentGetArgument.files,
-    TorrentGetArgument.fileStats,
-    TorrentGetArgument.hashString,
-    TorrentGetArgument.haveUnchecked,
-    TorrentGetArgument.haveValid,
-    TorrentGetArgument.honorsSessionLimits,
-    TorrentGetArgument.id,
-    TorrentGetArgument.isFinished,
-    TorrentGetArgument.isPrivate,
-    TorrentGetArgument.isStalled,
-    TorrentGetArgument.leftUntilDone,
-    TorrentGetArgument.magnetLink,
-    TorrentGetArgument.manualAnnounceTime,
-    TorrentGetArgument.maxConnectedPeers,
-    TorrentGetArgument.metadataPercentComplete,
-    TorrentGetArgument.name,
-    TorrentGetArgument.peerLimit,
-    TorrentGetArgument.peers,
-    TorrentGetArgument.peersConnected,
-    TorrentGetArgument.peersFrom,
-    TorrentGetArgument.peersGettingFromUs,
-    TorrentGetArgument.peersSendingToUs,
-    TorrentGetArgument.percentDone,
-    TorrentGetArgument.pieces,
-    TorrentGetArgument.pieceCount,
-    TorrentGetArgument.pieceSize,
-    TorrentGetArgument.priorities,
-    TorrentGetArgument.queuePosition,
-    TorrentGetArgument.rateDownload,
-    TorrentGetArgument.rateUpload,
-    TorrentGetArgument.recheckProgress,
-    TorrentGetArgument.secondsDownloading,
-    TorrentGetArgument.secondsSeeding,
-    TorrentGetArgument.seedIdleLimit,
-    TorrentGetArgument.seedIdleMode,
-    TorrentGetArgument.seedRatioLimit,
-    TorrentGetArgument.seedRatioMode,
-    TorrentGetArgument.sizeWhenDone,
-    TorrentGetArgument.startDate,
-    TorrentGetArgument.status,
-    TorrentGetArgument.trackers,
-    TorrentGetArgument.trackerStats,
-    TorrentGetArgument.totalSize,
-    TorrentGetArgument.torrentFile,
-    TorrentGetArgument.uploadedEver,
-    TorrentGetArgument.uploadLimit,
-    TorrentGetArgument.uploadLimited,
-    TorrentGetArgument.uploadRatio,
-    TorrentGetArgument.wanted,
-    TorrentGetArgument.webseeds,
-    TorrentGetArgument.webseedsSendingToUs,
-    // rpc15 new
-    TorrentGetArgument.etaIdle,
-    // rpc16 new
-    TorrentGetArgument.labels,
-    TorrentGetArgument.editDate,
-    // rpc17 new
-    TorrentGetArgument.availability,
-    TorrentGetArgument.fileCount,
-    TorrentGetArgument.group,
-    TorrentGetArgument.percentComplete,
-    TorrentGetArgument.primaryMimeType,
-    TorrentGetArgument.trackerList,
-    // rpc18 new
+  static final _allowedFields =
+      _TorrentGetRequestParamRpc17._allowedFields.union({
     TorrentGetArgument.sequentialDownload,
-  };
+  });
 
   const _TorrentGetRequestParamRpc18(super.fields, super.ids);
 
   @override
   Set<TorrentGetArgument> get allowedFields => _allowedFields;
-
-  @override
-  Set<TorrentGetArgument> get deprecatedFields => {};
 }
 
 class Availability {

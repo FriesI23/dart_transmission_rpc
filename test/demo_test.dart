@@ -258,6 +258,7 @@ Future<void> testTorrentAdd({TransmissionRpcClient? c}) async {
       metainfo:
           base64Encode(io.File("test/demo_test.torrent").readAsBytesSync()),
       downloadDir: "/downloads/complete",
+      labels: ["test", "test1"],
     ),
   );
   print(result.result);

@@ -398,18 +398,20 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     if (!isInited()) {
       throw const TransmissionCheckError("Client has not been initialized.");
     }
+
+    String buildFailedString(String reason) =>
+        "preCheck failed, method: $method, reason: $reason";
+
     if (timeout != null && timeout < 0) {
-      throw TransmissionCheckError(
-          "pre check failed, method: $method, reason: timeout $timeout <= 0");
+      throw TransmissionCheckError(buildFailedString("timeout $timeout <= 0"));
     }
     try {
       final reason = p?.check();
       if (reason != null && reason.isNotEmpty) {
-        log.warn("per check failed, method: $method, reason: $reason");
+        log.warn(buildFailedString(reason));
       }
     } on TransmissionError catch (e) {
-      throw TransmissionCheckError(
-          "pre check failed, method: $method, reason: $e");
+      throw TransmissionCheckError(buildFailedString(e.toString()));
     }
   }
 

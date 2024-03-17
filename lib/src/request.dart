@@ -7,6 +7,17 @@ import 'method.dart';
 import 'typedef.dart';
 
 abstract interface class RequestParam {
+  static String? buildCheckResult(
+      Iterable<RequestParamCheckResult> checkResults) {
+    final stringResults = checkResults
+        .where((e) => !e.isOk)
+        .map((e) => e.checkResultStr)
+        .toList();
+    return stringResults.isNotEmpty
+        ? "got possibly imcompatible fields, ${stringResults.join(", ")}"
+        : null;
+  }
+
   String? check();
   JsonMap toRpcJson();
 }
@@ -69,77 +80,47 @@ abstract interface class RequestParamChecker<T> {
 }
 
 class RequestParamCheckResult<T> {
-  final Set<T> checkNotAllowedFields;
-  final Set<T> checkDeprecatedFields;
+  final String label;
+  final Set<T> checkFailedFields;
 
   const RequestParamCheckResult({
-    this.checkNotAllowedFields = const {},
-    this.checkDeprecatedFields = const {},
+    required this.label,
+    this.checkFailedFields = const {},
   });
 
-  List<String> get checkResult {
-    String? notAllowedFieldsCheckResult() => checkNotAllowedFields.isNotEmpty
-        ? "missing: $checkNotAllowedFields"
-        : null;
+  bool get isOk => checkFailedFields.isEmpty;
 
-    String? deprecatedFieldsCheckResult() => checkDeprecatedFields.isNotEmpty
-        ? "deprecated: $checkDeprecatedFields"
-        : null;
-
-    final nr = notAllowedFieldsCheckResult();
-    final dr = deprecatedFieldsCheckResult();
-    return [
-      if (nr != null) nr,
-      if (dr != null) dr,
-    ];
-  }
+  String? get checkResultStr => !isOk ? "$label: $checkFailedFields" : null;
 }
 
 class RequestParamArgsChecker<T> implements RequestParamChecker {
-  final Set<T> _notAllowedFields;
-  final Set<T> _deprecatedFields;
-  final bool Function(T f)? checkNotAllowedFields;
-  final bool Function(T f)? checkDeprecatedFields;
+  final String label;
+  final Iterable<T> _fields;
+  final bool Function(T f)? failedChecker;
 
   RequestParamArgsChecker({
-    required Set<T> notAllowedFields,
-    required Set<T> deprecatedFields,
-    this.checkNotAllowedFields,
-    this.checkDeprecatedFields,
-  })  : _notAllowedFields = notAllowedFields,
-        _deprecatedFields = deprecatedFields;
+    this.label = "unknown",
+    required Iterable<T> fields,
+    this.failedChecker,
+  }) : _fields = fields;
 
-  bool _defaultCheckField(T f) => false;
+  bool _defaultChecker(T f) => false;
 
   @override
   RequestParamCheckResult<T> check() {
-    final Set<T> mFields = {};
-    for (var f in _notAllowedFields) {
-      if ((checkNotAllowedFields ?? _defaultCheckField)(f)) mFields.add(f);
+    final Set<T> fields = {};
+    for (var f in _fields) {
+      if ((failedChecker ?? _defaultChecker)(f)) fields.add(f);
     }
-    final Set<T> dFields = {};
-    for (var f in _deprecatedFields) {
-      if ((checkDeprecatedFields ?? _defaultCheckField)(f)) dFields.add(f);
-    }
-    return RequestParamCheckResult(
-      checkNotAllowedFields: mFields,
-      checkDeprecatedFields: dFields,
-    );
+    return RequestParamCheckResult(checkFailedFields: fields, label: label);
   }
 
   RequestParamArgsChecker<T> copyWith({
-    Set<T>? notAllowedFields,
-    Set<T>? deprecatedFields,
-    bool Function(T f)? checkNotAllowedFields,
-    bool Function(T f)? checkDeprecatedFields,
+    Set<T>? fields,
+    bool Function(T f)? failedChecker,
   }) {
     return RequestParamArgsChecker<T>(
-      notAllowedFields: notAllowedFields ?? _notAllowedFields,
-      deprecatedFields: deprecatedFields ?? _deprecatedFields,
-      checkNotAllowedFields:
-          checkNotAllowedFields ?? this.checkNotAllowedFields,
-      checkDeprecatedFields:
-          checkDeprecatedFields ?? this.checkDeprecatedFields,
-    );
+        fields: fields ?? _fields,
+        failedChecker: failedChecker ?? this.failedChecker);
   }
 }

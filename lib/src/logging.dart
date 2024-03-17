@@ -71,7 +71,7 @@ class _Logger implements Logger {
   }
 
   String join(message, List<dynamic>? args) =>
-      message + (args != null ? "|" : " + ") + (args?.join("|") ?? "");
+      message + (args != null ? "|" : "") + (args?.join("|") ?? "");
 
   @override
   void debug(String message, {List<dynamic>? args}) =>
