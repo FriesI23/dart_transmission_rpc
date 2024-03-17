@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import 'package:flutter_transmission_rpc/src/version.dart';
+import 'package:dart_transmission_rpc/src/version.dart';
 import 'package:test/test.dart';
 
 void testServerRpcVersion() => group("test ServerRpcVersion", () {

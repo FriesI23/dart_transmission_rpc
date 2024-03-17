@@ -8,19 +8,10 @@
 import 'dart:convert';
 import "dart:io" as io;
 
-import 'package:flutter_transmission_rpc/src/client.dart';
-import 'package:flutter_transmission_rpc/src/extension/client_torrent_extension.dart';
-import 'package:flutter_transmission_rpc/src/logging.dart';
-import 'package:flutter_transmission_rpc/src/model/group_get.dart';
-import 'package:flutter_transmission_rpc/src/model/group_set.dart';
-import 'package:flutter_transmission_rpc/src/model/session_get.dart';
-import 'package:flutter_transmission_rpc/src/model/session_set.dart';
-import 'package:flutter_transmission_rpc/src/model/torrent.dart';
-import 'package:flutter_transmission_rpc/src/model/torrent_add.dart';
-import 'package:flutter_transmission_rpc/src/model/torrent_get.dart';
-import 'package:flutter_transmission_rpc/src/model/torrent_move.dart';
-import 'package:flutter_transmission_rpc/src/model/torrent_rename.dart';
-import 'package:flutter_transmission_rpc/src/model/torrent_set.dart';
+import 'package:dart_transmission_rpc/client.dart';
+import 'package:dart_transmission_rpc/extensions.dart';
+import 'package:dart_transmission_rpc/logging.dart';
+import 'package:dart_transmission_rpc/model.dart';
 
 Future<void> testSessionGet() async {
   final client = TransmissionRpcClient(username: "admin", password: "123456");
@@ -182,6 +173,7 @@ Future<void> testTorrentGet({TransmissionRpcClient? c}) async {
     TorrentGetArgument.id,
     TorrentGetArgument.hashString,
     TorrentGetArgument.addedDate,
+    TorrentGetArgument.pieces,
     // rpc18
     TorrentGetArgument.sequentialDownload,
     // rpc17
@@ -364,7 +356,7 @@ void main() async {
   // await testTorrentSartNow();
   // await testTorrentVerify();
   // await testTorrentReannounce();
-  // await testTorrentGet();
+  await testTorrentGet();
   // await testTorrentGetAll();
   // await testTorrentSet();
   // await testTorrentRemove();

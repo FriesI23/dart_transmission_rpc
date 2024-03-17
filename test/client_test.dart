@@ -6,12 +6,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_transmission_rpc/src/model/session_get.dart';
-import 'package:flutter_transmission_rpc/src/client.dart';
-import 'package:flutter_transmission_rpc/src/exception.dart';
-import 'package:flutter_transmission_rpc/src/response.dart';
-import 'package:flutter_transmission_rpc/src/utils.dart';
-import 'package:flutter_transmission_rpc/src/version.dart';
+import 'package:dart_transmission_rpc/src/client.dart';
+import 'package:dart_transmission_rpc/src/exception.dart';
+import 'package:dart_transmission_rpc/src/model/session_get.dart';
+import 'package:dart_transmission_rpc/src/response.dart';
+import 'package:dart_transmission_rpc/src/utils.dart';
+import 'package:dart_transmission_rpc/src/version.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';

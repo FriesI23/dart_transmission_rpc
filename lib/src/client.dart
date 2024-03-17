@@ -313,8 +313,8 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       _sessionId,
       payload
     ]);
-    final resultText =
-        await _doRequest(body, Duration(milliseconds: timeout ?? this.timeout));
+    final resultText = await _doRequest(Uint8List.fromList(body),
+        Duration(milliseconds: timeout ?? this.timeout));
     log.debug("on doReqeust", args: [
       request.hashCode,
       request.method,

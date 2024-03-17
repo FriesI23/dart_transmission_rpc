@@ -3,9 +3,9 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import 'package:flutter_transmission_rpc/src/method.dart';
-import 'package:flutter_transmission_rpc/src/request.dart';
-import 'package:flutter_transmission_rpc/src/typedef.dart';
+import 'package:dart_transmission_rpc/src/method.dart';
+import 'package:dart_transmission_rpc/src/request.dart';
+import 'package:dart_transmission_rpc/src/typedef.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 

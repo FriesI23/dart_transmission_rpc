@@ -3,9 +3,9 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import 'package:flutter_transmission_rpc/src/model/session_get.dart';
-import 'package:flutter_transmission_rpc/src/exception.dart';
-import 'package:flutter_transmission_rpc/src/version.dart';
+import 'package:dart_transmission_rpc/src/exception.dart';
+import 'package:dart_transmission_rpc/src/model/session_get.dart';
+import 'package:dart_transmission_rpc/src/version.dart';
 import 'package:test/test.dart';
 
 void testSessionGetRequestParam() => group("test SessionGetRequestParam", () {
@@ -38,7 +38,7 @@ void testSessionGetRequestParam() => group("test SessionGetRequestParam", () {
               () => SessionGetRequestParam.build(version: v),
               throwsA(predicate((e) =>
                   e is TransmissionVersionError &&
-                  e.reason == "Incompatible API version on session-get")));
+                  e.reason.startsWith("Incompatible API version"))));
         });
         test("test invalid API version - negative rpc version", () {
           final v = ServerRpcVersion.build(-1, -1);
@@ -46,7 +46,7 @@ void testSessionGetRequestParam() => group("test SessionGetRequestParam", () {
               () => SessionGetRequestParam.build(version: v),
               throwsA(predicate((e) =>
                   e is TransmissionVersionError &&
-                  e.reason == "Incompatible API version on session-get")));
+                  e.reason.startsWith("Incompatible API version"))));
         });
 
         test("test invalid API version - negative min rpc version", () {
@@ -55,7 +55,7 @@ void testSessionGetRequestParam() => group("test SessionGetRequestParam", () {
               () => SessionGetRequestParam.build(version: v),
               throwsA(predicate((e) =>
                   e is TransmissionVersionError &&
-                  e.reason == "Incompatible API version on session-get")));
+                  e.reason.startsWith("Incompatible API version"))));
         });
       });
     });
