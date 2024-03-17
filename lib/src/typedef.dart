@@ -25,6 +25,7 @@ import 'response.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 typedef RpcTag = num;
+typedef TrackerId = num;
 
 // api
 typedef _ApiResponse<T extends RequestParam, V extends ResponseParam>

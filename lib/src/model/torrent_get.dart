@@ -813,7 +813,7 @@ enum TorrentStatus {
 
 class Tracker {
   final String announce;
-  final num id;
+  final TrackerId id;
   final String scrape;
   final num tier;
   final String? sitename;
@@ -844,7 +844,7 @@ class TrackerStat {
   final bool hasAnnounced;
   final bool hasScraped;
   final String host;
-  final num id;
+  final TrackerId id;
   final bool isBackup;
   final num lastAnnouncePeerCount;
   final String lastAnnounceResult;
@@ -962,11 +962,10 @@ class TorrentInfo {
   final List<File>? files;
   final List<FileStat>? fileStats;
   final String? group;
-  final String? hashString;
   final num? haveUnchecked;
   final num? haveValid;
   final bool? honorsSessionLimits;
-  final num? id;
+  final TorrentId? id;
   final bool? isFinished;
   final bool? isPrivate;
   final bool? isStalled;
@@ -1041,7 +1040,6 @@ class TorrentInfo {
     this.files,
     this.fileStats,
     this.group,
-    this.hashString,
     this.haveUnchecked,
     this.haveValid,
     this.honorsSessionLimits,
@@ -1115,6 +1113,12 @@ class TorrentInfo {
   }
 
   factory TorrentInfo.fromJson(JsonMap rawData) {
+    final rawId = rawData[TorrentGetArgument.id.argName] as num?;
+    final rawHashString =
+        rawData[TorrentGetArgument.hashString.argName] as String?;
+    final id = !(rawId == null && rawHashString == null)
+        ? TorrentId(id: rawId?.toInt(), hashStr: rawHashString)
+        : null;
     return TorrentInfo(
       activityDate: rawData[TorrentGetArgument.activityDate.argName] as num?,
       addedDate: rawData[TorrentGetArgument.addedDate.argName] as num?,
@@ -1150,12 +1154,11 @@ class TorrentInfo {
           ?.map((fileStat) => FileStat.fromJson(fileStat))
           .toList(),
       group: rawData[TorrentGetArgument.group.argName] as String?,
-      hashString: rawData[TorrentGetArgument.hashString.argName] as String?,
       haveUnchecked: rawData[TorrentGetArgument.haveUnchecked.argName] as num?,
       haveValid: rawData[TorrentGetArgument.haveValid.argName] as num?,
       honorsSessionLimits:
           rawData[TorrentGetArgument.honorsSessionLimits.argName] as bool?,
-      id: rawData[TorrentGetArgument.id.argName] as num?,
+      id: id,
       isFinished: rawData[TorrentGetArgument.isFinished.argName] as bool?,
       isPrivate: rawData[TorrentGetArgument.isPrivate.argName] as bool?,
       isStalled: rawData[TorrentGetArgument.isStalled.argName] as bool?,

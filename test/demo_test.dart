@@ -179,6 +179,7 @@ Future<void> testTorrentGet({TransmissionRpcClient? c}) async {
   final result = await client.torrentGet([
     TorrentGetArgument.name,
     TorrentGetArgument.id,
+    TorrentGetArgument.hashString,
     TorrentGetArgument.addedDate
   ]);
   print(result.result);
@@ -243,8 +244,7 @@ Future<void> testTorrentRemove({TransmissionRpcClient? c}) async {
   if (c == null) await client.init();
   final r1 = await client.torrentGetAll(const TorrentIds.empty());
   final r1id = r1.param!.torrents[0].id;
-  final result =
-      await client.torrentRemove(TorrentIds([TorrentId(id: r1id!.toInt())]));
+  final result = await client.torrentRemove(TorrentIds([r1id!]));
   print(result.result);
   print(result.param);
 }
@@ -342,13 +342,14 @@ void main() async {
   // await testFreeSpace();
   // await testGroupGet();
   // await testGroupSet();
-  await testSessionClose();
+  // await testSessionClose();
 
   // await testTorrentStop();
   // await testTorrentSart();
   // await testTorrentSartNow();
   // await testTorrentVerify();
   // await testTorrentReannounce();
+  // await testTorrentGet();
   // await testTorrentGetAll();
   // await testTorrentSet();
   // await testTorrentRemove();
