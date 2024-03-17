@@ -3,10 +3,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
+import '../utils.dart';
 import '../version.dart';
 
 enum SessionSetArgument {
@@ -521,19 +521,12 @@ abstract class SessionSetRequestParam
   factory SessionSetRequestParam.build({
     ServerRpcVersion? version,
     SessionSetRequestArgs? args,
-  }) {
-    _SessionSetRequestParam normalBuilder() =>
-        _SessionSetRequestParam(args: args ?? const SessionSetRequestArgs());
-
-    if (version == null) {
-      return normalBuilder();
-    } else if (version.checkApiVersionValidate()) {
-      return normalBuilder();
-    } else {
-      throw TransmissionVersionError("Incompatible API version on session-set",
-          version.rpcVersion, version.minRpcVersion);
-    }
-  }
+  }) =>
+      buildRequestParam1(version, args,
+          nullVersionBuilder: (args) => _SessionSetRequestParam(
+              args: args ?? const SessionSetRequestArgs()),
+          defaultVersionBuilder: (args) => _SessionSetRequestParam(
+              args: args ?? const SessionSetRequestArgs()));
 }
 
 class _SessionSetRequestParam extends SessionSetRequestParam {

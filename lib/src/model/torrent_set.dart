@@ -5,10 +5,10 @@
 
 // ignore_for_file: deprecated_member_use_from_same_package
 
-import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
+import '../utils.dart';
 import '../version.dart';
 import 'torrent.dart';
 
@@ -366,23 +366,19 @@ abstract class TorrentSetRequestParam
   const TorrentSetRequestParam({required TorrentSetRequestArgs args})
       : _args = args;
 
+  static final _verionBuilderMap =
+      <ParamBuilderEntry1<TorrentSetRequestParam, TorrentSetRequestArgs>>[
+    MapEntry(18, (args) => _TorrentSetRequestParamRpc18(args: args)),
+    MapEntry(17, (args) => _TorrentSetRequestParamRpc17(args: args)),
+    MapEntry(16, (args) => _TorrentSetRequestParamRpc16(args: args)),
+  ];
+
   factory TorrentSetRequestParam.build(
-      {ServerRpcVersion? version, required TorrentSetRequestArgs args}) {
-    if (version == null) {
-      return _TorrentSetRequestParam(args: args);
-    } else if (version.checkApiVersionValidate(v: 18)) {
-      return _TorrentSetRequestParamRpc18(args: args);
-    } else if (version.checkApiVersionValidate(v: 17)) {
-      return _TorrentSetRequestParamRpc17(args: args);
-    } else if (version.checkApiVersionValidate(v: 16)) {
-      return _TorrentSetRequestParamRpc16(args: args);
-    } else if (version.checkApiVersionValidate()) {
-      return _TorrentSetRequestParam(args: args);
-    } else {
-      throw TransmissionVersionError("Incompatible API version on torrent-set",
-          version.rpcVersion, version.minRpcVersion);
-    }
-  }
+          {ServerRpcVersion? version, required TorrentSetRequestArgs args}) =>
+      buildRequestParam1(version, args,
+          nullVersionBuilder: (args) => _TorrentSetRequestParam(args: args),
+          defaultVersionBuilder: (args) => _TorrentSetRequestParam(args: args),
+          versionBuilers: _verionBuilderMap);
 
   Set<TorrentSetArgument> get allowedFields;
   Set<TorrentSetArgument> get deprecatedFields;

@@ -3,10 +3,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
+import '../utils.dart';
 import '../version.dart';
 
 enum GroupGetArgument {
@@ -28,19 +28,17 @@ abstract class GroupGetRequestParam implements RequestParam {
 
   const GroupGetRequestParam(this.group);
 
+  static final _verionBuilderMap =
+      <ParamBuilderEntry1<GroupGetRequestParam, List<String>?>>[
+    MapEntry(17, (group) => _GroupGetRequestParamRpc17(group)),
+  ];
+
   factory GroupGetRequestParam.build(
-      {required ServerRpcVersion? version, required List<String>? group}) {
-    if (version == null) {
-      return const _GroupGetRequestParam();
-    } else if (version.checkApiVersionValidate(v: 17)) {
-      return _GroupGetRequestParamRpc17(group);
-    } else if (version.checkApiVersionValidate()) {
-      return const _GroupGetRequestParam();
-    } else {
-      throw TransmissionVersionError("Incompatible API version on group-get",
-          version.rpcVersion, version.minRpcVersion);
-    }
-  }
+          {required ServerRpcVersion? version, required List<String>? group}) =>
+      buildRequestParam1(version, group,
+          nullVersionBuilder: (group) => const _GroupGetRequestParam(),
+          defaultVersionBuilder: (group) => const _GroupGetRequestParam(),
+          versionBuilers: _verionBuilderMap);
 }
 
 class _GroupGetRequestParam extends GroupGetRequestParam {
@@ -109,5 +107,14 @@ class GroupDesc {
           rawData[GroupGetArgument.speedLimitUpEnabled.argName] as bool,
       speedLimitUp: rawData[GroupGetArgument.speedLimitUp.argName] as num,
     );
+  }
+
+  @override
+  String toString() {
+    return 'GroupDesc {name: $name, honorsSessionLimits: $honorsSessionLimits, '
+        'speedLimitDownEnabled: $speedLimitDownEnabled, '
+        'speedLimitDown: $speedLimitDown, '
+        'speedLimitUpEnabled: $speedLimitUpEnabled, '
+        'speedLimitUp: $speedLimitUp}';
   }
 }

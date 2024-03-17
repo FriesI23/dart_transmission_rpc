@@ -11,6 +11,7 @@ import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
+import '../utils.dart';
 import '../version.dart';
 import 'torrent.dart';
 
@@ -104,28 +105,25 @@ abstract class TorrentGetRequestParam implements RequestParam {
 
   const TorrentGetRequestParam(this.fields, this.ids);
 
+  static final _verionBuilderMap = <ParamBuilderEntry2<TorrentGetRequestParam,
+      List<TorrentGetArgument>?, TorrentIds?>>[
+    MapEntry(18, (fields, ids) => _TorrentGetRequestParamRpc18(fields, ids)),
+    MapEntry(17, (fields, ids) => _TorrentGetRequestParamRpc17(fields, ids)),
+    MapEntry(16, (fields, ids) => _TorrentGetRequestParamRpc16(fields, ids)),
+    MapEntry(15, (fields, ids) => _TorrentGetRequestParamRpc15(fields, ids)),
+  ];
+
   factory TorrentGetRequestParam.build({
     ServerRpcVersion? version,
     required List<TorrentGetArgument>? fields,
     TorrentIds? ids,
-  }) {
-    if (version == null) {
-      return _TorrentGetRequestParam(fields, ids);
-    } else if (version.checkApiVersionValidate(v: 18)) {
-      return _TorrentGetRequestParamRpc18(fields, ids);
-    } else if (version.checkApiVersionValidate(v: 17)) {
-      return _TorrentGetRequestParamRpc17(fields, ids);
-    } else if (version.checkApiVersionValidate(v: 16)) {
-      return _TorrentGetRequestParamRpc16(fields, ids);
-    } else if (version.checkApiVersionValidate(v: 15)) {
-      return _TorrentGetRequestParamRpc15(fields, ids);
-    } else if (version.checkApiVersionValidate()) {
-      return _TorrentGetRequestParam(fields, ids);
-    } else {
-      throw TransmissionVersionError("Incompatible API version on torrent-get",
-          version.rpcVersion, version.minRpcVersion);
-    }
-  }
+  }) =>
+      buildRequestParam2(version, fields, ids,
+          nullVersionBuilder: (fields, ids) =>
+              _TorrentGetRequestParam(fields, ids),
+          defaultVersionBuilder: (fields, ids) =>
+              _TorrentGetRequestParam(fields, ids),
+          versionBuilers: _verionBuilderMap);
 
   Set<TorrentGetArgument> get allowedFields;
   Set<TorrentGetArgument> get deprecatedFields;

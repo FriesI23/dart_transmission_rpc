@@ -180,7 +180,19 @@ Future<void> testTorrentGet({TransmissionRpcClient? c}) async {
     TorrentGetArgument.name,
     TorrentGetArgument.id,
     TorrentGetArgument.hashString,
-    TorrentGetArgument.addedDate
+    TorrentGetArgument.addedDate,
+    // rpc18
+    TorrentGetArgument.sequentialDownload,
+    // rpc17
+    TorrentGetArgument.availability,
+    TorrentGetArgument.fileCount,
+    TorrentGetArgument.group,
+    TorrentGetArgument.percentComplete,
+    TorrentGetArgument.primaryMimeType,
+    TorrentGetArgument.trackerList,
+    // rpc16
+    TorrentGetArgument.labels,
+    TorrentGetArgument.editDate,
   ]);
   print(result.result);
   print('------ torrents -----------');
@@ -265,6 +277,7 @@ Future<void> testTorrentAdd({TransmissionRpcClient? c}) async {
   print(result.param?.isDuplicated);
   print(result.param?.torrent?.id);
   print(result.param?.torrent?.name);
+  print(result.param.runtimeType);
 }
 
 Future<void> testTorrentSetLocation({TransmissionRpcClient? c}) async {

@@ -3,10 +3,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
+import '../utils.dart';
 import '../version.dart';
 import 'torrent.dart';
 
@@ -60,20 +60,10 @@ class TorrentRenamePathRequestParam
       : _args = args;
 
   factory TorrentRenamePathRequestParam.build(
-      {ServerRpcVersion? version, required TorrentRenamePathArgs args}) {
-    TorrentRenamePathRequestParam normalBuilder() =>
-        TorrentRenamePathRequestParam(args);
-    if (version == null) {
-      return normalBuilder();
-    } else if (version.checkApiVersionValidate()) {
-      return normalBuilder();
-    } else {
-      throw TransmissionVersionError(
-          "Incompatible API version on torrent-rename-path",
-          version.rpcVersion,
-          version.minRpcVersion);
-    }
-  }
+          {ServerRpcVersion? version, required TorrentRenamePathArgs args}) =>
+      buildRequestParam1(version, args,
+          nullVersionBuilder: (args) => TorrentRenamePathRequestParam(args),
+          defaultVersionBuilder: (args) => TorrentRenamePathRequestParam(args));
 
   @override
   String? check() => null;

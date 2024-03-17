@@ -27,6 +27,9 @@ typedef JsonMap = Map<String, dynamic>;
 typedef RpcTag = num;
 typedef TrackerId = num;
 
+typedef ParamBuilderEntry1<S, V> = MapEntry<int, S Function(V)>;
+typedef ParamBuilderEntry2<S, V1, V2> = MapEntry<int, S Function(V1, V2)>;
+
 // api
 typedef _ApiResponse<T extends RequestParam, V extends ResponseParam>
     = TransmissionRpcResponse<V, TransmissionRpcRequest<T>>;

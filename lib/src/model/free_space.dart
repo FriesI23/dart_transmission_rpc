@@ -3,10 +3,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
+import '../utils.dart';
 import '../version.dart';
 
 enum FreeSpaceArgument {
@@ -24,19 +24,17 @@ abstract class FreeSpaceRequestParam implements RequestParam {
 
   const FreeSpaceRequestParam(this.path);
 
+  static final _verionBuilderMap =
+      <ParamBuilderEntry1<FreeSpaceRequestParam, String>>[
+    MapEntry(15, (path) => _FreeSpaceRequstParamRpc15(path)),
+  ];
+
   factory FreeSpaceRequestParam.build(
-      {required ServerRpcVersion? version, required String path}) {
-    if (version == null) {
-      return const _FreeSpaceRequestParam();
-    } else if (version.checkApiVersionValidate(v: 15)) {
-      return _FreeSpaceRequstParamRpc15(path);
-    } else if (version.checkApiVersionValidate()) {
-      return const _FreeSpaceRequestParam();
-    } else {
-      throw TransmissionVersionError("Incompatible API version on free-space",
-          version.rpcVersion, version.minRpcVersion);
-    }
-  }
+          {required ServerRpcVersion? version, required String path}) =>
+      buildRequestParam1(version, path,
+          nullVersionBuilder: (path) => const _FreeSpaceRequestParam(),
+          defaultVersionBuilder: (path) => const _FreeSpaceRequestParam(),
+          versionBuilers: _verionBuilderMap);
 }
 
 class _FreeSpaceRequestParam extends FreeSpaceRequestParam {
@@ -70,16 +68,19 @@ abstract class FreeSpaceResponseParam implements ResponseParam {
     this.totalSize,
   });
 
+  static final _verionBuilderMap =
+      <ParamBuilderEntry1<FreeSpaceResponseParam, JsonMap>>[
+    MapEntry(17, (rawData) => _FreeSpaceResponseParamRpc17.fromJson(rawData)),
+  ];
+
   factory FreeSpaceResponseParam.fromJson(JsonMap rawData,
-      {required ServerRpcVersion? v}) {
-    if (v == null) {
-      return _FreeSpaceResponseParam.fromJson(rawData);
-    } else if (v.checkApiVersionValidate(v: 17)) {
-      return _FreeSpaceResponseParamRpc17.fromJson(rawData);
-    } else {
-      return _FreeSpaceResponseParam.fromJson(rawData);
-    }
-  }
+          {required ServerRpcVersion? v}) =>
+      buildResponseParam1(v, rawData,
+          nullVersionBuilder: (rawData) =>
+              _FreeSpaceResponseParam.fromJson(rawData),
+          defaultVersionBuilder: (rawData) =>
+              _FreeSpaceResponseParam.fromJson(rawData),
+          versionBuilers: _verionBuilderMap);
 }
 
 class _FreeSpaceResponseParam extends FreeSpaceResponseParam {

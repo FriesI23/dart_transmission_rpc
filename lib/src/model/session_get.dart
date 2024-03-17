@@ -5,10 +5,10 @@
 
 // ignore_for_file: deprecated_member_use_from_same_package
 
-import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
+import '../utils.dart';
 import '../version.dart';
 
 enum SessionGetArgument {
@@ -194,21 +194,18 @@ abstract class SessionGetRequestParam implements RequestParam {
 
   const SessionGetRequestParam(this.fields);
 
+  static final _verionBuilderMap =
+      <ParamBuilderEntry1<SessionGetRequestParam, List<SessionGetArgument>?>>[
+    MapEntry(17, (fields) => _SessionGetRequestPramRpc17(fields)),
+    MapEntry(16, (fields) => _SessionGetRequestPramRpc16(fields)),
+  ];
+
   factory SessionGetRequestParam.build(
-      {ServerRpcVersion? version, List<SessionGetArgument>? fields}) {
-    if (version == null) {
-      return _SessionGetRequestParam(fields);
-    } else if (version.checkApiVersionValidate(v: 17)) {
-      return _SessionGetRequestPramRpc17(fields);
-    } else if (version.checkApiVersionValidate(v: 16)) {
-      return _SessionGetRequestPramRpc16(fields);
-    } else if (version.checkApiVersionValidate()) {
-      return _SessionGetRequestParam(fields);
-    } else {
-      throw TransmissionVersionError("Incompatible API version on session-get",
-          version.rpcVersion, version.minRpcVersion);
-    }
-  }
+          {ServerRpcVersion? version, List<SessionGetArgument>? fields}) =>
+      buildRequestParam1(version, fields,
+          nullVersionBuilder: (fields) => _SessionGetRequestParam(fields),
+          defaultVersionBuilder: (fields) => _SessionGetRequestParam(fields),
+          versionBuilers: _verionBuilderMap);
 }
 
 class _SessionGetRequestParam extends SessionGetRequestParam {

@@ -7,6 +7,7 @@ import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
+import '../utils.dart';
 import '../version.dart';
 import 'torrent.dart';
 
@@ -67,20 +68,12 @@ class TorrentSetLocationRequestParam
   factory TorrentSetLocationRequestParam.build({
     ServerRpcVersion? version,
     required TorrentSetLocationArgs args,
-  }) {
-    TorrentSetLocationRequestParam normalBuilder() =>
-        TorrentSetLocationRequestParam(args: args);
-    if (version == null) {
-      return normalBuilder();
-    } else if (version.checkApiVersionValidate()) {
-      return normalBuilder();
-    } else {
-      throw TransmissionVersionError(
-          "Incompatible API version on torrent-set-location",
-          version.rpcVersion,
-          version.minRpcVersion);
-    }
-  }
+  }) =>
+      buildRequestParam1(version, args,
+          nullVersionBuilder: (args) =>
+              TorrentSetLocationRequestParam(args: args),
+          defaultVersionBuilder: (args) =>
+              TorrentSetLocationRequestParam(args: args));
 
   @override
   String? check() {

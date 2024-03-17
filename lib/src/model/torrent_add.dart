@@ -5,10 +5,10 @@
 
 import 'dart:io';
 
-import '../exception.dart';
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';
+import '../utils.dart';
 import '../version.dart';
 import 'torrent.dart';
 import 'torrent_get.dart';
@@ -197,19 +197,17 @@ abstract class TorrentAddRequestParam
   const TorrentAddRequestParam({required TorrentAddRequestArgs args})
       : _args = args;
 
+  static final _verionBuilderMap =
+      <ParamBuilderEntry1<TorrentAddRequestParam, TorrentAddRequestArgs>>[
+    MapEntry(17, (args) => _TorrentAddRequestParamRpc17(args: args)),
+  ];
+
   factory TorrentAddRequestParam.build(
-      {ServerRpcVersion? version, required TorrentAddRequestArgs args}) {
-    if (version == null) {
-      return _TorrentAddRequestParam(args: args);
-    } else if (version.checkApiVersionValidate(v: 17)) {
-      return _TorrentAddRequestParamRpc17(args: args);
-    } else if (version.checkApiVersionValidate()) {
-      return _TorrentAddRequestParam(args: args);
-    } else {
-      throw TransmissionVersionError("Incompatible API version on torrent-set",
-          version.rpcVersion, version.minRpcVersion);
-    }
-  }
+          {ServerRpcVersion? version, required TorrentAddRequestArgs args}) =>
+      buildRequestParam1(version, args,
+          nullVersionBuilder: (args) => _TorrentAddRequestParam(args: args),
+          defaultVersionBuilder: (args) => _TorrentAddRequestParam(args: args),
+          versionBuilers: _verionBuilderMap);
 
   Set<TorrentAddArgument> get allowedFields;
   Set<TorrentAddArgument> get deprecatedFields;
@@ -312,16 +310,19 @@ abstract class TorrentAddResponseParam implements ResponseParam {
 
   const TorrentAddResponseParam();
 
+  static final _verionBuilderMap =
+      <ParamBuilderEntry1<TorrentAddResponseParam, JsonMap>>[
+    MapEntry(15, (rawData) => _TorrentAddResponseParamRpc15.fromJson(rawData)),
+  ];
+
   factory TorrentAddResponseParam.fromJson(JsonMap rawData,
-      {ServerRpcVersion? version}) {
-    if (version == null) {
-      return _TorrentAddResponseParam.fromJson(rawData);
-    } else if (version.checkApiVersionValidate(v: 15)) {
-      return _TorrentAddResponseParamRpc15.fromJson(rawData);
-    } else {
-      return _TorrentAddResponseParam.fromJson(rawData);
-    }
-  }
+          {ServerRpcVersion? version}) =>
+      buildResponseParam1(version, rawData,
+          nullVersionBuilder: (rawData) =>
+              _TorrentAddResponseParam.fromJson(rawData),
+          defaultVersionBuilder: (rawData) =>
+              _TorrentAddResponseParam.fromJson(rawData),
+          versionBuilers: _verionBuilderMap);
 }
 
 class _TorrentAddResponseParam extends TorrentAddResponseParam {

@@ -7,6 +7,7 @@ import "../exception.dart";
 import "../request.dart";
 import "../response.dart";
 import "../typedef.dart";
+import "../utils.dart";
 import "../version.dart";
 
 enum GroupSetArgument {
@@ -81,21 +82,19 @@ abstract class GroupSetRequestParam
   const GroupSetRequestParam({required GroupSetRequestArgs args})
       : _args = args;
 
+  static final _verionBuilderMap =
+      <ParamBuilderEntry1<GroupSetRequestParam, GroupSetRequestArgs>>[
+    MapEntry(17, (args) => _GroupSetRequestParamRpc17(args)),
+  ];
+
   factory GroupSetRequestParam.build({
     required ServerRpcVersion? version,
     required GroupSetRequestArgs args,
-  }) {
-    if (version == null) {
-      return const _GroupSetRequestParam();
-    } else if (version.checkApiVersionValidate(v: 17)) {
-      return _GroupSetRequestParamRpc17(args);
-    } else if (version.checkApiVersionValidate()) {
-      return const _GroupSetRequestParam();
-    } else {
-      throw TransmissionVersionError("Incompatible API version on group-set",
-          version.rpcVersion, version.minRpcVersion);
-    }
-  }
+  }) =>
+      buildRequestParam1(version, args,
+          nullVersionBuilder: (args) => const _GroupSetRequestParam(),
+          defaultVersionBuilder: (args) => const _GroupSetRequestParam(),
+          versionBuilers: _verionBuilderMap);
 }
 
 class _GroupSetRequestParam extends GroupSetRequestParam {
