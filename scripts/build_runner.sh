@@ -2,6 +2,6 @@
 #
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
-cd "$(dirname "$0")"/..
 
+cd "$(dirname "$0")"/..
 dart run build_runner build --delete-conflicting-outputs
