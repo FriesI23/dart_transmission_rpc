@@ -31,56 +31,56 @@ typedef ParamBuilderEntry1<S, V> = MapEntry<int, S Function(V)>;
 typedef ParamBuilderEntry2<S, V1, V2> = MapEntry<int, S Function(V1, V2)>;
 
 // api
-typedef _ApiResponse<T extends RequestParam, V extends ResponseParam>
+typedef ApiResponse<T extends RequestParam, V extends ResponseParam>
     = TransmissionRpcResponse<V, TransmissionRpcRequest<T>>;
 // torrent-<action>
 typedef TorrentActionResponse<T extends TorrentActionReqeustParam>
-    = _ApiResponse<T, TorrentActionResponseParam>;
+    = ApiResponse<T, TorrentActionResponseParam>;
 // torrent-get
 typedef TorrentGetResponse
-    = _ApiResponse<TorrentGetRequestParam, TorrentGetResponseParam>;
+    = ApiResponse<TorrentGetRequestParam, TorrentGetResponseParam>;
 // torretn-set
 typedef TorrentSetResponse
-    = _ApiResponse<TorrentSetRequestParam, TorrentSetResponseParam>;
+    = ApiResponse<TorrentSetRequestParam, TorrentSetResponseParam>;
 // torrent-remove
 typedef TorrentRemoveResponse
-    = _ApiResponse<TorrentRemoveRequestParam, TorrentRemoveResponseParam>;
+    = ApiResponse<TorrentRemoveRequestParam, TorrentRemoveResponseParam>;
 // torrent-add
 typedef TorrentAddResponse
-    = _ApiResponse<TorrentAddRequestParam, TorrentAddResponseParam>;
+    = ApiResponse<TorrentAddRequestParam, TorrentAddResponseParam>;
 // torrent-set-location
-typedef TorrentSetLocationResponse = _ApiResponse<
-    TorrentSetLocationRequestParam, TorrentSetLocationResponseParam>;
+typedef TorrentSetLocationResponse = ApiResponse<TorrentSetLocationRequestParam,
+    TorrentSetLocationResponseParam>;
 // torrent-rename-path
-typedef TorrentRenamePathResponse = _ApiResponse<TorrentRenamePathRequestParam,
+typedef TorrentRenamePathResponse = ApiResponse<TorrentRenamePathRequestParam,
     TorrentRenamePathResponseParam>;
 // session-get
 typedef SessionGetResponse
-    = _ApiResponse<SessionGetRequestParam, SessionGetResponseParam>;
+    = ApiResponse<SessionGetRequestParam, SessionGetResponseParam>;
 // session-set
 typedef SessionSetResponse
-    = _ApiResponse<SessionSetRequestParam, SessionSetResponseParam>;
+    = ApiResponse<SessionSetRequestParam, SessionSetResponseParam>;
 // session-stats
 typedef SessionStatsResponse
-    = _ApiResponse<SessionStatsRequestParam, SessionStatsResponseParam>;
+    = ApiResponse<SessionStatsRequestParam, SessionStatsResponseParam>;
 // blocklist-update
 typedef BlocklistUpdateResponse
-    = _ApiResponse<BlocklistUpdateRequestParam, BlocklistUpdateResponseParam>;
+    = ApiResponse<BlocklistUpdateRequestParam, BlocklistUpdateResponseParam>;
 // port-test
 typedef PortTestResponse
-    = _ApiResponse<PorTestRequestParam, PortTestResponseParam>;
+    = ApiResponse<PorTestRequestParam, PortTestResponseParam>;
 // session-close
 typedef SessionCloseResponse
-    = _ApiResponse<SessionCloseRequestParam, SessionCloseResponseParam>;
+    = ApiResponse<SessionCloseRequestParam, SessionCloseResponseParam>;
 // queue-move-*
 typedef QueueMoveResponse<T extends QueueMoveRequestParam>
-    = _ApiResponse<T, QueueMoveResponseParam>;
+    = ApiResponse<T, QueueMoveResponseParam>;
 // free-space
 typedef FreeSpaceResponse
-    = _ApiResponse<FreeSpaceRequestParam, FreeSpaceResponseParam>;
+    = ApiResponse<FreeSpaceRequestParam, FreeSpaceResponseParam>;
 // group-get
 typedef GroupGetResponse
-    = _ApiResponse<GroupGetRequestParam, GroupGetResponseParam>;
+    = ApiResponse<GroupGetRequestParam, GroupGetResponseParam>;
 // group-set
 typedef GroupSetResponse
-    = _ApiResponse<GroupSetRequestParam, GroupSetResponseParam>;
+    = ApiResponse<GroupSetRequestParam, GroupSetResponseParam>;

@@ -8,6 +8,8 @@ import '../response.dart';
 import '../typedef.dart';
 
 class SessionCloseRequestParam implements RequestParam {
+  const SessionCloseRequestParam();
+
   @override
   String? check() => null;
 

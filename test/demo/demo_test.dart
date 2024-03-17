@@ -9,6 +9,7 @@ import 'dart:convert';
 import "dart:io" as io;
 
 import 'package:flutter_transmission_rpc/src/client.dart';
+import 'package:flutter_transmission_rpc/src/extension/client_torrent_extension.dart';
 import 'package:flutter_transmission_rpc/src/logging.dart';
 import 'package:flutter_transmission_rpc/src/model/group_get.dart';
 import 'package:flutter_transmission_rpc/src/model/group_set.dart';
@@ -286,8 +287,8 @@ Future<void> testTorrentSetLocation({TransmissionRpcClient? c}) async {
   if (c == null) await client.init();
   final result1 = await client.torrentAdd(
     TorrentAddRequestArgs(
-      metainfo:
-          base64Encode(io.File("test/demo_test.torrent").readAsBytesSync()),
+      metainfo: base64Encode(
+          io.File("test/demo/demo_test.torrent").readAsBytesSync()),
       downloadDir: "/downloads/complete",
     ),
   );
@@ -311,8 +312,8 @@ Future<void> testTorrentRenamePath({TransmissionRpcClient? c}) async {
   if (c == null) await client.init();
   final result1 = await client.torrentAdd(
     TorrentAddRequestArgs(
-      metainfo:
-          base64Encode(io.File("test/demo_test_2.torrent").readAsBytesSync()),
+      metainfo: base64Encode(
+          io.File("test/demo/demo_test.torrent").readAsBytesSync()),
       downloadDir: "/downloads/complete",
     ),
   );
@@ -325,8 +326,8 @@ Future<void> testTorrentRenamePath({TransmissionRpcClient? c}) async {
   print(result2.param?.torrents.first.fileStats?.first);
   final result3 = await client.torrentRenamePath(TorrentRenamePathArgs(
       id: ids.first,
-      oldPath: "Scavengers.Reign.S01.1080p.MAX.WEB-DL.x265-Protozoan-test",
-      newName: "Scavengers.Reign.S01.1080p.MAX.WEB-DL.x265-Protozoan-test-2"));
+      oldPath: "debian-12.5.0-i386-netinst.iso",
+      newName: "debian-12.5.0-i386-netinst.rename.iso"));
   print(result3.result);
   print(result3.param?.id);
   print(result3.param?.path);

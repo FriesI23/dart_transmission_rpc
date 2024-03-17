@@ -257,13 +257,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     final completer = Completer();
     _initIsWorking = completer.future;
 
-    final response = await _sessionGet(
-        SessionGetRequestParam.build(fields: const [
-          SessionGetArgument.rpcVersion,
-          SessionGetArgument.rpcVersionMinimum,
-        ]),
-        tag: null,
-        timeout: null);
+    final response = await _fetchBasicInfo();
 
     completer.complete();
     _initIsWorking = null;
@@ -287,6 +281,19 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
     log.debug("init complete",
         args: [_sessionId, _serverRpcVersion, _initIsWorking]);
   }
+
+  Future<SessionGetResponse> _fetchBasicInfo({RpcTag? tag, int? timeout}) =>
+      callApi(
+        SessionGetRequestParam.build(fields: const [
+          SessionGetArgument.rpcVersion,
+          SessionGetArgument.rpcVersionMinimum,
+        ]),
+        method: TransmissionRpcMethod.sessionGet,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            SessionGetResponseParam.fromJson(rawParam),
+      );
 
   @override
   bool isInited() => _inited;
@@ -417,599 +424,359 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
 
   @override
   Future<SessionGetResponse> sessionGet(List<SessionGetArgument>? fields,
-      {RpcTag? tag, int? timeout}) {
-    final p = SessionGetRequestParam.build(
-      version: serverRpcVersion,
-      fields: fields,
-    );
-    preCheck(TransmissionRpcMethod.sessionGet, p, timeout: timeout);
-    return _sessionGet(p, tag: tag, timeout: timeout);
-  }
-
-  Future<SessionGetResponse> _sessionGet(SessionGetRequestParam p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        method: TransmissionRpcMethod.sessionGet, param: p, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    return TransmissionRpcResponse(
-      request: request,
-      result: rawResult.toString(),
-      param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
-          ? SessionGetResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          {RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        SessionGetRequestParam.build(version: serverRpcVersion, fields: fields),
+        method: TransmissionRpcMethod.sessionGet,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            SessionGetResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<SessionSetResponse> sessionSet(SessionSetRequestArgs args,
-      {RpcTag? tag, int? timeout}) {
-    final p = SessionSetRequestParam.build(
-      version: serverRpcVersion,
-      args: args,
-    );
-    preCheck(TransmissionRpcMethod.sessionSet, p, timeout: timeout);
-    return _sessionSet(p, tag: tag, timeout: timeout);
-  }
-
-  Future<SessionSetResponse> _sessionSet(SessionSetRequestParam p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        method: TransmissionRpcMethod.sessionSet, param: p, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    return TransmissionRpcResponse(
-      request: request,
-      result: rawResult.toString(),
-      param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
-          ? SessionSetResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          {RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        SessionSetRequestParam.build(version: serverRpcVersion, args: args),
+        method: TransmissionRpcMethod.sessionSet,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            SessionSetResponseParam.fromJson(rawParam),
+      );
 
   @override
-  Future<SessionStatsResponse> sessionStats({RpcTag? tag, int? timeout}) {
-    preCheck(TransmissionRpcMethod.sessionStats, null, timeout: timeout);
-    return _sessionStats(tag: tag, timeout: timeout);
-  }
-
-  Future<SessionStatsResponse> _sessionStats(
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest<SessionStatsRequestParam>(
-        method: TransmissionRpcMethod.sessionStats, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    return TransmissionRpcResponse(
-      request: request,
-      result: rawResult.toString(),
-      param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
-          ? SessionStatsResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+  Future<SessionStatsResponse> sessionStats({RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        null,
+        method: TransmissionRpcMethod.sessionStats,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            SessionStatsResponseParam.fromJson(rawParam),
+      );
 
   @override
-  Future<BlocklistUpdateResponse> blocklistUpdate({RpcTag? tag, int? timeout}) {
-    preCheck(TransmissionRpcMethod.blocklistUpdate, null, timeout: timeout);
-    return _blocklistUpdate(tag: tag, timeout: timeout);
-  }
-
-  Future<BlocklistUpdateResponse> _blocklistUpdate(
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest<BlocklistUpdateRequestParam>(
-        method: TransmissionRpcMethod.blocklistUpdate, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    return TransmissionRpcResponse(
-      request: request,
-      result: rawResult.toString(),
-      param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
-          ? BlocklistUpdateResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+  Future<BlocklistUpdateResponse> blocklistUpdate(
+          {RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        null,
+        method: TransmissionRpcMethod.blocklistUpdate,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            BlocklistUpdateResponseParam.fromJson(rawParam),
+      );
 
   @override
-  Future<PortTestResponse> portTest({RpcTag? tag, int? timeout}) {
-    preCheck(TransmissionRpcMethod.portTest, null, timeout: timeout);
-    return _portTest(tag: tag, timeout: timeout);
-  }
-
-  Future<PortTestResponse> _portTest(
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest<PorTestRequestParam>(
-        method: TransmissionRpcMethod.portTest, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? PortTestResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+  Future<PortTestResponse> portTest({RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        null,
+        method: TransmissionRpcMethod.portTest,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            PortTestResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<QueueMoveResponse<QueueMoveBottomReqeustParam>> queueMoveBottom(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
-  }) {
-    const method = TransmissionRpcMethod.queueMoveBottom;
-    final p = QueueMoveBottomReqeustParam(ids: ids);
-    preCheck(method, p, timeout: timeout);
-    return _queueMove(method, p, tag: tag, timeout: timeout);
-  }
-
+  }) =>
+      checkAndCallApi(
+        QueueMoveBottomReqeustParam(ids: ids),
+        method: TransmissionRpcMethod.queueMoveBottom,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            QueueMoveResponseParam.fromJson(rawParam),
+      );
   @override
   Future<QueueMoveResponse<QueueMoveDownReqeustParam>> queueMoveDown(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
-  }) {
-    const method = TransmissionRpcMethod.queueMoveDown;
-    final p = QueueMoveDownReqeustParam(ids: ids);
-    preCheck(method, p, timeout: timeout);
-    return _queueMove(method, p, tag: tag, timeout: timeout);
-  }
+  }) =>
+      checkAndCallApi(
+        QueueMoveDownReqeustParam(ids: ids),
+        method: TransmissionRpcMethod.queueMoveDown,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            QueueMoveResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<QueueMoveResponse<QueueMoveTopReqeustParam>> queueMoveTop(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
-  }) {
-    const method = TransmissionRpcMethod.queueMoveTop;
-    final p = QueueMoveTopReqeustParam(ids: ids);
-    preCheck(method, p, timeout: timeout);
-    return _queueMove(method, p, tag: tag, timeout: timeout);
-  }
+  }) =>
+      checkAndCallApi(
+        QueueMoveTopReqeustParam(ids: ids),
+        method: TransmissionRpcMethod.queueMoveTop,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            QueueMoveResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<QueueMoveResponse<QueueMoveUpReqeustParam>> queueMoveUp(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
-  }) {
-    const method = TransmissionRpcMethod.queueMoveUp;
-    final p = QueueMoveUpReqeustParam(ids: ids);
-    preCheck(method, p, timeout: timeout);
-    return _queueMove(method, p, tag: tag, timeout: timeout);
-  }
-
-  Future<QueueMoveResponse<T>> _queueMove<T extends QueueMoveRequestParam>(
-      TransmissionRpcMethod method, T p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request =
-        TransmissionRpcRequest<T>(param: p, method: method, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? QueueMoveResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+  }) =>
+      checkAndCallApi(
+        QueueMoveUpReqeustParam(ids: ids),
+        method: TransmissionRpcMethod.queueMoveUp,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            QueueMoveResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<FreeSpaceResponse> freeSpace(String path,
       {RpcTag? tag, int? timeout}) {
     final v = serverRpcVersion;
-    final p = FreeSpaceRequestParam.build(path: path, version: v);
-    preCheck(TransmissionRpcMethod.freeSpace, p, timeout: timeout);
-    return _freeSpace(p, tag: tag, timeout: timeout, v: v);
-  }
-
-  Future<FreeSpaceResponse> _freeSpace(FreeSpaceRequestParam p,
-      {required RpcTag? tag,
-      required int? timeout,
-      required ServerRpcVersion? v}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.freeSpace, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? FreeSpaceResponseParam.fromJson(rawParam, v: v)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
+    return checkAndCallApi(
+      FreeSpaceRequestParam.build(version: v, path: path),
+      method: TransmissionRpcMethod.freeSpace,
+      tag: tag,
+      timeout: timeout,
+      responseParamBuilder: (rawParam) =>
+          FreeSpaceResponseParam.fromJson(rawParam, v: v),
     );
   }
 
   @override
   Future<GroupGetResponse> groupGet(List<String>? group,
-      {RpcTag? tag, int? timeout}) {
-    final p = GroupGetRequestParam.build(
-      version: serverRpcVersion,
-      group: group,
-    );
-    preCheck(TransmissionRpcMethod.groupGet, p, timeout: timeout);
-    return _groupGet(p, tag: tag, timeout: timeout);
-  }
-
-  Future<GroupGetResponse> _groupGet(GroupGetRequestParam p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.groupGet, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? GroupGetResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          {RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        GroupGetRequestParam.build(version: serverRpcVersion, group: group),
+        method: TransmissionRpcMethod.groupGet,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            GroupGetResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<GroupSetResponse> groupSet(GroupSetRequestArgs args,
-      {RpcTag? tag, int? timeout}) {
-    final p = GroupSetRequestParam.build(version: serverRpcVersion, args: args);
-    preCheck(TransmissionRpcMethod.groupSet, p, timeout: timeout);
-    return _groupSet(p, tag: tag, timeout: timeout);
-  }
-
-  Future<GroupSetResponse> _groupSet(GroupSetRequestParam p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.groupSet, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? GroupSetResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          {RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        GroupSetRequestParam.build(version: serverRpcVersion, args: args),
+        method: TransmissionRpcMethod.groupSet,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            GroupSetResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<TorrentActionResponse<TorrentReannounceRequestParam>>
-      torrentReannounce(TorrentIds ids, {RpcTag? tag, int? timeout}) {
-    const method = TransmissionRpcMethod.torrentReannounce;
-    final p = TorrentReannounceRequestParam(ids: ids);
-    preCheck(method, p, timeout: timeout);
-    return _torrentAction(method, p, tag: tag, timeout: timeout);
-  }
+      torrentReannounce(TorrentIds ids, {RpcTag? tag, int? timeout}) =>
+          checkAndCallApi(
+            TorrentReannounceRequestParam(ids: ids),
+            method: TransmissionRpcMethod.torrentReannounce,
+            tag: tag,
+            timeout: timeout,
+            responseParamBuilder: (rawParam) =>
+                TorrentActionResponseParam.fromJson(rawParam),
+          );
 
   @override
   Future<TorrentActionResponse<TorrentStartRequestParam>> torrentStart(
-      TorrentIds ids,
-      {RpcTag? tag,
-      int? timeout}) {
-    const method = TransmissionRpcMethod.torrentStart;
-    final p = TorrentStartRequestParam(ids: ids);
-    preCheck(method, p, timeout: timeout);
-    return _torrentAction(method, p, tag: tag, timeout: timeout);
-  }
+          TorrentIds ids,
+          {RpcTag? tag,
+          int? timeout}) =>
+      checkAndCallApi(
+        TorrentStartRequestParam(ids: ids),
+        method: TransmissionRpcMethod.torrentStart,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            TorrentActionResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<TorrentActionResponse<TorrentStartNowRequestParam>> torrentStartNow(
-      TorrentIds ids,
-      {RpcTag? tag,
-      int? timeout}) {
-    const method = TransmissionRpcMethod.torrentStartNow;
-    final p = TorrentStartNowRequestParam(ids: ids);
-    preCheck(method, p, timeout: timeout);
-    return _torrentAction(method, p, tag: tag, timeout: timeout);
-  }
+          TorrentIds ids,
+          {RpcTag? tag,
+          int? timeout}) =>
+      checkAndCallApi(
+        TorrentStartNowRequestParam(ids: ids),
+        method: TransmissionRpcMethod.torrentStartNow,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            TorrentActionResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<TorrentActionResponse<TorrentStopRequestParam>> torrentStop(
-      TorrentIds ids,
-      {RpcTag? tag,
-      int? timeout}) {
-    const method = TransmissionRpcMethod.torrentStop;
-    final p = TorrentStopRequestParam(ids: ids);
-    preCheck(method, p, timeout: timeout);
-    return _torrentAction(method, p, tag: tag, timeout: timeout);
-  }
+          TorrentIds ids,
+          {RpcTag? tag,
+          int? timeout}) =>
+      checkAndCallApi(
+        TorrentStopRequestParam(ids: ids),
+        method: TransmissionRpcMethod.torrentStop,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            TorrentActionResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<TorrentActionResponse<TorrentVerifyRequestParam>> torrentVerify(
-      TorrentIds ids,
-      {RpcTag? tag,
-      int? timeout}) {
-    const method = TransmissionRpcMethod.torrentVerify;
-    final p = TorrentVerifyRequestParam(ids: ids);
-    preCheck(method, p, timeout: timeout);
-    return _torrentAction(method, p, tag: tag, timeout: timeout);
-  }
-
-  Future<TorrentActionResponse<T>>
-      _torrentAction<T extends TorrentActionReqeustParam>(
-          TransmissionRpcMethod method, T p,
-          {required RpcTag? tag, required int? timeout}) async {
-    final request =
-        TransmissionRpcRequest<T>(param: p, method: method, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? TorrentActionResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          TorrentIds ids,
+          {RpcTag? tag,
+          int? timeout}) =>
+      checkAndCallApi(
+        TorrentVerifyRequestParam(ids: ids),
+        method: TransmissionRpcMethod.torrentVerify,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            TorrentActionResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<TorrentGetResponse> torrentGet(List<TorrentGetArgument> fields,
-      {TorrentIds? ids, RpcTag? tag, int? timeout}) {
-    final p = TorrentGetRequestParam.build(
-        version: serverRpcVersion, fields: fields, ids: ids);
-    preCheck(TransmissionRpcMethod.torrentGet, p, timeout: timeout);
-    return _torrentGet(p, tag: tag, timeout: timeout);
-  }
-
-  Future<TorrentGetResponse> _torrentGet(TorrentGetRequestParam p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.torrentGet, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? TorrentGetResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          {TorrentIds? ids, RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        TorrentGetRequestParam.build(
+            version: serverRpcVersion, fields: fields, ids: ids),
+        method: TransmissionRpcMethod.torrentGet,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            TorrentGetResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<TorrentSetResponse> torrentSet(TorrentSetRequestArgs args,
-      {RpcTag? tag, int? timeout}) {
-    final p = TorrentSetRequestParam.build(
-      version: serverRpcVersion,
-      args: args,
-    );
-    preCheck(TransmissionRpcMethod.torrentSet, p, timeout: timeout);
-    return _torrentSet(p, tag: tag, timeout: timeout);
-  }
-
-  Future<TorrentSetResponse> _torrentSet(TorrentSetRequestParam p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.torrentSet, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? TorrentSetResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          {RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        TorrentSetRequestParam.build(version: serverRpcVersion, args: args),
+        method: TransmissionRpcMethod.torrentSet,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            TorrentSetResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<TorrentRemoveResponse> torrentRemove(TorrentIds<TorrentId> ids,
-      {bool? deleteLocalData, RpcTag? tag, int? timeout}) {
-    final p = TorrentRemoveRequestParam.build(
-      version: serverRpcVersion,
-      ids: ids,
-    );
-    preCheck(TransmissionRpcMethod.torrentRemove, p, timeout: timeout);
-    return _torrentRemove(p, tag: tag, timeout: timeout);
-  }
-
-  Future<TorrentRemoveResponse> _torrentRemove(TorrentRemoveRequestParam p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.torrentRemove, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? TorrentRemoveResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          {bool? deleteLocalData, RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        TorrentRemoveRequestParam.build(version: serverRpcVersion, ids: ids),
+        method: TransmissionRpcMethod.torrentRemove,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            TorrentRemoveResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<TorrentAddResponse> torrentAdd(TorrentAddRequestArgs args,
       {RpcTag? tag, int? timeout}) {
     final v = serverRpcVersion;
-    final p = TorrentAddRequestParam.build(args: args, version: v);
-    preCheck(TransmissionRpcMethod.torrentAdd, p, timeout: timeout);
-    return _torrentAdd(p, tag: tag, timeout: timeout, v: v);
-  }
-
-  Future<TorrentAddResponse> _torrentAdd(TorrentAddRequestParam p,
-      {required RpcTag? tag,
-      required int? timeout,
-      required ServerRpcVersion? v}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.torrentAdd, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? TorrentAddResponseParam.fromJson(rawParam, version: v)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
+    return checkAndCallApi(
+      TorrentAddRequestParam.build(args: args, version: v),
+      method: TransmissionRpcMethod.torrentAdd,
+      tag: tag,
+      timeout: timeout,
+      responseParamBuilder: (rawParam) =>
+          TorrentAddResponseParam.fromJson(rawParam, version: v),
     );
   }
 
   @override
   Future<TorrentSetLocationResponse> torrentSetLocation(
-      TorrentSetLocationArgs args,
-      {RpcTag? tag,
-      int? timeout}) {
-    final p = TorrentSetLocationRequestParam.build(
-        args: args, version: serverRpcVersion);
-    preCheck(TransmissionRpcMethod.torrentSetLocation, p, timeout: timeout);
-    return _torrentSetLocation(p, tag: tag, timeout: timeout);
-  }
-
-  Future<TorrentSetLocationResponse> _torrentSetLocation(
-      TorrentSetLocationRequestParam p,
-      {required RpcTag? tag,
-      required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.torrentSetLocation, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? TorrentSetLocationResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          TorrentSetLocationArgs args,
+          {RpcTag? tag,
+          int? timeout}) =>
+      checkAndCallApi(
+        TorrentSetLocationRequestParam.build(
+            args: args, version: serverRpcVersion),
+        method: TransmissionRpcMethod.torrentSetLocation,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            TorrentSetLocationResponseParam.fromJson(rawParam),
+      );
 
   @override
   Future<TorrentRenamePathResponse> torrentRenamePath(
-      TorrentRenamePathArgs args,
-      {RpcTag? tag,
-      int? timeout}) {
-    final p = TorrentRenamePathRequestParam.build(
-        args: args, version: serverRpcVersion);
-    preCheck(TransmissionRpcMethod.torrentRenamePath, p, timeout: timeout);
-    return _torrentRenamePath(p, tag: tag, timeout: timeout);
-  }
-
-  Future<TorrentRenamePathResponse> _torrentRenamePath(
-      TorrentRenamePathRequestParam p,
-      {required RpcTag? tag,
-      required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.torrentRenamePath, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? TorrentRenamePathResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
-    );
-  }
+          TorrentRenamePathArgs args,
+          {RpcTag? tag,
+          int? timeout}) =>
+      checkAndCallApi(
+        TorrentRenamePathRequestParam.build(
+            args: args, version: serverRpcVersion),
+        method: TransmissionRpcMethod.torrentRenamePath,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            TorrentRenamePathResponseParam.fromJson(rawParam),
+      );
 
   @override
-  Future<SessionCloseResponse> sessionClose({RpcTag? tag, int? timeout}) {
-    final p = SessionCloseRequestParam();
-    preCheck(TransmissionRpcMethod.sessionClose, p, timeout: timeout);
-    return _sessionClose(p, tag: tag, timeout: timeout);
-  }
+  Future<SessionCloseResponse> sessionClose({RpcTag? tag, int? timeout}) =>
+      checkAndCallApi(
+        const SessionCloseRequestParam(),
+        method: TransmissionRpcMethod.sessionClose,
+        tag: tag,
+        timeout: timeout,
+        responseParamBuilder: (rawParam) =>
+            SessionCloseResponseParam.fromJson(rawParam),
+      );
+}
 
-  Future<SessionCloseResponse> _sessionClose(SessionCloseRequestParam p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.sessionClose, tag: tag);
+extension TransmissionRpcClientFrameExtension on TransmissionRpcClient {
+  Future<ApiResponse<T, V>>
+      callApi<T extends RequestParam, V extends ResponseParam>(
+    T? p, {
+    required TransmissionRpcMethod method,
+    required RpcTag? tag,
+    required int? timeout,
+    V Function(JsonMap rawParam)? responseParamBuilder,
+  }) async {
+    final request = TransmissionRpcRequest(method: method, param: p, tag: tag);
     final rawData = await doRequest(request, timeout: timeout);
     final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
     final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
     final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
     return TransmissionRpcResponse(
       request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? SessionCloseResponseParam.fromJson(rawParam)
+      result: rawResult.toString(),
+      param: TransmissionRpcResponse.isSucceed(rawResult) && rawParam is JsonMap
+          ? responseParamBuilder?.call(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );
   }
-}
 
-extension TransmissionRpcTorrentExtention on TransmissionRpcClient {
-  // Get torrents info
-  Future<TorrentGetResponse> torrentGetAll(TorrentIds ids,
-      {RpcTag? tag, int? timeout}) {
-    final p = TorrentGetRequestParam.build(
-        version: serverRpcVersion, ids: ids, fields: null);
-    preCheck(TransmissionRpcMethod.torrentGet, p, timeout: timeout);
-    return _torrentGetAll(p, tag: tag, timeout: timeout);
-  }
-
-  Future<TorrentGetResponse> _torrentGetAll(TorrentGetRequestParam p,
-      {required RpcTag? tag, required int? timeout}) async {
-    final request = TransmissionRpcRequest(
-        param: p, method: TransmissionRpcMethod.torrentGet, tag: tag);
-    final rawData = await doRequest(request, timeout: timeout);
-    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
-    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
-    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
-    final result = rawResult.toString();
-    return TransmissionRpcResponse(
-      request: request,
-      result: result,
-      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
-          ? TorrentGetResponseParam.fromJson(rawParam)
-          : null,
-      tag: RpcTag.tryParse(rawTag.toString()),
+  Future<ApiResponse<T, V>>
+      checkAndCallApi<T extends RequestParam, V extends ResponseParam>(
+    T? p, {
+    required TransmissionRpcMethod method,
+    required RpcTag? tag,
+    required int? timeout,
+    V Function(JsonMap rawParam)? responseParamBuilder,
+  }) async {
+    preCheck(method, p, timeout: timeout);
+    return callApi(
+      p,
+      method: method,
+      tag: tag,
+      timeout: timeout,
+      responseParamBuilder: responseParamBuilder,
     );
   }
 }
