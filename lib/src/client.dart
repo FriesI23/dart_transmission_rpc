@@ -17,6 +17,7 @@ import 'model/group_get.dart';
 import 'model/group_set.dart';
 import 'model/port_test.dart';
 import 'model/queue_move.dart';
+import 'model/session_close.dart';
 import 'model/session_get.dart';
 import 'model/session_set.dart';
 import 'model/session_stats.dart';
@@ -124,6 +125,9 @@ abstract interface class TransmissionRpcClient {
 
   // Test to see if your incoming peer port is accessible.
   Future<PortTestResponse> portTest({RpcTag? tag, int? timeout});
+
+  // Tells the transmission session to shutdown
+  Future<SessionCloseResponse> sessionClose({RpcTag? tag, int? timeout});
 
   // Move torretns at top of queue
   Future<QueueMoveResponse<QueueMoveTopReqeustParam>> queueMoveTop(
@@ -946,6 +950,32 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
       result: result,
       param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
           ? TorrentRenamePathResponseParam.fromJson(rawParam)
+          : null,
+      tag: RpcTag.tryParse(rawTag.toString()),
+    );
+  }
+
+  @override
+  Future<SessionCloseResponse> sessionClose({RpcTag? tag, int? timeout}) {
+    final p = SessionCloseRequestParam();
+    preCheck(TransmissionRpcMethod.sessionClose, p, timeout: timeout);
+    return _sessionClose(p, tag: tag, timeout: timeout);
+  }
+
+  Future<SessionCloseResponse> _sessionClose(SessionCloseRequestParam p,
+      {required RpcTag? tag, required int? timeout}) async {
+    final request = TransmissionRpcRequest(
+        param: p, method: TransmissionRpcMethod.sessionClose, tag: tag);
+    final rawData = await doRequest(request, timeout: timeout);
+    final rawResult = rawData[TransmissionRpcResponseKey.result.keyName];
+    final rawParam = rawData[TransmissionRpcRequestJsonKey.arguments.keyName];
+    final rawTag = rawData[TransmissionRpcResponseKey.tag.keyName];
+    final result = rawResult.toString();
+    return TransmissionRpcResponse(
+      request: request,
+      result: result,
+      param: TransmissionRpcResponse.isSucceed(result) && rawParam is JsonMap
+          ? SessionCloseResponseParam.fromJson(rawParam)
           : null,
       tag: RpcTag.tryParse(rawTag.toString()),
     );

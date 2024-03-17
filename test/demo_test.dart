@@ -324,6 +324,13 @@ Future<void> testTorrentRenamePath({TransmissionRpcClient? c}) async {
   print(result4.param?.torrents.first.fileStats?.first);
 }
 
+Future<void> testSessionClose() async {
+  final client = TransmissionRpcClient(username: "admin", password: "123456");
+  await client.init();
+  final result = await client.sessionClose();
+  print(result.result);
+}
+
 void main() async {
   Logger("TransmissionRpcClient", showLevel: LogLevel.debug);
   // await testSessionGet();
@@ -335,6 +342,7 @@ void main() async {
   // await testFreeSpace();
   // await testGroupGet();
   // await testGroupSet();
+  await testSessionClose();
 
   // await testTorrentStop();
   // await testTorrentSart();

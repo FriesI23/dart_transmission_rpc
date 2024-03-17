@@ -9,6 +9,7 @@ import 'model/group_get.dart';
 import 'model/group_set.dart';
 import 'model/port_test.dart';
 import 'model/queue_move.dart';
+import 'model/session_close.dart';
 import 'model/session_get.dart';
 import 'model/session_set.dart';
 import 'model/session_stats.dart';
@@ -64,6 +65,9 @@ typedef BlocklistUpdateResponse
 // port-test
 typedef PortTestResponse
     = _ApiResponse<PorTestRequestParam, PortTestResponseParam>;
+// session-close
+typedef SessionCloseResponse
+    = _ApiResponse<SessionCloseRequestParam, SessionCloseResponseParam>;
 // queue-move-*
 typedef QueueMoveResponse<T extends QueueMoveRequestParam>
     = _ApiResponse<T, QueueMoveResponseParam>;

@@ -11,7 +11,7 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages).
 -->
 
-- [ ] torrent
+- [x] torrent
   - [x] torrent-start
   - [x] torrent-start-now
   - [x] torrent-stop
@@ -29,7 +29,7 @@ and the Flutter guide for
   - [x] session-stats
   - [x] blocklist-update
   - [x] port-test
-  - [ ] ~session-close~
+  - [x] ~session-close~
   - [x] queue-move-top
   - [x] queue-move-up
   - [x] queue-move-down
