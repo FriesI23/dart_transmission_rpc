@@ -7,14 +7,15 @@ import 'dart:async';
 import 'dart:developer';
 
 enum LogLevel {
-  debug(1200),
-  info(800),
-  warn(900),
-  error(500);
+  debug(1200, "D"),
+  info(800, "I"),
+  warn(900, "W"),
+  error(500, "E");
 
   final int number;
+  final String shortName;
 
-  const LogLevel(this.number);
+  const LogLevel(this.number, this.shortName);
 }
 
 abstract class Logger {
@@ -55,7 +56,7 @@ class _Logger implements Logger {
 
   void _log(String message, LogLevel level,
       {Object? error, StackTrace? stackTrace}) {
-    log(message,
+    log("[${level.shortName}] $message",
         name: name,
         level: level.number,
         error: error,

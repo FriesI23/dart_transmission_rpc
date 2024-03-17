@@ -17,6 +17,7 @@ import 'package:flutter_transmission_rpc/src/model/session_set.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_add.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_get.dart';
+import 'package:flutter_transmission_rpc/src/model/torrent_move.dart';
 import 'package:flutter_transmission_rpc/src/model/torrent_set.dart';
 
 Future<void> testSessionGet() async {
@@ -264,6 +265,31 @@ Future<void> testTorrentAdd({TransmissionRpcClient? c}) async {
   print(result.param?.torrent?.name);
 }
 
+Future<void> testTorrentSetLocation({TransmissionRpcClient? c}) async {
+  final client =
+      c ?? TransmissionRpcClient(username: "admin", password: "123456");
+  if (c == null) await client.init();
+  final result1 = await client.torrentAdd(
+    TorrentAddRequestArgs(
+      metainfo:
+          base64Encode(io.File("test/demo_test.torrent").readAsBytesSync()),
+      downloadDir: "/downloads/complete",
+    ),
+  );
+  final ids =
+      TorrentIds([TorrentId(id: result1.param!.torrent!.id.id!.toInt())]);
+  await client.torrentSetLocation(
+      TorrentSetLocationArgs(ids: ids, location: "/downloads"));
+  final result2 = await client.torrentGet([
+    TorrentGetArgument.id,
+    TorrentGetArgument.name,
+    TorrentGetArgument.downloadDir,
+  ], ids: ids);
+  print(result2.param?.torrents.firstOrNull?.id);
+  print(result2.param?.torrents.firstOrNull?.name);
+  print(result2.param?.torrents.firstOrNull?.downloadDir);
+}
+
 void main() async {
   Logger("TransmissionRpcClient", showLevel: LogLevel.debug);
   // await testSessionGet();
@@ -285,4 +311,5 @@ void main() async {
   // await testTorrentSet();
   // await testTorrentRemove();
   // await testTorrentAdd();
+  await testTorrentSetLocation();
 }
