@@ -98,6 +98,24 @@ enum TorrentSetArgument {
   const TorrentSetArgument({required this.argName});
 }
 
+class TrackerReplace {
+  final TrackerId id;
+  final String url;
+
+  const TrackerReplace({required this.id, required this.url});
+
+  List<dynamic> toRpcJson() => [id, url];
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is TrackerReplace && other.id == id && other.url == url;
+  }
+
+  @override
+  int get hashCode => id.hashCode ^ url.hashCode;
+}
+
 mixin TorrentSetRequestArgsDefine {
   TorrentIds get ids;
   num? get bandwidthPriority;
@@ -119,16 +137,16 @@ mixin TorrentSetRequestArgsDefine {
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   List<String>? get trackerAdd;
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
-  List<String>? get trackerRemove;
+  List<TrackerId>? get trackerRemove;
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
-  List<String>? get trackerReplace;
+  List<TrackerReplace>? get trackerReplace;
   num? get uploadLimit;
   bool? get uploadLimited;
   // rpc16 new
   List<String>? get labels;
   // rpc17 new
   String? get group;
-  String? get trackerList;
+  List<List<String>>? get trackerList;
   // rpc19 new
   bool? get sequentialDownload;
 }
@@ -224,10 +242,10 @@ class TorrentSetRequestArgs with TorrentSetRequestArgsDefine {
   final List<String>? trackerAdd;
   @override
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
-  final List<String>? trackerRemove;
+  final List<TrackerId>? trackerRemove;
   @override
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
-  final List<String>? trackerReplace;
+  final List<TrackerReplace>? trackerReplace;
   @override
   final num? uploadLimit;
   @override
@@ -239,7 +257,7 @@ class TorrentSetRequestArgs with TorrentSetRequestArgsDefine {
   @override
   final String? group;
   @override
-  final String? trackerList;
+  final List<List<String>>? trackerList;
   // rpc19 new
   @override
   final bool? sequentialDownload;
@@ -339,11 +357,11 @@ abstract class TorrentSetRequestParam
 
   @override
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
-  List<String>? get trackerRemove => _args.trackerRemove;
+  List<TrackerId>? get trackerRemove => _args.trackerRemove;
 
   @override
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
-  List<String>? get trackerReplace => _args.trackerReplace;
+  List<TrackerReplace>? get trackerReplace => _args.trackerReplace;
 
   @override
   num? get uploadLimit => _args.uploadLimit;
@@ -358,7 +376,7 @@ abstract class TorrentSetRequestParam
   String? get group => _args.group;
 
   @override
-  String? get trackerList => _args.trackerList;
+  List<List<String>>? get trackerList => _args.trackerList;
 
   @override
   bool? get sequentialDownload => _args.sequentialDownload;
@@ -473,7 +491,8 @@ class _TorrentSetRequestParam extends TorrentSetRequestParam {
         if (trackerRemove != null)
           TorrentSetArgument.trackerRemove.argName: trackerRemove,
         if (trackerReplace != null)
-          TorrentSetArgument.trackerReplace.argName: trackerReplace,
+          TorrentSetArgument.trackerReplace.argName:
+              trackerReplace!.map((e) => e.toRpcJson()).toList(),
         if (uploadLimit != null)
           TorrentSetArgument.uploadLimit.argName: uploadLimit,
         if (uploadLimited != null)
@@ -505,12 +524,11 @@ class _TorrentSetRequestParamRpc17 extends _TorrentSetRequestParamRpc16 {
     TorrentSetArgument.trackerList,
   });
 
-  static final _deprecatedFields =
-      _TorrentSetRequestParam._allowedFields.union({
+  static final _deprecatedFields = {
     TorrentSetArgument.trackerAdd,
     TorrentSetArgument.trackerRemove,
     TorrentSetArgument.trackerReplace,
-  });
+  };
 
   const _TorrentSetRequestParamRpc17({required super.args});
 
@@ -525,7 +543,8 @@ class _TorrentSetRequestParamRpc17 extends _TorrentSetRequestParamRpc16 {
     ..addAll({
       if (group != null) TorrentSetArgument.group.argName: group,
       if (trackerList != null)
-        TorrentSetArgument.trackerList.argName: trackerList,
+        TorrentSetArgument.trackerList.argName:
+            trackerList!.map((x) => x.join("\n\n")).join("\n"),
     });
 }
 
