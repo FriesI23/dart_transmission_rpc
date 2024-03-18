@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import 'exception.dart';
+import 'model/torrent.dart';
 import 'request.dart';
 import 'response.dart';
 import 'typedef.dart';
@@ -12,6 +13,19 @@ import 'version.dart';
 const kMaxRpcTag = (1 << 63) - 1;
 
 enum HttpProtocol { http, https }
+
+dynamic toRpcJsonByType<T>(dynamic val) {
+  switch (val.runtimeType) {
+    case TorrentIds _:
+      val as TorrentIds;
+      return val.toRpcJson();
+    case FileIndices _:
+      val as FileIndices;
+      return val.toRpcJson();
+    default:
+      return val;
+  }
+}
 
 T _buildParam<T>({
   String? label,

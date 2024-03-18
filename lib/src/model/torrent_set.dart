@@ -453,51 +453,34 @@ class _TorrentSetRequestParam extends TorrentSetRequestParam {
   Set<TorrentSetArgument> get deprecatedFields => {};
 
   @override
-  JsonMap toRpcJson() => {
-        if (ids.isNotEmpty) TorrentSetArgument.ids.argName: ids.toRpcJson(),
-        if (bandwidthPriority != null)
-          TorrentSetArgument.bandwidthPriority.argName: bandwidthPriority,
-        if (downloadLimit != null)
-          TorrentSetArgument.downloadLimit.argName: downloadLimit,
-        if (downloadLimited != null)
-          TorrentSetArgument.downloadLimited.argName: downloadLimited,
-        if (filesUnwanted != null)
-          TorrentSetArgument.filesUnwanted.argName: filesUnwanted!.toRpcJson(),
-        if (filesWanted != null)
-          TorrentSetArgument.filesWanted.argName: filesWanted!.toRpcJson(),
-        if (honorsSessionLimits != null)
-          TorrentSetArgument.honorsSessionLimits.argName: honorsSessionLimits,
-        if (location != null) TorrentSetArgument.location.argName: location,
-        if (peerLimit != null) TorrentSetArgument.peerLimit.argName: peerLimit,
-        if (priorityHigh != null)
-          TorrentSetArgument.priorityHigh.argName: priorityHigh!.toRpcJson(),
-        if (priorityLow != null)
-          TorrentSetArgument.priorityLow.argName: priorityLow!.toRpcJson(),
-        if (priorityNormal != null)
-          TorrentSetArgument.priorityNormal.argName:
-              priorityNormal!.toRpcJson(),
-        if (queuePosition != null)
-          TorrentSetArgument.queuePosition.argName: queuePosition,
-        if (seedIdleLimit != null)
-          TorrentSetArgument.seedIdleLimit.argName: seedIdleLimit,
-        if (seedIdleMode != null)
-          TorrentSetArgument.seedIdleMode.argName: seedIdleMode,
-        if (seedRatioLimit != null)
-          TorrentSetArgument.seedRatioLimit.argName: seedRatioLimit,
-        if (seedRatioMode != null)
-          TorrentSetArgument.seedRatioMode.argName: seedRatioMode,
-        if (trackerAdd != null)
-          TorrentSetArgument.trackerAdd.argName: trackerAdd,
-        if (trackerRemove != null)
-          TorrentSetArgument.trackerRemove.argName: trackerRemove,
-        if (trackerReplace != null)
-          TorrentSetArgument.trackerReplace.argName:
-              trackerReplace!.map((e) => e.toRpcJson()).toList(),
-        if (uploadLimit != null)
-          TorrentSetArgument.uploadLimit.argName: uploadLimit,
-        if (uploadLimited != null)
-          TorrentSetArgument.uploadLimited.argName: uploadLimited,
-      };
+  JsonMap toRpcJson() {
+    JsonMap result = {};
+    for (var f in allowedFields) {
+      if (!toRpcJsonField(result, f)) {
+        final val = _args.getValueByArgument(f);
+        if (val == null) continue;
+        result[f.argName] = toRpcJsonByType(val);
+      }
+    }
+    return result;
+  }
+
+  bool toRpcJsonField(JsonMap result, TorrentSetArgument f) {
+    switch (f) {
+      case TorrentSetArgument.ids:
+        if (ids.isNotEmpty) {
+          result[f.argName] = ids.toRpcJson();
+        }
+      case TorrentSetArgument.trackerReplace:
+        if (trackerReplace != null) {
+          result[f.argName] =
+              trackerReplace!.map((e) => e.toRpcJson()).toList();
+        }
+      default:
+        return false;
+    }
+    return true;
+  }
 }
 
 class _TorrentSetRequestParamRpc16 extends _TorrentSetRequestParam {
@@ -511,10 +494,15 @@ class _TorrentSetRequestParamRpc16 extends _TorrentSetRequestParam {
   Set<TorrentSetArgument> get allowedFields => _allowedFields;
 
   @override
-  JsonMap toRpcJson() => super.toRpcJson()
-    ..addAll({
-      if (labels != null) TorrentSetArgument.labels.argName: labels,
-    });
+  bool toRpcJsonField(JsonMap result, TorrentSetArgument f) {
+    switch (f) {
+      case TorrentSetArgument.labels:
+        if (labels != null) result[f.argName] = labels;
+      default:
+        return super.toRpcJsonField(result, f);
+    }
+    return true;
+  }
 }
 
 class _TorrentSetRequestParamRpc17 extends _TorrentSetRequestParamRpc16 {
@@ -539,13 +527,18 @@ class _TorrentSetRequestParamRpc17 extends _TorrentSetRequestParamRpc16 {
   Set<TorrentSetArgument> get deprecatedFields => _deprecatedFields;
 
   @override
-  JsonMap toRpcJson() => super.toRpcJson()
-    ..addAll({
-      if (group != null) TorrentSetArgument.group.argName: group,
-      if (trackerList != null)
-        TorrentSetArgument.trackerList.argName:
-            trackerList!.map((x) => x.join("\n\n")).join("\n"),
-    });
+  bool toRpcJsonField(JsonMap result, TorrentSetArgument f) {
+    switch (f) {
+      case TorrentSetArgument.trackerList:
+        if (trackerList != null) {
+          result[f.argName] =
+              trackerList!.map((x) => x.join("\n\n")).join("\n");
+        }
+      default:
+        return super.toRpcJsonField(result, f);
+    }
+    return true;
+  }
 }
 
 class _TorrentSetRequestParamRpc18 extends _TorrentSetRequestParamRpc17 {
@@ -558,13 +551,6 @@ class _TorrentSetRequestParamRpc18 extends _TorrentSetRequestParamRpc17 {
 
   @override
   Set<TorrentSetArgument> get allowedFields => _allowedFields;
-
-  @override
-  JsonMap toRpcJson() => super.toRpcJson()
-    ..addAll({
-      if (sequentialDownload != null)
-        TorrentSetArgument.sequentialDownload.argName: sequentialDownload,
-    });
 }
 
 class TorrentSetResponseParam implements ResponseParam {

@@ -257,20 +257,25 @@ class _TorrentAddRequestParam extends TorrentAddRequestParam {
   JsonMap toRpcJson() {
     JsonMap result = {};
     for (var f in allowedFields) {
-      final val = _args.getValueByArgument(f);
-      if (val == null) continue;
-      switch (val.runtimeType) {
-        case FileIndices _:
-          val as FileIndices;
-          result[f.argName] = val.toRpcJson();
-        case List<Cookie> _:
-          val as List<Cookie>;
-          result[f.argName] = val.map((e) => e.toString()).join("; ");
-        default:
-          result[f.argName] = val;
+      if (!toRpcJsonField(result, f)) {
+        final val = _args.getValueByArgument(f);
+        if (val == null) continue;
+        result[f.argName] = toRpcJsonByType(val);
       }
     }
     return result;
+  }
+
+  bool toRpcJsonField(JsonMap result, TorrentAddArgument f) {
+    switch (f) {
+      case TorrentAddArgument.cookies:
+        if (cookies != null) {
+          result[f.argName] = cookies!.map((e) => e.toString()).join("; ");
+        }
+      default:
+        return false;
+    }
+    return true;
   }
 }
 
@@ -370,5 +375,5 @@ class _TorrentAddResponseParamRpc15 extends TorrentAddResponseParam {
   bool get isDuplicated => torrentDulicate != null;
 
   @override
-  TorrentAdded? get torrent => torrentAdded ?? torrentDulicate;
+  TorrentAdded? get torrent => torrentDulicate ?? torrentAdded;
 }
