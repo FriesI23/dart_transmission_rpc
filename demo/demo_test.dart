@@ -3,9 +3,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// ignore_for_file: avoid_print
-
-import 'dart:convert';
 import "dart:io" as io;
 
 import 'package:dart_transmission_rpc/client.dart';
@@ -260,17 +257,33 @@ Future<void> testTorrentAdd({TransmissionRpcClient? c}) async {
   if (c == null) await client.init();
   final result = await client.torrentAdd(
     TorrentAddRequestArgs(
-      metainfo:
-          base64Encode(io.File("test/demo_test.torrent").readAsBytesSync()),
+      fileInfo: TorrentAddFileInfo.byMetainfo(
+          io.File("demo/demo_test.torrent").readAsBytesSync()),
       downloadDir: "/downloads/complete",
       labels: ["test", "test1"],
     ),
   );
+  print('1----------------------');
   print(result.result);
   print(result.param?.isDuplicated);
   print(result.param?.torrent?.id);
   print(result.param?.torrent?.name);
   print(result.param.runtimeType);
+
+  final result2 = await client.torrentAdd(
+    TorrentAddRequestArgs(
+      fileInfo: TorrentAddFileInfo.byFilename(
+          "magnet:?xt=urn:btih:cce82738e2f9217c5631549b0b8c1dfe12331503&dn=debian-12.5.0-i386-netinst.iso"),
+      downloadDir: "/downloads/complete",
+      labels: ["test", "test1", "test2"],
+    ),
+  );
+  print('2----------------------');
+  print(result2.result);
+  print(result2.param?.isDuplicated);
+  print(result2.param?.torrent?.id);
+  print(result2.param?.torrent?.name);
+  print(result2.param.runtimeType);
 }
 
 Future<void> testTorrentSetLocation({TransmissionRpcClient? c}) async {
@@ -279,8 +292,8 @@ Future<void> testTorrentSetLocation({TransmissionRpcClient? c}) async {
   if (c == null) await client.init();
   final result1 = await client.torrentAdd(
     TorrentAddRequestArgs(
-      metainfo: base64Encode(
-          io.File("test/demo/demo_test.torrent").readAsBytesSync()),
+      fileInfo: TorrentAddFileInfo.byMetainfo(
+          io.File("demo/demo_test.torrent").readAsBytesSync()),
       downloadDir: "/downloads/complete",
     ),
   );
@@ -304,8 +317,8 @@ Future<void> testTorrentRenamePath({TransmissionRpcClient? c}) async {
   if (c == null) await client.init();
   final result1 = await client.torrentAdd(
     TorrentAddRequestArgs(
-      metainfo: base64Encode(
-          io.File("test/demo/demo_test.torrent").readAsBytesSync()),
+      fileInfo: TorrentAddFileInfo.byMetainfo(
+          io.File("demo/demo_test.torrent").readAsBytesSync()),
       downloadDir: "/downloads/complete",
     ),
   );
@@ -356,7 +369,7 @@ void main() async {
   // await testTorrentSartNow();
   // await testTorrentVerify();
   // await testTorrentReannounce();
-  await testTorrentGet();
+  // await testTorrentGet();
   // await testTorrentGetAll();
   // await testTorrentSet();
   // await testTorrentRemove();

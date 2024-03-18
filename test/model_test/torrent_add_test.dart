@@ -3,15 +3,20 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_transmission_rpc/model.dart';
 import 'package:dart_transmission_rpc/utils.dart';
 import 'package:test/test.dart';
 
+final testFileInfo = TorrentAddFileInfo(
+  filename: "example.torrent",
+  metainfo: utf8.encode("example metainfo"),
+);
+
 TorrentAddRequestArgs buildTestingUseNoNullArgs() => TorrentAddRequestArgs(
-    filename: "example.torrent",
-    metainfo: "example metainfo",
+    fileInfo: testFileInfo,
     cookies: [Cookie("session_id", "123456")],
     downloadDir: "/downloads",
     paused: false,
@@ -27,8 +32,7 @@ TorrentAddRequestArgs buildTestingUseNoNullArgs() => TorrentAddRequestArgs(
 JsonMap buildTestingUseStructArgs() => {
       'cookies': 'session_id=123456; HttpOnly',
       'download-dir': '/downloads',
-      'filename': 'example.torrent',
-      'metainfo': 'example metainfo',
+      'filename': testFileInfo.filename,
       'paused': false,
       'peer-limit': 100,
       'bandwidthPriority': 1,
@@ -66,8 +70,7 @@ void testTorrentAddRequestArgs() => group("test TorrentAddRequestArgs", () {
       group("constructor: ()", () {
         test("with args", () {
           final args = TorrentAddRequestArgs(
-            filename: "example.torrent",
-            metainfo: "example metainfo",
+            fileInfo: testFileInfo,
             cookies: [Cookie("session_id", "123456")],
             downloadDir: "/downloads",
             paused: false,
@@ -80,8 +83,8 @@ void testTorrentAddRequestArgs() => group("test TorrentAddRequestArgs", () {
             priorityNormal: FileIndices([5, 6]),
             labels: ["label1", "label2"],
           );
-          expect(args.filename, "example.torrent");
-          expect(args.metainfo, "example metainfo");
+          expect(args.fileInfo.filename, "example.torrent");
+          expect(args.fileInfo.metainfo, utf8.encode("example metainfo"));
           expect(args.cookies?.length, 1);
           expect(args.downloadDir, "/downloads");
           expect(args.paused, false);
@@ -96,7 +99,8 @@ void testTorrentAddRequestArgs() => group("test TorrentAddRequestArgs", () {
         });
 
         test("Get value by argument with empty arguments", () {
-          final args = TorrentAddRequestArgs(filename: "test");
+          final args = TorrentAddRequestArgs(
+              fileInfo: TorrentAddFileInfo.byFilename("test"));
           expect(args.getValueByArgument(TorrentAddArgument.filename), "test");
           expect(args.getValueByArgument(TorrentAddArgument.metainfo), isNull);
           expect(args.getValueByArgument(TorrentAddArgument.cookies), isNull);
@@ -119,14 +123,13 @@ void testTorrentAddRequestArgs() => group("test TorrentAddRequestArgs", () {
           expect(args.getValueByArgument(TorrentAddArgument.labels), isNull);
         });
         test("filename & metainfo", () {
-          expect(() => TorrentAddRequestArgs(),
+          expect(() => TorrentAddRequestArgs(fileInfo: TorrentAddFileInfo()),
               throwsA(TypeMatcher<AssertionError>()));
         });
       });
       test("method: getValueByArgument", () {
         final args = TorrentAddRequestArgs(
-          filename: "example.torrent",
-          metainfo: "example metainfo",
+          fileInfo: testFileInfo,
           cookies: [Cookie("session_id", "123456")],
           downloadDir: "/downloads",
           paused: false,
@@ -141,9 +144,9 @@ void testTorrentAddRequestArgs() => group("test TorrentAddRequestArgs", () {
         );
 
         expect(args.getValueByArgument(TorrentAddArgument.filename),
-            "example.torrent");
+            testFileInfo.filename);
         expect(args.getValueByArgument(TorrentAddArgument.metainfo),
-            "example metainfo");
+            testFileInfo.metainfo);
         expect(
             args.getValueByArgument(TorrentAddArgument.cookies), args.cookies);
         expect(args.getValueByArgument(TorrentAddArgument.downloadDir),
@@ -205,8 +208,8 @@ void testTorrentAddRequestParam() => group("test TorrentAddRequestParam", () {
         final requestParam = TorrentAddRequestParamStub(args: args);
 
         expect(requestParam.cookies, args.cookies);
-        expect(requestParam.filename, args.filename);
-        expect(requestParam.metainfo, args.metainfo);
+        expect(requestParam.fileInfo.filename, args.fileInfo.filename);
+        expect(requestParam.fileInfo.metainfo, args.fileInfo.metainfo);
         expect(requestParam.downloadDir, args.downloadDir);
         expect(requestParam.paused, args.paused);
         expect(requestParam.peerLimit, args.peerLimit);
@@ -245,13 +248,18 @@ void testTorrentAddRequestParamImpl() =>
       });
       test("check", () {
         final p1 = TorrentAddRequestParam.build(
-            args: TorrentAddRequestArgs(filename: "test"));
+            args: TorrentAddRequestArgs(
+                fileInfo: TorrentAddFileInfo.byFilename("test")));
         expect(p1.check(), isNull);
         final p2 = TorrentAddRequestParam.build(
-            args: TorrentAddRequestArgs(filename: "test", downloadDir: "ttt"));
+            args: TorrentAddRequestArgs(
+                fileInfo: TorrentAddFileInfo.byFilename("test"),
+                downloadDir: "ttt"));
         expect(p2.check(), isNull);
         final p3 = TorrentAddRequestParam.build(
-            args: TorrentAddRequestArgs(filename: "test", labels: ["1", "2"]));
+            args: TorrentAddRequestArgs(
+                fileInfo: TorrentAddFileInfo.byFilename("test"),
+                labels: ["1", "2"]));
         expect(p3.check(), contains("prohibited"));
       });
       test("deprecatedFields", () {
@@ -263,15 +271,19 @@ void testTorrentAddRequestParamImpl() =>
         });
         test("default", () {
           final p1 = TorrentAddRequestParam.build(
-              args: TorrentAddRequestArgs(filename: "test"));
+              args: TorrentAddRequestArgs(
+                  fileInfo: TorrentAddFileInfo.byFilename("test")));
           expect(p1.toRpcJson(), {"filename": "test"});
           final p2 = TorrentAddRequestParam.build(
-              args: TorrentAddRequestArgs(metainfo: "test2"));
-          expect(p2.toRpcJson(), {"metainfo": "test2"});
+              args: TorrentAddRequestArgs(
+            fileInfo: TorrentAddFileInfo.byMetainfo(utf8.encode("test2")),
+          ));
+          expect(p2.toRpcJson(), {"metainfo": 'dGVzdDI='});
         });
         test("with args", () {
           var r = p!.toRpcJson();
           for (var f in p!.allowedFields) {
+            if (f == TorrentAddArgument.metainfo) continue;
             expect(r[f.argName], isNotNull, reason: "check field failed: $f");
             r.remove(f.argName);
           }

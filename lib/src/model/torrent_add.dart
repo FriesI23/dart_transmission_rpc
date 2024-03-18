@@ -3,6 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import 'dart:convert';
 import 'dart:io';
 
 import '../request.dart';
@@ -60,9 +61,25 @@ enum TorrentAddArgument {
   const TorrentAddArgument({required this.argName});
 }
 
+class TorrentAddFileInfo {
+  final String? filename;
+  final List<int>? metainfo;
+
+  const TorrentAddFileInfo({this.filename, this.metainfo})
+      : assert(!(filename == null && metainfo == null));
+
+  const TorrentAddFileInfo.byFilename(String this.filename) : metainfo = null;
+
+  const TorrentAddFileInfo.byMetainfo(List<int> this.metainfo)
+      : filename = null;
+
+  JsonMap toRpcJson() => filename != null
+      ? {TorrentAddArgument.filename.argName: filename}
+      : {TorrentAddArgument.metainfo.argName: base64Encode(metainfo!)};
+}
+
 mixin TorrentAddRequestArgsDefine {
-  String? get filename;
-  String? get metainfo;
+  TorrentAddFileInfo get fileInfo;
   List<Cookie>? get cookies;
   String? get downloadDir;
   bool? get paused;
@@ -79,8 +96,10 @@ mixin TorrentAddRequestArgsDefine {
 
 class TorrentAddRequestArgs with TorrentAddRequestArgsDefine {
   static final _enumToPropertyMap = {
-    TorrentAddArgument.filename: (TorrentAddRequestArgs args) => args.filename,
-    TorrentAddArgument.metainfo: (TorrentAddRequestArgs args) => args.metainfo,
+    TorrentAddArgument.filename: (TorrentAddRequestArgs args) =>
+        args.fileInfo.filename,
+    TorrentAddArgument.metainfo: (TorrentAddRequestArgs args) =>
+        args.fileInfo.metainfo,
     TorrentAddArgument.cookies: (TorrentAddRequestArgs args) => args.cookies,
     TorrentAddArgument.downloadDir: (TorrentAddRequestArgs args) =>
         args.downloadDir,
@@ -103,9 +122,7 @@ class TorrentAddRequestArgs with TorrentAddRequestArgsDefine {
   };
 
   @override
-  final String? filename;
-  @override
-  final String? metainfo;
+  final TorrentAddFileInfo fileInfo;
   @override
   final List<Cookie>? cookies;
   @override
@@ -131,8 +148,7 @@ class TorrentAddRequestArgs with TorrentAddRequestArgsDefine {
   final List<String>? labels;
 
   TorrentAddRequestArgs({
-    this.filename,
-    this.metainfo,
+    required this.fileInfo,
     this.cookies,
     this.downloadDir,
     this.paused,
@@ -144,7 +160,7 @@ class TorrentAddRequestArgs with TorrentAddRequestArgsDefine {
     this.priorityLow,
     this.priorityNormal,
     this.labels,
-  }) : assert(!(filename == null && metainfo == null));
+  });
 
   Object? getValueByArgument(TorrentAddArgument arg) =>
       _enumToPropertyMap[arg]?.call(this);
@@ -156,10 +172,7 @@ abstract class TorrentAddRequestParam
   final TorrentAddRequestArgs _args;
 
   @override
-  String? get filename => _args.filename;
-
-  @override
-  String? get metainfo => _args.metainfo;
+  TorrentAddFileInfo get fileInfo => _args.fileInfo;
 
   @override
   List<Cookie>? get cookies => _args.cookies;
@@ -255,7 +268,7 @@ class _TorrentAddRequestParam extends TorrentAddRequestParam {
 
   @override
   JsonMap toRpcJson() {
-    JsonMap result = {};
+    JsonMap result = {}..addAll(fileInfo.toRpcJson());
     for (var f in allowedFields) {
       if (!toRpcJsonField(result, f)) {
         final val = _args.getValueByArgument(f);
@@ -272,6 +285,9 @@ class _TorrentAddRequestParam extends TorrentAddRequestParam {
         if (cookies != null) {
           result[f.argName] = cookies!.map((e) => e.toString()).join("; ");
         }
+      case TorrentAddArgument.filename:
+      case TorrentAddArgument.metainfo:
+        break;
       default:
         return false;
     }
