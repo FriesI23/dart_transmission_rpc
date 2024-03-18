@@ -6,8 +6,13 @@
 const kMinimumSupportRpcVersion = 14;
 
 class ServerRpcVersion {
+  /// Current rpc version supported
   final num rpcVersion;
+
+  /// The minimum rpc version supported
   final num minRpcVersion;
+
+  /// Last server rpc version update time
   final DateTime updateDate;
 
   const ServerRpcVersion({

@@ -14,6 +14,112 @@ const kMaxRpcTag = (1 << 63) - 1;
 
 enum HttpProtocol { http, https }
 
+/// see libtransmission/transmission.h::tr_priority_t
+/// since Normal is 0, memset initializes nicely
+enum BandwidthPriority {
+  low(-1),
+  normal(0),
+  high(1);
+
+  final num nice;
+
+  const BandwidthPriority(this.nice);
+
+  factory BandwidthPriority.nice(num nice) {
+    switch (nice) {
+      case 1:
+        return BandwidthPriority.high;
+      case -1:
+        return BandwidthPriority.low;
+      default:
+        return BandwidthPriority.normal;
+    }
+  }
+}
+
+enum IdleLimitMode {
+  /// follow the global settings
+  global(0),
+
+  /// verride the global settings, seeding until a certain idle time
+  single(1),
+
+  /// override the global settings, seeding regardless of activity
+  unlimited(2);
+
+  final int code;
+
+  const IdleLimitMode(this.code);
+
+  factory IdleLimitMode.code(int code) {
+    switch (code) {
+      case 1:
+        return IdleLimitMode.single;
+      case 2:
+        return IdleLimitMode.unlimited;
+      default:
+        return IdleLimitMode.global;
+    }
+  }
+}
+
+enum RatioLimitMode {
+  /// follow the global settings
+  global(0),
+
+  /// verride the global settings, seeding until a certain idle time
+  single(1),
+
+  /// override the global settings, seeding regardless of activity
+  unlimited(2);
+
+  final int code;
+
+  const RatioLimitMode(this.code);
+
+  factory RatioLimitMode.code(int code) {
+    switch (code) {
+      case 1:
+        return RatioLimitMode.single;
+      case 2:
+        return RatioLimitMode.unlimited;
+      default:
+        return RatioLimitMode.global;
+    }
+  }
+}
+
+enum ServerErrorCode {
+  /// everything's fine
+  ok(0),
+
+  /// when server announced to the tracker, it got a warning in the response
+  tackerWarning(1),
+
+  /// when server announced to the tracker, it got an error in the response
+  trackerError(2),
+
+  /// server local trouble, such as disk full or permissions error
+  localError(3);
+
+  final int code;
+
+  const ServerErrorCode(this.code);
+
+  factory ServerErrorCode.code(int code) {
+    switch (code) {
+      case 1:
+        return ServerErrorCode.tackerWarning;
+      case 2:
+        return ServerErrorCode.trackerError;
+      case 3:
+        return ServerErrorCode.localError;
+      default:
+        return ServerErrorCode.ok;
+    }
+  }
+}
+
 dynamic toRpcJsonByType<T>(dynamic val) {
   switch (val.runtimeType) {
     case TorrentIds _:

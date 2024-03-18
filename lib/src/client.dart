@@ -37,6 +37,9 @@ import 'version.dart';
 
 enum TransmissionRpcRetryReason { csrf }
 
+/// A Transmission RPC client implemented in Dart, visit
+/// [rpc-spec.md](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md)
+/// obtain more information.
 abstract interface class TransmissionRpcClient {
   Uri get url;
   String? get username;
@@ -45,35 +48,55 @@ abstract interface class TransmissionRpcClient {
   int get maxRetryCount;
   int get timeout;
 
-  // Start torrent
+  /// Start a torrent.
+  /// more info see:
+  /// [torrent-start](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#31-torrent-action-requests)
+  ///
+  /// use [TorrentIds.empty] apply for all torrents;
   Future<TorrentActionResponse<TorrentStartRequestParam>> torrentStart(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // Start start torrent disregarding queue position
+  /// Start start torrent disregarding queue position.
+  /// more info see:
+  /// [torrent-start-now](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#31-torrent-action-requests)
+  ///
+  /// use [TorrentIds.empty] apply for all torrents;
   Future<TorrentActionResponse<TorrentStartNowRequestParam>> torrentStartNow(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // Stop torrent
+  /// Stop torrent.
+  /// more info see:
+  /// [torrent-stop](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#31-torrent-action-requests)
+  ///
+  /// use [TorrentIds.empty] apply for all torrents;
   Future<TorrentActionResponse<TorrentStopRequestParam>> torrentStop(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // Verify torrent
+  /// Verify torrent.
+  /// more info see:
+  /// [torrent-verify](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#31-torrent-action-requests)
+  ///
+  /// use [TorrentIds.empty] apply for all torrents;
   Future<TorrentActionResponse<TorrentVerifyRequestParam>> torrentVerify(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // Re-announce to trackers now
+  /// Re-announce to trackers now.
+  /// more info see:
+  /// [torrent-reannounce](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#31-torrent-action-requests)
+  ///
+  /// use [TorrentIds.empty] apply for all torrents;
   Future<TorrentActionResponse<TorrentReannounceRequestParam>>
       torrentReannounce(
     TorrentIds ids, {
@@ -81,90 +104,179 @@ abstract interface class TransmissionRpcClient {
     int? timeout,
   });
 
-  // Get torrents info
+  /// Get torrents info.
+  /// more info see:
+  /// [torrent-get](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#33-torrent-accessor-torrent-get)
+  ///
+  /// leave [ids] null or use [TorrentIds.empty] apply for all torrents;
+  ///
+  ///
+  /// If [ids] are set to [TorrentIds.recently], then response set
+  /// [TorrentGetResponseParam.removed] with only the 'id' field of recently
+  /// removed torrents.
   Future<TorrentGetResponse> torrentGet(List<TorrentGetArgument> fields,
       {TorrentIds? ids, RpcTag? tag, int? timeout});
 
-  // Set torrents info
+  /// Set torrents info.
+  /// more info see:
+  /// [torrent-set](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#32-torrent-mutator-torrent-set)
+  ///
+  /// set [TorrentIds.torrentSetForAll] on [ids] to apply changes for
+  /// all torrents;
+  ///
+  /// set [FileIndices.empty] on [filesWanted]/[filesUnwanted]/
+  /// [priorityHigh]/[priorityNormal]/[priorityLow] to fetch
+  /// "all files";
   Future<TorrentSetResponse> torrentSet(TorrentSetRequestArgs args,
       {RpcTag? tag, int? timeout});
 
-  // Removing a torrent
+  /// Removing a torrent.
+  /// more info see: [torrent-remove](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#35-removing-a-torrent)
+  ///
+  /// If [deleteLocalData] is not passed, server default behavior will be used;
   Future<TorrentRemoveResponse> torrentRemove(TorrentIds ids,
       {bool? deleteLocalData, RpcTag? tag, int? timeout});
 
-  // Add a torrent
+  /// Adding a torrent.
+  /// more info see: [torrent-add](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#34-adding-a-torrent)
+  ///
+  /// [TorrentAddFileInfo] should only set `filename` or `metainfo`,
+  /// only `filename` will take effect if both are set;
+  ///
+  /// resonse [TorrentAddResponseParam.isDuplicated] will be true when
+  /// attempting to add a duplicate torrent;
   Future<TorrentAddResponse> torrentAdd(TorrentAddRequestArgs args,
       {RpcTag? tag, int? timeout});
 
-  // Moving a torrent
+  /// Moving a torrent.
+  /// more info see: [torrent-set-location](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#36-moving-a-torrent)
+  ///
+  /// If [move] param not passed, server default behavior will be used;
   Future<TorrentSetLocationResponse> torrentSetLocation(
       TorrentSetLocationArgs args,
       {RpcTag? tag,
       int? timeout});
 
-  // Renaming a torrent's path
+  /// Renaming a torrent's path.
+  /// more info see: [torrent-rename-path](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#37-renaming-a-torrents-path)
+  ///
+  /// e.g. a torrent struct:
+  /// ```text
+  /// linux
+  ///   - checksum
+  ///   - linux.iso
+  /// ```
+  ///
+  /// call:
+  /// ```dart
+  /// final args = TorrentRenamePathArgs(
+  ///   id: TorrentId(id: 1),
+  ///   oldPath: "linux",
+  ///   newName: "foo",
+  /// );
+  /// await torrentSetLocation(args);
+  /// ```
+  /// will rename `linux` folder as `foo`, new torrent path struct:
+  /// ```
+  /// foo # origin name `linux`
+  ///   - checksum
+  ///   - linux.iso
+  /// ```
+  ///
+  /// call:
+  /// ```dart
+  /// final args = TorrentRenamePathArgs(
+  ///   id: TorrentId(id: 1),
+  ///   oldPath: "linux/checksum",
+  ///   newName: "foo",
+  /// );
+  /// await torrentSetLocation(args);
+  /// ```
+  /// will rename `checksum` file as `foo`, new torrent path struct:
+  /// ```
+  /// linux
+  ///   - foo # origin name `checksum`
+  ///   - linux.iso
+  /// ```
+  ///
+  /// call [torrentGet] again if wat to update torrent's `files` and `name`;
   Future<TorrentRenamePathResponse> torrentRenamePath(
       TorrentRenamePathArgs args,
       {RpcTag? tag,
       int? timeout});
 
-  // Get session running stats by given fields
+  /// Get session running stats by given fields.
+  /// more info see: [session-get](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#412-accessors)
   Future<SessionGetResponse> sessionGet(List<SessionGetArgument>? fields,
       {RpcTag? tag, int? timeout});
 
-  // Set sesion running stats
+  /// Set sesion running stats.
+  /// more info see: [session-set](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#411-mutators)
   Future<SessionSetResponse> sessionSet(SessionSetRequestArgs args,
       {RpcTag? tag, int? timeout});
 
-  // Get sssion statistics
+  /// Get sssion statistics
+  /// more info see: [session-stats](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#42-session-statistics)
   Future<SessionStatsResponse> sessionStats({RpcTag? tag, int? timeout});
 
-  // Update blocklist (if setting blocklist-url)
+  /// Update blocklist (if setting blocklist-url).
+  /// more info see: [blocklist-update](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#43-blocklist)
   Future<BlocklistUpdateResponse> blocklistUpdate({RpcTag? tag, int? timeout});
 
-  // Test to see if your incoming peer port is accessible.
+  /// Test to see if your incoming peer port is accessible.
+  /// more info see: [port-test](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#44-port-checking)
   Future<PortTestResponse> portTest({RpcTag? tag, int? timeout});
 
-  // Tells the transmission session to shutdown
+  /// Tells the transmission session to shutdown.
+  /// more info see: [session-close](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#45-session-shutdown)
   Future<SessionCloseResponse> sessionClose({RpcTag? tag, int? timeout});
 
-  // Move torretns at top of queue
+  /// Move torretns at top of queue.
+  /// more info see: [queue-move-top](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#46-queue-movement-requests)
   Future<QueueMoveResponse<QueueMoveTopReqeustParam>> queueMoveTop(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // Move torrents up from queue
+  /// Move torrents up from queue.
+  /// more info see: [queue-move-up](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#46-queue-movement-requests)
   Future<QueueMoveResponse<QueueMoveUpReqeustParam>> queueMoveUp(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // Move torrent down from queue
+  /// Move torrent down from queue.
+  /// more info see: [queue-move-down](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#46-queue-movement-requests)
   Future<QueueMoveResponse<QueueMoveDownReqeustParam>> queueMoveDown(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // Move torrent at bottom of queue
+  /// Move torrent at bottom of queue.
+  /// more info see: [queue-move-bottom](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#46-queue-movement-requests)
   Future<QueueMoveResponse<QueueMoveBottomReqeustParam>> queueMoveBottom(
     TorrentIds ids, {
     RpcTag? tag,
     int? timeout,
   });
 
-  // Tests how much free space is available in a client-specified folder
+  /// Tests how much free space is available in a client-specified folder.
+  /// more info see: [free-space](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#47-free-space)
   Future<FreeSpaceResponse> freeSpace(String path, {RpcTag? tag, int? timeout});
 
-  // Get bandwidth group
+  /// Get bandwidth group.
+  /// more info see: [group-get](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#482-bandwidth-group-accessor-group-get)
+  ///
+  /// [group] is a list of bandwidth group desc name, you can apply group by
+  /// setting `TorrentSetRequestArgs(group: "group_name")` on [torrentSet];
   Future<GroupGetResponse> groupGet(List<String>? group,
       {RpcTag? tag, int? timeout});
 
-  // Set bandwith group
+  /// Set bandwith group
+  /// more info see: [group-set](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md#481-bandwidth-group-mutator-group-set)
   Future<GroupSetResponse> groupSet(GroupSetRequestArgs args,
       {RpcTag? tag, int? timeout});
 

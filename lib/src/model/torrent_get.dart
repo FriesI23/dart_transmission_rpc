@@ -16,82 +16,261 @@ import '../version.dart';
 import 'torrent.dart';
 
 enum TorrentGetArgument {
+  /// The last time uploaded or downloaded piece data on this torrent
   activityDate(argName: "activityDate"),
+
+  /// When the torrent was first added.
   addedDate(argName: "addedDate"),
+
+  /// An array of `pieceCount` numbers representing the number of connected
+  /// peers that have each piece, or -1 if server already have the piece.
   availability(argName: "availability"),
+
+  /// torrent's bandwidth priority, should be -1, 0, or 1, check
+  /// [BandwidthPriority] get more information.
   bandwidthPriority(argName: "bandwidthPriority"),
+
+  /// torrent comment text
   comment(argName: "comment"),
+
+  /// Byte count of all the corrupt data you've ever downloaded for
+  /// this torrent. If you're on a poisoned torrent, this number can
+  /// grow very large.
   corruptEver(argName: "corruptEver"),
+
+  /// torrent creator
   creator(argName: "creator"),
+
+  /// when torrent task created.
   dateCreated(argName: "dateCreated"),
+
+  /// Byte count of all the piece data server want and don't have yet,
+  /// but that a connected peer does have. [0...leftUntilDone]
   desiredAvailable(argName: "desiredAvailable"),
+
+  /// When the torrent finished downloading.
   doneDate(argName: "doneDate"),
+
+  /// torrent download directory
   downloadDir(argName: "downloadDir"),
+
+  /// Byte count of all the non-corrupt data you've ever downloaded for this
+  /// torrent. If you deleted the files and downloaded a second time,
+  /// this will be `2*totalSize`..
   downloadedEver(argName: "downloadedEver"),
+
+  /// maximum download speed (KBps)
   downloadLimit(argName: "downloadLimit"),
+
+  /// true if [downloadLimit] is honored
   downloadLimited(argName: "downloadLimited"),
+
+  /// The last time during this session that a rarely-changing field changed
+  /// -- e.g. any metainfo field (trackers, filenames, name) or download
+  /// directory.
+  /// It can monitor this to know when to reload fields that rarely change.
   editDate(argName: "editDate"),
+
+  /// Defines what kind of text is in errorString, check [ServerErrorCode]
+  /// get more information.
   error(argName: "error"),
+
+  /// A warning or error message regarding the torrent, see [error]
   errorString(argName: "errorString"),
+
+  /// If downloading, estimated number of seconds left until the torrent is
+  /// done. If seeding, estimated number of seconds left until seed ratio
+  /// is reached
   eta(argName: "eta"),
+
+  /// If seeding, number of seconds left until the idle time limit is reached.
   etaIdle(argName: "etaIdle"),
+
+  /// Number of torrent files
   fileCount(argName: "file-count"),
+
+  /// Files information with torrent
   files(argName: "files"),
+
+  /// A file's non-constant properties.
   fileStats(argName: "fileStats"),
+
+  /// bandwith group name, see api [groupSet] and [groupGet]
   group(argName: "group"),
+
+  /// torrent's hashed string
   hashString(argName: "hashString"),
+
+  /// Byte count of all the partial piece data server have for this torrent.
+  /// As pieces become complete, this value may decrease as portions of it
+  /// are moved to [corruptEver] or [haveValid].
   haveUnchecked(argName: "haveUnchecked"),
+
+  /// Byte count of all the checksum-verified data server have for this torrent.
   haveValid(argName: "haveValid"),
+
+  /// true if session upload limits are honored
   honorsSessionLimits(argName: "honorsSessionLimits"),
+
+  /// torrent id
   id(argName: "id"),
+
+  ///  A torrent is considered finished if it has met its seed ratio.
+  /// As a result, only paused torrents can be finished
   isFinished(argName: "isFinished"),
+
+  /// True if this torrent is private
   isPrivate(argName: "isPrivate"),
+
+  /// True if the torrent is running, but has been idle for long enough
+  /// to be considered stalled.
   isStalled(argName: "isStalled"),
+
+  /// Torrent labels
   labels(argName: "labels"),
+
+  /// Byte count of how much data is left to be downloaded until server got
+  /// all the pieces that it want
   leftUntilDone(argName: "leftUntilDone"),
+
+  /// Torrent Magnet link, e.g.: magnet:?...
   magnetLink(argName: "magnetLink"),
+
   manualAnnounceTime(argName: "manualAnnounceTime"),
+
   maxConnectedPeers(argName: "maxConnectedPeers"),
+
+  /// How much of the metadata the torrent has. For torrents added from a
+  /// torrent this will always be 1. For magnet links, this number will from
+  /// from 0 to 1 as the metadata is downloaded. Range is [0..1]
   metadataPercentComplete(argName: "metadataPercentComplete"),
+
+  /// torrent name
   name(argName: "name"),
+
+  /// Maximum number of peers
   peerLimit(argName: "peer-limit"),
+
+  /// Peer's information
   peers(argName: "peers"),
+
+  /// Number of peers that server connected to
   peersConnected(argName: "peersConnected"),
+
+  /// How many connected peers server found out about from the tracker,
+  /// or from pex, or from incoming connections, or from our resume file.
   peersFrom(argName: "peersFrom"),
+
+  ///  Number of peers that server sending data to
   peersGettingFromUs(argName: "peersGettingFromUs"),
+
+  /// Number of peers that are sending data to us.
   peersSendingToUs(argName: "peersSendingToUs"),
+
+  /// How much has been downloaded of the entire torrent. Range is [0..1]
   percentComplete(argName: "percentComplete"),
+
+  /// How much has been downloaded of the files the user wants. This differs
+  /// from percentComplete if the user wants only some of the torrent's files.
+  /// Range is [0..1], see [leftUntilDone]
   percentDone(argName: "percentDone"),
+
+  /// A bitfield holding [pieceCount] flags which are set to `true`/`1`
+  /// if server have the piece matching that position.
   pieces(argName: "pieces"),
+
   pieceCount(argName: "pieceCount"),
+
+  /// Checkout how many KiB each piece should be
   pieceSize(argName: "pieceSize"),
+
+  // TODO: replace with BandwidthPriority
+  /// An array of torrent file count numbers.
+  /// Each is the [BandwidthPriority.nice] for the corresponding file.
   priorities(argName: "priorities"),
+
   primaryMimeType(argName: "primary-mime-type"),
+
+  /// position of this torrent in its queue [0...n)
   queuePosition(argName: "queuePosition"),
+
+  /// Download rate (B/s)
   rateDownload(argName: "rateDownload"),
+
+  /// Upload rate (B/s)
   rateUpload(argName: "rateUpload"),
+
+  /// Percentage of how much of the files has been verified. When it gets to 1,
+  /// the verify process is done. Range is [0..1]
   recheckProgress(argName: "recheckProgress"),
+
+  /// Cumulative seconds the torrent's ever spent downloading
   secondsDownloading(argName: "secondsDownloading"),
+
+  /// Cumulative seconds the torrent's ever spent seeding
   secondsSeeding(argName: "secondsSeeding"),
+
+  /// torrent-level number of minutes of seeding inactivity
   seedIdleLimit(argName: "seedIdleLimit"),
+
+  // TODO: replace with IdleLimitMode
+  /// Figger out which seeding inactivity to use. see [IdleLimitMode.code]
   seedIdleMode(argName: "seedIdleMode"),
+
+  /// the default seed ratio for torrents to use
   seedRatioLimit(argName: "seedRatioLimit"),
+
+  // TODO: replace with RatioLimitMode
+  /// which ratio to use. see [RatioLimitMode.code]
   seedRatioMode(argName: "seedRatioMode"),
+
+  /// download torrent pieces sequentially
   sequentialDownload(argName: "sequentialDownload"),
+
+  /// Byte count of all the piece data we'll have downloaded when we're done,
+  /// whether or not we have it yet. If we only want some of the files,
+  /// this may be less than [totalSize]. Range is [0...totalSize]
   sizeWhenDone(argName: "sizeWhenDone"),
+
+  /// When the torrent was last started.
   startDate(argName: "startDate"),
+
+  /// torrent status, see [TorrentStatus]
   status(argName: "status"),
+
+  /// torrent tracker information
   trackers(argName: "trackers"),
+
+  // TODO: add custom type TrackerList
+  /// string of announce URLs, one per line, and a blank line between tiers.
   trackerList(argName: "trackerList"),
+
+  /// Tracker's State information
   trackerStats(argName: "trackerStats"),
+
+  /// torrent total size (Bytes)
   totalSize(argName: "totalSize"),
+
   torrentFile(argName: "torrentFile"),
+
+  /// Byte count of all data you've ever uploaded for this torrent.
   uploadedEver(argName: "uploadedEver"),
+
+  /// maximum upload speed (KBps)
   uploadLimit(argName: "uploadLimit"),
+
+  /// `true` if [uploadLimit] is honored
   uploadLimited(argName: "uploadLimited"),
+
   uploadRatio(argName: "uploadRatio"),
+
+  /// An array of torrent file count 0/1, 1 (true) if the corresponding file
+  /// is to be downloaded
   wanted(argName: "wanted"),
+
   webseeds(argName: "webseeds"),
+
+  /// Number of webseeds that are sending data to us.
   webseedsSendingToUs(argName: "webseedsSendingToUs");
 
   final String argName;

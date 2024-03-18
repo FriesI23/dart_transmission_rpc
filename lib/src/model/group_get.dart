@@ -79,11 +79,22 @@ class GroupGetResponseParam implements ResponseParam {
 }
 
 class GroupDesc {
+  /// Bandwidth group name
   final String name;
+
+  /// true if session upload limits are honored
   final bool honorsSessionLimits;
+
+  /// true means enabled
   final bool speedLimitDownEnabled;
+
+  /// max global download speed (KBps)
   final num speedLimitDown;
+
+  /// true means enabled
   final bool speedLimitUpEnabled;
+
+  /// max global upload speed (KBps)
   final num speedLimitUp;
 
   const GroupDesc({

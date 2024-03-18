@@ -13,70 +13,70 @@ import '../version.dart';
 import 'torrent.dart';
 
 enum TorrentSetArgument {
-  // This torrent's bandwidth priority
+  /// This torrent's bandwidth priority
   bandwidthPriority(argName: "bandwidthPriority"),
 
-  // Maximum download speed (KBps)
+  /// Maximum download speed (KBps)
   downloadLimit(argName: "downloadLimit"),
 
-  // Indicates whether downloadLimit is honored
+  /// Indicates whether downloadLimit is honored
   downloadLimited(argName: "downloadLimited"),
 
-  // Indices of file(s) to not download
+  /// Indices of file(s) to not download
   filesUnwanted(argName: "files-unwanted"),
 
-  // Indices of file(s) to download
+  /// Indices of file(s) to download
   filesWanted(argName: "files-wanted"),
 
-  // The name of this torrent's bandwidth group
+  /// The name of this torrent's bandwidth group
   group(argName: "group"),
 
-  // Indicates whether session upload limits are honored
+  /// Indicates whether session upload limits are honored
   honorsSessionLimits(argName: "honorsSessionLimits"),
 
-  // Torrent list, as described
+  /// Torrent list, as described
   ids(argName: "ids"),
 
-  // Array of string labels
+  /// Array of string labels
   labels(argName: "labels"),
 
-  // New location of the torrent's content
+  /// New location of the torrent's content
   location(argName: "location"),
 
-  // Maximum number of peers
+  /// Maximum number of peers
   peerLimit(argName: "peer-limit"),
 
-  // Indices of high-priority file(s)
+  /// Indices of high-priority file(s)
   priorityHigh(argName: "priority-high"),
 
-  // Indices of low-priority file(s)
+  /// Indices of low-priority file(s)
   priorityLow(argName: "priority-low"),
 
-  // Indices of normal-priority file(s)
+  /// Indices of normal-priority file(s)
   priorityNormal(argName: "priority-normal"),
 
-  // Position of this torrent in its queue [0...n)
+  /// Position of this torrent in its queue [0...n)
   queuePosition(argName: "queuePosition"),
 
-  // Torrent-level number of minutes of seeding inactivity
+  /// Torrent-level number of minutes of seeding inactivity
   seedIdleLimit(argName: "seedIdleLimit"),
 
-  // Which seeding inactivity to use
+  /// Which seeding inactivity to use
   seedIdleMode(argName: "seedIdleMode"),
 
-  // Torrent-level seeding ratio
+  /// Torrent-level seeding ratio
   seedRatioLimit(argName: "seedRatioLimit"),
 
-  // Which ratio to use
+  /// Which ratio to use
   seedRatioMode(argName: "seedRatioMode"),
 
-  // Download torrent pieces sequentially
+  /// Download torrent pieces sequentially
   sequentialDownload(argName: "sequentialDownload"),
 
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   trackerAdd(argName: "trackerAdd"),
 
-  // String of announce URLs, one per line, and a blank line between tiers
+  /// String of announce URLs, one per line, and a blank line between tiers
   trackerList(argName: "trackerList"),
 
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
@@ -85,10 +85,10 @@ enum TorrentSetArgument {
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   trackerReplace(argName: "trackerReplace"),
 
-  // Maximum upload speed (KBps)
+  /// Maximum upload speed (KBps)
   uploadLimit(argName: "uploadLimit"),
 
-  // Indicates whether uploadLimit is honored
+  /// Indicates whether uploadLimit is honored
   uploadLimited(argName: "uploadLimited");
 
   static final allFieldsSet = TorrentSetArgument.values.toSet();
@@ -118,6 +118,7 @@ class TrackerReplace {
 
 mixin TorrentSetRequestArgsDefine {
   TorrentIds get ids;
+  // TODO: replace with enum
   num? get bandwidthPriority;
   num? get downloadLimit;
   bool? get downloadLimited;
@@ -131,8 +132,10 @@ mixin TorrentSetRequestArgsDefine {
   FileIndices? get priorityNormal;
   num? get queuePosition;
   num? get seedIdleLimit;
+  // TODO: replace with enum
   num? get seedIdleMode;
   num? get seedRatioLimit;
+  // TODO: replace with enum
   num? get seedRatioMode;
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   List<String>? get trackerAdd;
@@ -146,6 +149,7 @@ mixin TorrentSetRequestArgsDefine {
   List<String>? get labels;
   // rpc17 new
   String? get group;
+  // TODO: add custom type TrackerList
   List<List<String>>? get trackerList;
   // rpc19 new
   bool? get sequentialDownload;
