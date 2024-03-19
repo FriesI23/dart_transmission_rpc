@@ -374,7 +374,7 @@ void main() async {
   // await testTorrentSartNow();
   // await testTorrentVerify();
   // await testTorrentReannounce();
-  await testTorrentGet();
+  // await testTorrentGet();
   // await testTorrentGetAll();
   // await testTorrentSet();
   // await testTorrentRemove();
