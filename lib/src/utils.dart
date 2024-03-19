@@ -10,9 +10,47 @@ import 'response.dart';
 import 'typedef.dart';
 import 'version.dart';
 
+const kUint8Max = (1 << 8) - 1;
+
 const kMaxRpcTag = (1 << 63) - 1;
 
 enum HttpProtocol { http, https }
+
+enum TorrentStatus {
+  unknown(kUint8Max),
+  stopped(0),
+  queuedToVerify(1),
+  verifyLocalData(2),
+  queuedToDownload(3),
+  downloading(4),
+  queuedToSeed(5),
+  seeding(6);
+
+  final int val;
+
+  const TorrentStatus(this.val);
+
+  factory TorrentStatus.fromVal(int val) {
+    switch (val) {
+      case 0:
+        return TorrentStatus.stopped;
+      case 1:
+        return TorrentStatus.queuedToVerify;
+      case 2:
+        return TorrentStatus.verifyLocalData;
+      case 3:
+        return TorrentStatus.queuedToDownload;
+      case 4:
+        return TorrentStatus.downloading;
+      case 5:
+        return TorrentStatus.queuedToSeed;
+      case 6:
+        return TorrentStatus.seeding;
+      default:
+        return TorrentStatus.unknown;
+    }
+  }
+}
 
 /// see libtransmission/transmission.h::tr_priority_t
 /// since Normal is 0, memset initializes nicely
@@ -38,6 +76,9 @@ enum BandwidthPriority {
 }
 
 enum IdleLimitMode {
+  /// unknown mode
+  unknown(kUint8Max),
+
   /// follow the global settings
   global(0),
 
@@ -53,17 +94,22 @@ enum IdleLimitMode {
 
   factory IdleLimitMode.code(int code) {
     switch (code) {
+      case 0:
+        return IdleLimitMode.global;
       case 1:
         return IdleLimitMode.single;
       case 2:
         return IdleLimitMode.unlimited;
       default:
-        return IdleLimitMode.global;
+        return IdleLimitMode.unknown;
     }
   }
 }
 
 enum RatioLimitMode {
+  /// unknown mode
+  unknown(kUint8Max),
+
   /// follow the global settings
   global(0),
 
@@ -79,17 +125,22 @@ enum RatioLimitMode {
 
   factory RatioLimitMode.code(int code) {
     switch (code) {
+      case 0:
+        return RatioLimitMode.global;
       case 1:
         return RatioLimitMode.single;
       case 2:
         return RatioLimitMode.unlimited;
       default:
-        return RatioLimitMode.global;
+        return RatioLimitMode.unknown;
     }
   }
 }
 
 enum ServerErrorCode {
+  /// unknown error
+  unknown(kUint8Max),
+
   /// everything's fine
   ok(0),
 
@@ -108,6 +159,8 @@ enum ServerErrorCode {
 
   factory ServerErrorCode.code(int code) {
     switch (code) {
+      case 0:
+        return ServerErrorCode.ok;
       case 1:
         return ServerErrorCode.tackerWarning;
       case 2:
@@ -115,7 +168,7 @@ enum ServerErrorCode {
       case 3:
         return ServerErrorCode.localError;
       default:
-        return ServerErrorCode.ok;
+        return ServerErrorCode.unknown;
     }
   }
 }

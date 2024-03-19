@@ -184,7 +184,6 @@ enum TorrentGetArgument {
   /// Checkout how many KiB each piece should be
   pieceSize(argName: "pieceSize"),
 
-  // TODO: replace with BandwidthPriority
   /// An array of torrent file count numbers.
   /// Each is the [BandwidthPriority.nice] for the corresponding file.
   priorities(argName: "priorities"),
@@ -213,7 +212,6 @@ enum TorrentGetArgument {
   /// torrent-level number of minutes of seeding inactivity
   seedIdleLimit(argName: "seedIdleLimit"),
 
-  // TODO: replace with IdleLimitMode
   /// Figger out which seeding inactivity to use. see [IdleLimitMode.code]
   seedIdleMode(argName: "seedIdleMode"),
 
@@ -654,41 +652,6 @@ class Pieces {
   Uint8? elementAtOrNull(int index) => pieces.elementAtOrNull(index) as Uint8?;
 }
 
-enum TorrentStatus {
-  stopped(0),
-  queuedToVerify(1),
-  verifyLocalData(2),
-  queuedToDownload(3),
-  downloading(4),
-  queuedToSeed(5),
-  seeding(6);
-
-  final int val;
-
-  const TorrentStatus(this.val);
-
-  factory TorrentStatus.fromVal(int val) {
-    switch (val) {
-      case 0:
-        return TorrentStatus.stopped;
-      case 1:
-        return TorrentStatus.queuedToVerify;
-      case 2:
-        return TorrentStatus.verifyLocalData;
-      case 3:
-        return TorrentStatus.queuedToDownload;
-      case 4:
-        return TorrentStatus.downloading;
-      case 5:
-        return TorrentStatus.queuedToSeed;
-      case 6:
-        return TorrentStatus.seeding;
-      default:
-        throw ArgumentError("Invalid TorrentStatus value: $val");
-    }
-  }
-}
-
 class Tracker {
   final String announce;
   final TrackerId id;
@@ -874,7 +837,7 @@ class TorrentInfo {
   final num? secondsDownloading;
   final num? secondsSeeding;
   final num? seedIdleLimit;
-  final num? seedIdleMode;
+  final IdleLimitMode? seedIdleMode;
   final num? seedRatioLimit;
   final num? seedRatioMode;
   final bool? sequentialDownload;
@@ -991,12 +954,19 @@ class TorrentInfo {
   }
 
   factory TorrentInfo.fromJson(JsonMap rawData) {
-    final rawId = rawData[TorrentGetArgument.id.argName] as num?;
-    final rawHashString =
-        rawData[TorrentGetArgument.hashString.argName] as String?;
-    final id = !(rawId == null && rawHashString == null)
-        ? TorrentId(id: rawId?.toInt(), hashStr: rawHashString)
-        : null;
+    TorrentId? buildId() {
+      final rawId = rawData[TorrentGetArgument.id.argName] as num?;
+      final rawHash = rawData[TorrentGetArgument.hashString.argName] as String?;
+      return !(rawId == null && rawHash == null)
+          ? TorrentId(id: rawId?.toInt(), hashStr: rawHash)
+          : null;
+    }
+
+    IdleLimitMode? buildSeedIdleMode() {
+      final rawMode = rawData[TorrentGetArgument.seedIdleMode.argName] as num?;
+      return rawMode != null ? IdleLimitMode.code(rawMode.toInt()) : null;
+    }
+
     return TorrentInfo(
       activityDate: rawData[TorrentGetArgument.activityDate.argName] as num?,
       addedDate: rawData[TorrentGetArgument.addedDate.argName] as num?,
@@ -1036,7 +1006,7 @@ class TorrentInfo {
       haveValid: rawData[TorrentGetArgument.haveValid.argName] as num?,
       honorsSessionLimits:
           rawData[TorrentGetArgument.honorsSessionLimits.argName] as bool?,
-      id: id,
+      id: buildId(),
       isFinished: rawData[TorrentGetArgument.isFinished.argName] as bool?,
       isPrivate: rawData[TorrentGetArgument.isPrivate.argName] as bool?,
       isStalled: rawData[TorrentGetArgument.isStalled.argName] as bool?,
@@ -1085,7 +1055,7 @@ class TorrentInfo {
       secondsSeeding:
           rawData[TorrentGetArgument.secondsSeeding.argName] as num?,
       seedIdleLimit: rawData[TorrentGetArgument.seedIdleLimit.argName] as num?,
-      seedIdleMode: rawData[TorrentGetArgument.seedIdleMode.argName] as num?,
+      seedIdleMode: buildSeedIdleMode(),
       seedRatioLimit:
           rawData[TorrentGetArgument.seedRatioLimit.argName] as num?,
       seedRatioMode: rawData[TorrentGetArgument.seedRatioMode.argName] as num?,

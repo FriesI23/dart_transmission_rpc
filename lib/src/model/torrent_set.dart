@@ -118,7 +118,6 @@ class TrackerReplace {
 
 mixin TorrentSetRequestArgsDefine {
   TorrentIds get ids;
-  // TODO: replace with enum
   num? get bandwidthPriority;
   num? get downloadLimit;
   bool? get downloadLimited;
@@ -132,8 +131,7 @@ mixin TorrentSetRequestArgsDefine {
   FileIndices? get priorityNormal;
   num? get queuePosition;
   num? get seedIdleLimit;
-  // TODO: replace with enum
-  num? get seedIdleMode;
+  IdleLimitMode? get seedIdleMode;
   num? get seedRatioLimit;
   // TODO: replace with enum
   num? get seedRatioMode;
@@ -236,7 +234,7 @@ class TorrentSetRequestArgs with TorrentSetRequestArgsDefine {
   @override
   final num? seedIdleLimit;
   @override
-  final num? seedIdleMode;
+  final IdleLimitMode? seedIdleMode;
   @override
   final num? seedRatioLimit;
   @override
@@ -347,7 +345,7 @@ abstract class TorrentSetRequestParam
   num? get seedIdleLimit => _args.seedIdleLimit;
 
   @override
-  num? get seedIdleMode => _args.seedIdleMode;
+  IdleLimitMode? get seedIdleMode => _args.seedIdleMode;
 
   @override
   num? get seedRatioLimit => _args.seedRatioLimit;
@@ -479,6 +477,10 @@ class _TorrentSetRequestParam extends TorrentSetRequestParam {
         if (trackerReplace != null) {
           result[f.argName] =
               trackerReplace!.map((e) => e.toRpcJson()).toList();
+        }
+      case TorrentSetArgument.seedIdleMode:
+        if (seedIdleMode != null && seedIdleMode != IdleLimitMode.unknown) {
+          result[f.argName] = seedIdleMode!.code;
         }
       default:
         return false;

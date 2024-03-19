@@ -9,6 +9,7 @@ import 'package:dart_transmission_rpc/client.dart';
 import 'package:dart_transmission_rpc/extensions.dart';
 import 'package:dart_transmission_rpc/logging.dart';
 import 'package:dart_transmission_rpc/model.dart';
+import 'package:dart_transmission_rpc/src/utils.dart';
 
 Future<void> testSessionGet() async {
   final client = TransmissionRpcClient(username: "admin", password: "123456");
@@ -232,7 +233,7 @@ Future<void> testTorrentSet({TransmissionRpcClient? c}) async {
     // ids: TorrentIds([TorrentId(id: 2)]),
     ids: TorrentIds.empty(),
     labels: ["test", "foo", "bar", "new"],
-    seedIdleMode: 1,
+    seedIdleMode: IdleLimitMode.single,
   ));
   print(r2.result);
   final r3 = await client.torrentGetAll(const TorrentIds.empty());
@@ -371,7 +372,7 @@ void main() async {
   // await testTorrentReannounce();
   // await testTorrentGet();
   // await testTorrentGetAll();
-  // await testTorrentSet();
+  await testTorrentSet();
   // await testTorrentRemove();
   // await testTorrentAdd();
   // await testTorrentSetLocation();

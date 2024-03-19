@@ -8,6 +8,7 @@
 import 'package:dart_transmission_rpc/model.dart';
 import 'package:dart_transmission_rpc/src/exception.dart';
 import 'package:dart_transmission_rpc/src/typedef.dart';
+import 'package:dart_transmission_rpc/src/utils.dart';
 import 'package:test/test.dart';
 
 TorrentSetRequestArgs buildTestingUseNoNullArgs({TorrentIds? ids}) =>
@@ -26,7 +27,7 @@ TorrentSetRequestArgs buildTestingUseNoNullArgs({TorrentIds? ids}) =>
       priorityNormal: FileIndices.empty(),
       queuePosition: 1,
       seedIdleLimit: 10,
-      seedIdleMode: 0,
+      seedIdleMode: IdleLimitMode.global,
       seedRatioLimit: 2,
       seedRatioMode: 1,
       sequentialDownload: true,
@@ -62,7 +63,7 @@ TorrentSetRequestArgs buildTestingUseStructArgs({TorrentIds? ids}) =>
       priorityNormal: FileIndices.empty(),
       queuePosition: 1,
       seedIdleLimit: 10,
-      seedIdleMode: 0,
+      seedIdleMode: IdleLimitMode.single,
       seedRatioLimit: 2,
       seedRatioMode: 1,
       trackerAdd: ['http://tracker1.com', 'http://tracker2.com'],
@@ -97,7 +98,7 @@ JsonMap buildTestingUseStructExpectJson({List<int>? expectIds, num? v}) => {
       'priority-normal': [],
       'queuePosition': 1,
       'seedIdleLimit': 10,
-      'seedIdleMode': 0,
+      'seedIdleMode': 1,
       'seedRatioLimit': 2,
       'seedRatioMode': 1,
       'trackerAdd': ['http://tracker1.com', 'http://tracker2.com'],
@@ -182,7 +183,7 @@ void testTorrentSetRequestArgs() => group("test TorrentSetRequestArgs", () {
             priorityNormal: FileIndices.empty(),
             queuePosition: 1,
             seedIdleLimit: 10,
-            seedIdleMode: 0,
+            seedIdleMode: IdleLimitMode.global,
             seedRatioLimit: 2,
             seedRatioMode: 1,
             sequentialDownload: true,
@@ -232,7 +233,7 @@ void testTorrentSetRequestArgs() => group("test TorrentSetRequestArgs", () {
           expect(args.getValueByArgument(TorrentSetArgument.seedIdleLimit),
               equals(10));
           expect(args.getValueByArgument(TorrentSetArgument.seedIdleMode),
-              equals(0));
+              equals(IdleLimitMode.global));
           expect(args.getValueByArgument(TorrentSetArgument.seedRatioLimit),
               equals(2));
           expect(args.getValueByArgument(TorrentSetArgument.seedRatioMode),
@@ -332,7 +333,7 @@ void testTorrentSetRequestArgs() => group("test TorrentSetRequestArgs", () {
           priorityNormal: FileIndices.empty(),
           queuePosition: 1,
           seedIdleLimit: 10,
-          seedIdleMode: 0,
+          seedIdleMode: IdleLimitMode.global,
           seedRatioLimit: 2,
           seedRatioMode: 1,
           sequentialDownload: true,
