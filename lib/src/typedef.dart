@@ -26,6 +26,8 @@ import 'response.dart';
 typedef JsonMap = Map<String, dynamic>;
 typedef RpcTag = num;
 typedef TrackerId = num;
+typedef TrackerList = List<List<String>>;
+typedef TrackerListIter = Iterable<Iterable<String>>;
 
 typedef ParamBuilderEntry1<S, V> = MapEntry<int, S Function(V)>;
 typedef ParamBuilderEntry2<S, V1, V2> = MapEntry<int, S Function(V1, V2)>;

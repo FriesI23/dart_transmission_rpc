@@ -191,6 +191,7 @@ Future<void> testTorrentGet({TransmissionRpcClient? c}) async {
     print(p.name);
     print(p.id);
     print(p.addedDate);
+    print(p.trackerList);
   }
   print('--------- removed ---------');
   for (var p in result.param!.removed) {
@@ -373,9 +374,9 @@ void main() async {
   // await testTorrentSartNow();
   // await testTorrentVerify();
   // await testTorrentReannounce();
-  // await testTorrentGet();
+  await testTorrentGet();
   // await testTorrentGetAll();
-  await testTorrentSet();
+  // await testTorrentSet();
   // await testTorrentRemove();
   // await testTorrentAdd();
   // await testTorrentSetLocation();

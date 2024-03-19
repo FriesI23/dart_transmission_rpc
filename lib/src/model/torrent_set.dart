@@ -11,6 +11,7 @@ import '../typedef.dart';
 import '../utils.dart';
 import '../version.dart';
 import 'torrent.dart';
+import 'tracker_list.dart';
 
 enum TorrentSetArgument {
   /// This torrent's bandwidth priority
@@ -146,8 +147,7 @@ mixin TorrentSetRequestArgsDefine {
   List<String>? get labels;
   // rpc17 new
   String? get group;
-  // TODO: add custom type TrackerList
-  List<List<String>>? get trackerList;
+  TrackerListIter? get trackerList;
   // rpc19 new
   bool? get sequentialDownload;
 }
@@ -258,7 +258,7 @@ class TorrentSetRequestArgs with TorrentSetRequestArgsDefine {
   @override
   final String? group;
   @override
-  final List<List<String>>? trackerList;
+  final TrackerListIter? trackerList;
   // rpc19 new
   @override
   final bool? sequentialDownload;
@@ -377,7 +377,7 @@ abstract class TorrentSetRequestParam
   String? get group => _args.group;
 
   @override
-  List<List<String>>? get trackerList => _args.trackerList;
+  TrackerListIter? get trackerList => _args.trackerList;
 
   @override
   bool? get sequentialDownload => _args.sequentialDownload;
@@ -532,8 +532,7 @@ class _TorrentSetRequestParamRpc17 extends _TorrentSetRequestParamRpc16 {
     switch (f) {
       case TorrentSetArgument.trackerList:
         if (trackerList != null) {
-          result[f.argName] =
-              trackerList!.map((x) => x.join("\n\n")).join("\n");
+          result[f.argName] = trackerListCodec.encode(trackerList!);
         }
       default:
         return super.toRpcJsonField(result, f);

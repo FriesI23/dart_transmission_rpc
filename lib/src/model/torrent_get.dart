@@ -14,6 +14,7 @@ import '../typedef.dart';
 import '../utils.dart';
 import '../version.dart';
 import 'torrent.dart';
+import 'tracker_list.dart';
 
 enum TorrentGetArgument {
   /// The last time uploaded or downloaded piece data on this torrent
@@ -238,7 +239,6 @@ enum TorrentGetArgument {
   /// torrent tracker information
   trackers(argName: "trackers"),
 
-  // TODO: add custom type TrackerList
   /// string of announce URLs, one per line, and a blank line between tiers.
   trackerList(argName: "trackerList"),
 
@@ -844,7 +844,7 @@ class TorrentInfo {
   final num? startDate;
   final TorrentStatus? status;
   final List<Tracker>? trackers;
-  final String? trackerList;
+  final TrackerList? trackerList;
   final List<TrackerStat>? trackerStats;
   final num? totalSize;
   final String? torrentFile;
@@ -971,6 +971,13 @@ class TorrentInfo {
       return rawMode != null ? RatioLimitMode.code(rawMode.toInt()) : null;
     }
 
+    TrackerList? buildTrackerList() {
+      final input = rawData[TorrentGetArgument.trackerList.argName] as String?;
+      return input != null
+          ? trackerListCodec.decode(input).map((e) => e.toList()).toList()
+          : null;
+    }
+
     return TorrentInfo(
       activityDate: rawData[TorrentGetArgument.activityDate.argName] as num?,
       addedDate: rawData[TorrentGetArgument.addedDate.argName] as num?,
@@ -1074,7 +1081,7 @@ class TorrentInfo {
       trackers: (rawData[TorrentGetArgument.trackers.argName] as List?)
           ?.map((tracker) => Tracker.fromJson(tracker))
           .toList(),
-      trackerList: rawData[TorrentGetArgument.trackerList.argName] as String?,
+      trackerList: buildTrackerList(),
       trackerStats: (rawData[TorrentGetArgument.trackerStats.argName] as List?)
           ?.map((trackerStat) => TrackerStat.fromJson(trackerStat))
           .toList(),
