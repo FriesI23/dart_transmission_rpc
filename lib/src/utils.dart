@@ -174,13 +174,17 @@ enum ServerErrorCode {
 }
 
 dynamic toRpcJsonByType<T>(dynamic val) {
-  switch (val.runtimeType) {
-    case TorrentIds _:
-      val as TorrentIds;
+  switch (val) {
+    case TorrentIds():
       return val.toRpcJson();
-    case FileIndices _:
-      val as FileIndices;
+    case FileIndices():
       return val.toRpcJson();
+    case ServerErrorCode():
+      return val.code;
+    case IdleLimitMode():
+      return val.code;
+    case RatioLimitMode():
+      return val.code;
     default:
       return val;
   }

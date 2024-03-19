@@ -477,14 +477,6 @@ class _TorrentSetRequestParam extends TorrentSetRequestParam {
           result[f.argName] =
               trackerReplace!.map((e) => e.toRpcJson()).toList();
         }
-      case TorrentSetArgument.seedIdleMode:
-        if (seedIdleMode != null && seedIdleMode != IdleLimitMode.unknown) {
-          result[f.argName] = seedIdleMode!.code;
-        }
-      case TorrentSetArgument.seedRatioMode:
-        if (seedRatioMode != null && seedRatioMode != RatioLimitMode.unknown) {
-          result[f.argName] = seedRatioMode!.code;
-        }
       default:
         return false;
     }
