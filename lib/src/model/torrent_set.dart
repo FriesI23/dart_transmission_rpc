@@ -14,82 +14,34 @@ import 'torrent.dart';
 import 'tracker_list.dart';
 
 enum TorrentSetArgument {
-  /// This torrent's bandwidth priority
   bandwidthPriority(argName: "bandwidthPriority"),
-
-  /// Maximum download speed (KBps)
   downloadLimit(argName: "downloadLimit"),
-
-  /// Indicates whether downloadLimit is honored
   downloadLimited(argName: "downloadLimited"),
-
-  /// Indices of file(s) to not download
   filesUnwanted(argName: "files-unwanted"),
-
-  /// Indices of file(s) to download
   filesWanted(argName: "files-wanted"),
-
-  /// The name of this torrent's bandwidth group
   group(argName: "group"),
-
-  /// Indicates whether session upload limits are honored
   honorsSessionLimits(argName: "honorsSessionLimits"),
-
-  /// Torrent list, as described
   ids(argName: "ids"),
-
-  /// Array of string labels
   labels(argName: "labels"),
-
-  /// New location of the torrent's content
   location(argName: "location"),
-
-  /// Maximum number of peers
   peerLimit(argName: "peer-limit"),
-
-  /// Indices of high-priority file(s)
   priorityHigh(argName: "priority-high"),
-
-  /// Indices of low-priority file(s)
   priorityLow(argName: "priority-low"),
-
-  /// Indices of normal-priority file(s)
   priorityNormal(argName: "priority-normal"),
-
-  /// Position of this torrent in its queue [0...n)
   queuePosition(argName: "queuePosition"),
-
-  /// Torrent-level number of minutes of seeding inactivity
   seedIdleLimit(argName: "seedIdleLimit"),
-
-  /// Which seeding inactivity to use
   seedIdleMode(argName: "seedIdleMode"),
-
-  /// Torrent-level seeding ratio
   seedRatioLimit(argName: "seedRatioLimit"),
-
-  /// Which ratio to use
   seedRatioMode(argName: "seedRatioMode"),
-
-  /// Download torrent pieces sequentially
   sequentialDownload(argName: "sequentialDownload"),
-
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   trackerAdd(argName: "trackerAdd"),
-
-  /// String of announce URLs, one per line, and a blank line between tiers
   trackerList(argName: "trackerList"),
-
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   trackerRemove(argName: "trackerRemove"),
-
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   trackerReplace(argName: "trackerReplace"),
-
-  /// Maximum upload speed (KBps)
   uploadLimit(argName: "uploadLimit"),
-
-  /// Indicates whether uploadLimit is honored
   uploadLimited(argName: "uploadLimited");
 
   static final allFieldsSet = TorrentSetArgument.values.toSet();
@@ -118,37 +70,92 @@ class TrackerReplace {
 }
 
 mixin TorrentSetRequestArgsDefine {
+  /// Gets the IDs of torrents.
   TorrentIds get ids;
+
+  /// Gets the bandwidth priority of the torrent.
   num? get bandwidthPriority;
+
+  /// Gets the maximum download speed of the torrent (in KBps).
   num? get downloadLimit;
+
+  /// Indicates whether the download limit is honored.
   bool? get downloadLimited;
+
+  /// Gets the indices of unwanted files.
   FileIndices? get filesUnwanted;
+
+  /// Gets the indices of wanted files.
   FileIndices? get filesWanted;
+
+  /// Indicates whether session upload limits are honored.
   bool? get honorsSessionLimits;
+
+  /// Gets the location of the torrent's content.
   String? get location;
+
+  /// Gets the maximum number of peers.
   num? get peerLimit;
+
+  /// Gets the indices of high-priority files.
   FileIndices? get priorityHigh;
+
+  /// Gets the indices of low-priority files.
   FileIndices? get priorityLow;
+
+  /// Gets the indices of normal-priority files.
   FileIndices? get priorityNormal;
+
+  /// Gets the position of the torrent in its queue.
   num? get queuePosition;
+
+  /// Gets the torrent-level number of minutes of seeding inactivity.
   num? get seedIdleLimit;
+
+  /// Gets the seeding inactivity mode.
   IdleLimitMode? get seedIdleMode;
+
+  /// Gets the torrent-level seeding ratio limit.
   num? get seedRatioLimit;
+
+  /// Gets the seeding ratio mode.
   RatioLimitMode? get seedRatioMode;
+
+  /// Deprecated in rpc-version>=17, use [trackerList] instead.
+  /// Gets the list of tracker URLs to add.
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   List<String>? get trackerAdd;
+
+  /// Deprecated in rpc-version>=17, use [trackerList] instead.
+  /// Gets the list of trackers to remove.
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   List<TrackerId>? get trackerRemove;
+
+  /// Deprecated in rpc-version>=17, use [trackerList] instead.
+  /// Gets the list of trackers to replace.
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   List<TrackerReplace>? get trackerReplace;
+
+  /// Gets the maximum upload speed of the torrent (in KBps).
   num? get uploadLimit;
+
+  /// Indicates whether the upload limit is honored.
   bool? get uploadLimited;
-  // rpc16 new
+
+  /// Gets the array of string labels.
+  /// (new in rpc-version 16)
   List<String>? get labels;
-  // rpc17 new
+
+  /// Gets the name of the torrent's bandwidth group.
+  /// (new in rpc-version 17)
   String? get group;
+
+  /// Gets the list of tracker URLs.
+  /// (new in rpc-version 17)
   TrackerListIter? get trackerList;
-  // rpc19 new
+
+  /// Indicates whether to download torrent pieces sequentially.
+  /// (new in rpc-version 19)
   bool? get sequentialDownload;
 }
 

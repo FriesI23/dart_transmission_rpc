@@ -10,8 +10,13 @@ import '../utils.dart';
 import '../version.dart';
 
 enum FreeSpaceArgument {
+  /// the directory to query
   path(argName: "path"),
+
+  /// the size, in bytes, of the free space in that directory
   sizeBytes(argName: "size-bytes"),
+
+  /// the total capacity, in bytes, of that directory
   totalSize(argName: "total_size");
 
   final String argName;
@@ -58,8 +63,13 @@ class _FreeSpaceRequstParamRpc15 extends FreeSpaceRequestParam {
 }
 
 abstract class FreeSpaceResponseParam implements ResponseParam {
+  /// the directory to query, same as the Request argument
   final String path;
+
+  /// the size, in bytes, of the free space in that directory
   final num sizeBytes;
+
+  /// the total capacity, in bytes, of that directory
   final num? totalSize;
 
   const FreeSpaceResponseParam({

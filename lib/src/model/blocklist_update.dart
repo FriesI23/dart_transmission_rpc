@@ -8,6 +8,7 @@ import '../response.dart';
 import '../typedef.dart';
 
 enum BlocklistUpdateArguments {
+  /// number of rules in the blocklist
   blocklistSize(argName: "blocklist-size");
 
   final String argName;

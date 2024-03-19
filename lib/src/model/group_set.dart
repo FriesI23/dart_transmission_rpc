@@ -11,22 +11,11 @@ import "../utils.dart";
 import "../version.dart";
 
 enum GroupSetArgument {
-  /// Bandwidth group name
   name(argName: "name"),
-
-  /// true if session upload limits are honored
   honorSessionLimits(argName: "honorsSessionLimits"),
-
-  /// true to enable group's global download speed limit
   speedLimitDownEnabled(argName: "speed-limit-down-enabled"),
-
-  /// max global download speed (KBps)
   speedLimitDown(argName: "speed-limit-down"),
-
-  /// true to enable group's global upload speed limit
   speedLimitUpEnabled(argName: "speed-limit-up-enabled"),
-
-  /// max global upload speed (KBps)
   speedLimitUp(argName: "speed-limit-up");
 
   final String argName;
@@ -35,11 +24,22 @@ enum GroupSetArgument {
 }
 
 mixin GroupSetRequestArgsDefine {
+  /// Bandwidth group name
   String get name;
+
+  /// true if session upload limits are honored
   bool? get honorSessionLimits;
+
+  /// true to enable group's global download speed limit
   bool? get speedLimitDownEnabled;
+
+  /// max global download speed (KBps)
   num? get speedLimitDown;
+
+  /// true to enable group's global upload speed limit
   bool? get speedLimitUpEnabled;
+
+  /// max global upload speed (KBps)
   num? get speedLimitUp;
 }
 

@@ -23,7 +23,11 @@ enum TorrentRenamePathArgument {
 
 mixin TorrentRenamePathArgsDefine {
   TorrentId get id;
+
+  /// the path to the file or folder that will be renamed
   String get oldPath;
+
+  /// the file or folder's new name
   String get newName;
 }
 

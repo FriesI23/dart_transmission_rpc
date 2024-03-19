@@ -15,43 +15,18 @@ import 'torrent.dart';
 import 'torrent_get.dart';
 
 enum TorrentAddArgument {
-  // Pointer to a string of one or more cookies
   cookies(argName: "cookies"),
-
-  // Path to download the torrent to
   downloadDir(argName: "download-dir"),
-
-  // Filename or URL of the .torrent file
   filename(argName: "filename"),
-
-  // Array of string labels
   labels(argName: "labels"),
-
-  // Base64-encoded .torrent content
   metainfo(argName: "metainfo"),
-
-  // If true, don't start the torrent
   paused(argName: "paused"),
-
-  // Maximum number of peers
   peerLimit(argName: "peer-limit"),
-
-  // Torrent's bandwidth tr_priority_t
   bandwidthPriority(argName: "bandwidthPriority"),
-
-  // Indices of file(s) to download
   filesWanted(argName: "files-wanted"),
-
-  // Indices of file(s) to not download
   filesUnwanted(argName: "files-unwanted"),
-
-  // Indices of high-priority file(s)
   priorityHigh(argName: "priority-high"),
-
-  // Indices of low-priority file(s)
   priorityLow(argName: "priority-low"),
-
-  // Indices of normal-priority file(s)
   priorityNormal(argName: "priority-normal");
 
   static final allFieldsSet = TorrentAddArgument.values.toSet();
@@ -79,18 +54,41 @@ class TorrentAddFileInfo {
 }
 
 mixin TorrentAddRequestArgsDefine {
+  /// Information about the torrent's files.
   TorrentAddFileInfo get fileInfo;
+
+  /// One or more cookies.
   List<Cookie>? get cookies;
+
+  /// Path to download the torrent to.
   String? get downloadDir;
+
+  /// Indicates whether the torrent should be added in a paused state.
   bool? get paused;
+
+  /// Maximum number of peers for the torrent.
   num? get peerLimit;
+
+  /// Priority for the torrent's bandwidth.
   num? get bandwidthPriority;
+
+  /// Indices of file(s) to be downloaded.
   FileIndices? get filesWanted;
+
+  /// Indices of file(s) not to be downloaded.
   FileIndices? get filesUnwanted;
+
+  /// Indices of high-priority file(s).
   FileIndices? get priorityHigh;
+
+  /// Indices of low-priority file(s).
   FileIndices? get priorityLow;
+
+  /// Indices of normal-priority file(s).
   FileIndices? get priorityNormal;
-  // rpc17 new
+
+  /// Array of string labels.
+  /// (new in rpc-version 17)
   List<String>? get labels;
 }
 

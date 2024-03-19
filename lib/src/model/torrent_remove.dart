@@ -20,6 +20,8 @@ enum TorrentRemoveArgument {
 
 abstract class TorrentRemoveRequestParam implements RequestParam {
   final TorrentIds ids;
+
+  /// delete local data.
   final bool? deleteLocalData;
 
   const TorrentRemoveRequestParam({required this.ids, this.deleteLocalData});

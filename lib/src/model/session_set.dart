@@ -10,152 +10,56 @@ import '../utils.dart';
 import '../version.dart';
 
 enum SessionSetArgument {
-  /// max global download speed (KBps)
   altSpeedDown(argName: "alt-speed-down"),
-
-  /// true means use the alt speeds
   altSpeedEnabled(argName: "alt-speed-enabled"),
-
-  /// when to turn on alt speeds (units: minutes after midnight)
   altSpeedTimeBegin(argName: "alt-speed-time-begin"),
-
-  /// what day(s) to turn on alt speeds (look at tr_sched_day)
   altSpeedTimeDay(argName: "alt-speed-time-day"),
-
-  /// true means the scheduled on/off times are used
   altSpeedTimeEnabled(argName: "alt-speed-time-enabled"),
-
-  /// when to turn off alt speeds (units: same)
   altSpeedTimeEnd(argName: "alt-speed-time-end"),
-
-  /// max global upload speed (KBps)
   altSpeedUp(argName: "alt-speed-up"),
-
-  /// true means enabled
   blocklistEnabled(argName: "blocklist-enabled"),
-
-  /// location of the blocklist to use for `blocklist-update`
   blocklistUrl(argName: "blocklist-url"),
-
-  /// maximum size of the disk cache (MB)
   cacheSizeMb(argName: "cache-size-mb"),
-
-  /// announce URLs, one per line, and a blank line between tiers
   defaultTrackers(argName: "default-trackers"),
-
-  /// true means allow DHT in public torrents
   dhtEnabled(argName: "dht-enabled"),
-
-  /// default path to download torrents
   downloadDir(argName: "download-dir"),
-
-  /// DEPRECATED: Use the `free-space` method instead.
+  @Deprecated("Deprecated rpc-version>=17, use \"free-space\" method instead")
   downloadDirFreeSpace(argName: "download-dir-free-space"),
-
-  /// if true, limit how many torrents can be downloaded at once
   downloadQueueEnabled(argName: "download-queue-enabled"),
-
-  /// max number of torrents to download at once (see download-queue-enabled)
   downloadQueueSize(argName: "download-queue-size"),
-
-  /// `required`, `preferred`, `tolerated`
   encryption(argName: "encryption"),
-
-  /// true if the seeding inactivity limit is honored by default
   idleSeedingLimitEnabled(argName: "idle-seeding-limit-enabled"),
-
-  /// torrents we're seeding will be stopped if they're idle for this long
   idleSeedingLimit(argName: "idle-seeding-limit"),
-
-  /// true means keep torrents in incomplete-dir until done
   incompleteDirEnabled(argName: "incomplete-dir-enabled"),
-
-  /// path for incomplete torrents, when enabled
   incompleteDir(argName: "incomplete-dir"),
-
-  /// true means allow Local Peer Discovery in public torrents
   lpdEnabled(argName: "lpd-enabled"),
-
-  /// maximum global number of peers
   peerLimitGlobal(argName: "peer-limit-global"),
-
-  /// maximum global number of peers
   peerLimitPerTorrent(argName: "peer-limit-per-torrent"),
-
-  /// true means pick a random peer port on launch
   peerPortRandomOnStart(argName: "peer-port-random-on-start"),
-
-  /// port number
   peerPort(argName: "peer-port"),
-
-  /// true means allow PEX in public torrents
   pexEnabled(argName: "pex-enabled"),
-
-  /// true means ask upstream router to forward the configured peer port
-  /// to transmission using UPnP or NAT-PMP
   portForwardingEnabled(argName: "port-forwarding-enabled"),
-
-  /// whether or not to consider idle torrents as stalled
   queueStalledEnabled(argName: "queue-stalled-enabled"),
-
-  /// torrents that are idle for N minutes aren't counted
-  /// toward seed-queue-size or download-queue-size
   queueStalledMinutes(argName: "queue-stalled-minutes"),
-
-  /// true means append `.part` to incomplete files
   renamePartialFiles(argName: "rename-partial-files"),
-
-  /// whether or not to call the `added` script
   scriptTorrentAddedEnabled(argName: "script-torrent-added-enabled"),
-
-  /// filename of the script to run
   scriptTorrentAddedFilename(argName: "script-torrent-added-filename"),
-
-  /// whether or not to call the `done` script
   scriptTorrentDoneEnabled(argName: "script-torrent-done-enabled"),
-
-  /// filename of the script to run
   scriptTorrentDoneFilename(argName: "script-torrent-done-filename"),
-
-  /// whether or not to call the `seeding-done` script
   scriptTorrentDoneSeedingEnabled(
       argName: "script-torrent-done-seeding-enabled"),
-
-  /// filename of the script to run
   scriptTorrentDoneSeedingFilename(
       argName: "script-torrent-done-seeding-filename"),
-
-  /// if true, limit how many torrents can be uploaded at once
   seedQueueEnabled(argName: "seed-queue-enabled"),
-
-  /// max number of torrents to upload at once (see seed-queue-enabled)
   seedQueueSize(argName: "seed-queue-size"),
-
-  /// the default seed ratio for torrents to use
   seedRatioLimit(argName: "seedRatioLimit"),
-
-  /// true if seedRatioLimit is honored by default
   seedRatioLimited(argName: "seedRatioLimited"),
-
-  /// true means enabled
   speedLimitDownEnabled(argName: "speed-limit-down-enabled"),
-
-  /// max global download speed (KBps)
   speedLimitDown(argName: "speed-limit-down"),
-
-  /// true means enabled
   speedLimitUpEnabled(argName: "speed-limit-up-enabled"),
-
-  /// max global upload speed (KBps)
   speedLimitUp(argName: "speed-limit-up"),
-
-  /// true means added torrents will be started right away
   startAddedTorrents(argName: "start-added-torrents"),
-
-  /// true means the .torrent file of added torrents will be deleted
   trashOriginalTorrentFiles(argName: "trash-original-torrent-files"),
-
-  /// true means allow UTP
   utpEnabled(argName: "utp-enabled");
 
   final String argName;
@@ -164,53 +68,149 @@ enum SessionSetArgument {
 }
 
 mixin SessionSetRequestArgsDefine {
+  /// Max global download speed (KBps)
   num? get altSpeedDown;
+
+  /// Indicates whether alternative speeds are enabled
   bool? get altSpeedEnabled;
+
+  /// Time to begin alternative speeds (units: minutes after midnight)
   num? get altSpeedTimeBegin;
+
+  /// Day(s) to turn on alternative speeds (look at tr_sched_day)
   num? get altSpeedTimeDay;
+
+  /// Indicates whether alternative speeds time is enabled
   bool? get altSpeedTimeEnabled;
+
+  /// Time to end alternative speeds (units: same)
   num? get altSpeedTimeEnd;
+
+  /// Max global upload speed (KBps)
   num? get altSpeedUp;
+
+  /// Indicates whether the blocklist is enabled
   bool? get blocklistEnabled;
+
+  /// Location of the blocklist to use for `blocklist-update`
   String? get blocklistUrl;
+
+  /// Maximum size of the disk cache (MB)
   num? get cacheSizeMb;
+
+  /// Announce URLs, one per line, and a blank line between tiers
   String? get defaultTrackers;
+
+  /// Indicates whether DHT is enabled in public torrents
   bool? get dhtEnabled;
+
+  /// Default path to download torrents
   String? get downloadDir;
+
+  /// DEPRECATED: Use [freeSpace] method instead.
+  @Deprecated("Deprecated rpc-version>=17, use \"free-space\" method instead")
   num? get downloadDirFreeSpace;
+
+  /// Indicates if limiting how many torrents can be downloaded at once is enabled
   bool? get downloadQueueEnabled;
+
+  /// Max number of torrents to download at once (see downloadQueueEnabled)
   num? get downloadQueueSize;
+
+  /// Specifies the encryption method (`required`, `preferred`, `tolerated`)
   String? get encryption;
+
+  /// Indicates if the seeding inactivity limit is honored by default
   bool? get idleSeedingLimitEnabled;
+
+  /// Torrents we're seeding will be stopped if they're idle for this long
   num? get idleSeedingLimit;
+
+  /// Indicates whether incomplete directory is enabled
   bool? get incompleteDirEnabled;
+
+  /// Path for incomplete torrents, when enabled
   String? get incompleteDir;
+
+  /// Indicates whether Local Peer Discovery in public torrents is enabled
   bool? get lpdEnabled;
+
+  /// Maximum global number of peers
   num? get peerLimitGlobal;
+
+  /// Maximum global number of peers per torrent
   num? get peerLimitPerTorrent;
+
+  /// Indicates whether to pick a random peer port on launch
   bool? get peerPortRandomOnStart;
+
+  /// Port number
   num? get peerPort;
+
+  /// Indicates whether Peer Exchange (PEX) in public torrents is enabled
   bool? get pexEnabled;
+
+  /// Indicates whether UPnP or NAT-PMP is enabled to forward peer ports
   bool? get portForwardingEnabled;
+
+  /// Indicates whether idle torrents are considered as stalled
   bool? get queueStalledEnabled;
+
+  /// Torrents that are idle for N minutes aren't counted toward seed-queue-size or download-queue-size
   num? get queueStalledMinutes;
+
+  /// Indicates whether to append `.part` to incomplete files
   bool? get renamePartialFiles;
+
+  /// Indicates whether to call the `added` script
   bool? get scriptTorrentAddedEnabled;
+
+  /// Filename of the script to run when a torrent is added
   String? get scriptTorrentAddedFilename;
+
+  /// Indicates whether to call the `done` script
   bool? get scriptTorrentDoneEnabled;
+
+  /// Filename of the script to run when a torrent is done
   String? get scriptTorrentDoneFilename;
+
+  /// Indicates whether to call the `seeding-done` script
   bool? get scriptTorrentDoneSeedingEnabled;
+
+  /// Filename of the script to run when seeding is done
   String? get scriptTorrentDoneSeedingFilename;
+
+  /// Indicates if limiting how many torrents can be uploaded at once is enabled
   bool? get seedQueueEnabled;
+
+  /// Max number of torrents to upload at once (see seedQueueEnabled)
   num? get seedQueueSize;
+
+  /// The default seed ratio for torrents to use
   num? get seedRatioLimit;
+
+  /// Indicates if seedRatioLimit is honored by default
   bool? get seedRatioLimited;
+
+  /// Indicates whether download speed limit is enabled
   bool? get speedLimitDownEnabled;
+
+  /// Max global download speed (KBps)
   num? get speedLimitDown;
+
+  /// Indicates whether upload speed limit is enabled
   bool? get speedLimitUpEnabled;
+
+  /// Max global upload speed (KBps)
   num? get speedLimitUp;
+
+  /// Indicates whether added torrents will be started right away
   bool? get startAddedTorrents;
+
+  /// Indicates whether the .torrent file of added torrents will be deleted
   bool? get trashOriginalTorrentFiles;
+
+  /// Indicates whether UDP Transport Protocol (UTP) is enabled
   bool? get utpEnabled;
 }
 

@@ -12,14 +12,8 @@ import '../version.dart';
 import 'torrent.dart';
 
 enum TorrentSetLocationArgument {
-  // torrent list
   ids(argName: "ids"),
-
-  // the new torrent location
   location(argName: "location"),
-
-  // if true, move from previous location.
-  // otherwise, search "location" for files (default: false)
   move(argName: "move");
 
   final String argName;
@@ -28,8 +22,14 @@ enum TorrentSetLocationArgument {
 }
 
 mixin TorrentSetLocationArgsDefine {
+  /// torrent list
   TorrentIds get ids;
+
+  /// the new torrent location
   String get location;
+
+  /// if true, move from previous location;
+  /// otherwise, search "location" for files.
   bool? get move;
 }
 
