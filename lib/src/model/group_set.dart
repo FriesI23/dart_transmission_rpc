@@ -65,6 +65,25 @@ class GroupSetRequestArgs with GroupSetRequestArgsDefine {
     this.speedLimitUpEnabled,
     this.speedLimitUp,
   });
+
+  GroupSetRequestArgs copyWith({
+    String? name,
+    bool? honorSessionLimits,
+    bool? speedLimitDownEnabled,
+    num? speedLimitDown,
+    bool? speedLimitUpEnabled,
+    num? speedLimitUp,
+  }) {
+    return GroupSetRequestArgs(
+      name: name ?? this.name,
+      honorSessionLimits: honorSessionLimits ?? this.honorSessionLimits,
+      speedLimitDownEnabled:
+          speedLimitDownEnabled ?? this.speedLimitDownEnabled,
+      speedLimitDown: speedLimitDown ?? this.speedLimitDown,
+      speedLimitUpEnabled: speedLimitUpEnabled ?? this.speedLimitUpEnabled,
+      speedLimitUp: speedLimitUp ?? this.speedLimitUp,
+    );
+  }
 }
 
 abstract class GroupSetRequestParam

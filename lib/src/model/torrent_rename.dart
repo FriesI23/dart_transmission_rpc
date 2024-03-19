@@ -44,6 +44,18 @@ class TorrentRenamePathArgs with TorrentRenamePathArgsDefine {
     required this.oldPath,
     required this.newName,
   });
+
+  TorrentRenamePathArgs copyWith({
+    TorrentId? id,
+    String? oldPath,
+    String? newName,
+  }) {
+    return TorrentRenamePathArgs(
+      id: id ?? this.id,
+      oldPath: oldPath ?? this.oldPath,
+      newName: newName ?? this.newName,
+    );
+  }
 }
 
 class TorrentRenamePathRequestParam

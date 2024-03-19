@@ -46,6 +46,18 @@ class TorrentSetLocationArgs with TorrentSetLocationArgsDefine {
     required this.location,
     this.move,
   });
+
+  TorrentSetLocationArgs copyWith({
+    TorrentIds? ids,
+    String? location,
+    bool? move,
+  }) {
+    return TorrentSetLocationArgs(
+      ids: ids ?? this.ids,
+      location: location ?? this.location,
+      move: move ?? this.move,
+    );
+  }
 }
 
 class TorrentSetLocationRequestParam

@@ -301,6 +301,64 @@ class TorrentSetRequestArgs with TorrentSetRequestArgsDefine {
 
   Object? getValueByArgument(TorrentSetArgument arg) =>
       _enumToPropertyMap[arg]?.call(this);
+
+  TorrentSetRequestArgs copyWith({
+    TorrentIds? ids,
+    num? bandwidthPriority,
+    num? downloadLimit,
+    bool? downloadLimited,
+    FileIndices? filesUnwanted,
+    FileIndices? filesWanted,
+    bool? honorsSessionLimits,
+    String? location,
+    num? peerLimit,
+    FileIndices? priorityHigh,
+    FileIndices? priorityLow,
+    FileIndices? priorityNormal,
+    num? queuePosition,
+    num? seedIdleLimit,
+    IdleLimitMode? seedIdleMode,
+    num? seedRatioLimit,
+    RatioLimitMode? seedRatioMode,
+    bool? sequentialDownload,
+    List<String>? trackerAdd,
+    List<TrackerId>? trackerRemove,
+    List<TrackerReplace>? trackerReplace,
+    num? uploadLimit,
+    bool? uploadLimited,
+    List<String>? labels,
+    String? group,
+    TrackerListIter? trackerList,
+  }) {
+    return TorrentSetRequestArgs(
+      ids: ids ?? this.ids,
+      bandwidthPriority: bandwidthPriority ?? this.bandwidthPriority,
+      downloadLimit: downloadLimit ?? this.downloadLimit,
+      downloadLimited: downloadLimited ?? this.downloadLimited,
+      filesUnwanted: filesUnwanted ?? this.filesUnwanted,
+      filesWanted: filesWanted ?? this.filesWanted,
+      honorsSessionLimits: honorsSessionLimits ?? this.honorsSessionLimits,
+      location: location ?? this.location,
+      peerLimit: peerLimit ?? this.peerLimit,
+      priorityHigh: priorityHigh ?? this.priorityHigh,
+      priorityLow: priorityLow ?? this.priorityLow,
+      priorityNormal: priorityNormal ?? this.priorityNormal,
+      queuePosition: queuePosition ?? this.queuePosition,
+      seedIdleLimit: seedIdleLimit ?? this.seedIdleLimit,
+      seedIdleMode: seedIdleMode ?? this.seedIdleMode,
+      seedRatioLimit: seedRatioLimit ?? this.seedRatioLimit,
+      seedRatioMode: seedRatioMode ?? this.seedRatioMode,
+      sequentialDownload: sequentialDownload ?? this.sequentialDownload,
+      trackerAdd: trackerAdd ?? this.trackerAdd,
+      trackerRemove: trackerRemove ?? this.trackerRemove,
+      trackerReplace: trackerReplace ?? this.trackerReplace,
+      uploadLimit: uploadLimit ?? this.uploadLimit,
+      uploadLimited: uploadLimited ?? this.uploadLimited,
+      labels: labels ?? this.labels,
+      group: group ?? this.group,
+      trackerList: trackerList ?? this.trackerList,
+    );
+  }
 }
 
 abstract class TorrentSetRequestParam

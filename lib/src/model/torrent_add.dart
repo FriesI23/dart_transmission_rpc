@@ -162,6 +162,36 @@ class TorrentAddRequestArgs with TorrentAddRequestArgsDefine {
 
   Object? getValueByArgument(TorrentAddArgument arg) =>
       _enumToPropertyMap[arg]?.call(this);
+
+  TorrentAddRequestArgs copyWith({
+    TorrentAddFileInfo? fileInfo,
+    List<Cookie>? cookies,
+    String? downloadDir,
+    bool? paused,
+    num? peerLimit,
+    num? bandwidthPriority,
+    FileIndices? filesWanted,
+    FileIndices? filesUnwanted,
+    FileIndices? priorityHigh,
+    FileIndices? priorityLow,
+    FileIndices? priorityNormal,
+    List<String>? labels,
+  }) {
+    return TorrentAddRequestArgs(
+      fileInfo: fileInfo ?? this.fileInfo,
+      cookies: cookies ?? this.cookies,
+      downloadDir: downloadDir ?? this.downloadDir,
+      paused: paused ?? this.paused,
+      peerLimit: peerLimit ?? this.peerLimit,
+      bandwidthPriority: bandwidthPriority ?? this.bandwidthPriority,
+      filesWanted: filesWanted ?? this.filesWanted,
+      filesUnwanted: filesUnwanted ?? this.filesUnwanted,
+      priorityHigh: priorityHigh ?? this.priorityHigh,
+      priorityLow: priorityLow ?? this.priorityLow,
+      priorityNormal: priorityNormal ?? this.priorityNormal,
+      labels: labels ?? this.labels,
+    );
+  }
 }
 
 abstract class TorrentAddRequestParam
