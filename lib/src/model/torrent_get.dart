@@ -218,7 +218,6 @@ enum TorrentGetArgument {
   /// the default seed ratio for torrents to use
   seedRatioLimit(argName: "seedRatioLimit"),
 
-  // TODO: replace with RatioLimitMode
   /// which ratio to use. see [RatioLimitMode.code]
   seedRatioMode(argName: "seedRatioMode"),
 
@@ -839,7 +838,7 @@ class TorrentInfo {
   final num? seedIdleLimit;
   final IdleLimitMode? seedIdleMode;
   final num? seedRatioLimit;
-  final num? seedRatioMode;
+  final RatioLimitMode? seedRatioMode;
   final bool? sequentialDownload;
   final num? sizeWhenDone;
   final num? startDate;
@@ -967,6 +966,11 @@ class TorrentInfo {
       return rawMode != null ? IdleLimitMode.code(rawMode.toInt()) : null;
     }
 
+    RatioLimitMode? buildSeedRatioMode() {
+      final rawMode = rawData[TorrentGetArgument.seedRatioMode.argName] as num?;
+      return rawMode != null ? RatioLimitMode.code(rawMode.toInt()) : null;
+    }
+
     return TorrentInfo(
       activityDate: rawData[TorrentGetArgument.activityDate.argName] as num?,
       addedDate: rawData[TorrentGetArgument.addedDate.argName] as num?,
@@ -1058,7 +1062,7 @@ class TorrentInfo {
       seedIdleMode: buildSeedIdleMode(),
       seedRatioLimit:
           rawData[TorrentGetArgument.seedRatioLimit.argName] as num?,
-      seedRatioMode: rawData[TorrentGetArgument.seedRatioMode.argName] as num?,
+      seedRatioMode: buildSeedRatioMode(),
       sequentialDownload:
           rawData[TorrentGetArgument.sequentialDownload.argName] as bool?,
       sizeWhenDone: rawData[TorrentGetArgument.sizeWhenDone.argName] as num?,

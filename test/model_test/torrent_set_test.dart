@@ -29,7 +29,7 @@ TorrentSetRequestArgs buildTestingUseNoNullArgs({TorrentIds? ids}) =>
       seedIdleLimit: 10,
       seedIdleMode: IdleLimitMode.global,
       seedRatioLimit: 2,
-      seedRatioMode: 1,
+      seedRatioMode: RatioLimitMode.single,
       sequentialDownload: true,
       trackerAdd: ['http://tracker1.com', 'http://tracker2.com'],
       trackerRemove: [1, 2],
@@ -65,7 +65,7 @@ TorrentSetRequestArgs buildTestingUseStructArgs({TorrentIds? ids}) =>
       seedIdleLimit: 10,
       seedIdleMode: IdleLimitMode.single,
       seedRatioLimit: 2,
-      seedRatioMode: 1,
+      seedRatioMode: RatioLimitMode.unlimited,
       trackerAdd: ['http://tracker1.com', 'http://tracker2.com'],
       trackerRemove: [1, 2],
       trackerReplace: [
@@ -100,7 +100,7 @@ JsonMap buildTestingUseStructExpectJson({List<int>? expectIds, num? v}) => {
       'seedIdleLimit': 10,
       'seedIdleMode': 1,
       'seedRatioLimit': 2,
-      'seedRatioMode': 1,
+      'seedRatioMode': 2,
       'trackerAdd': ['http://tracker1.com', 'http://tracker2.com'],
       'trackerRemove': [1, 2],
       'trackerReplace': [
@@ -185,7 +185,7 @@ void testTorrentSetRequestArgs() => group("test TorrentSetRequestArgs", () {
             seedIdleLimit: 10,
             seedIdleMode: IdleLimitMode.global,
             seedRatioLimit: 2,
-            seedRatioMode: 1,
+            seedRatioMode: RatioLimitMode.single,
             sequentialDownload: true,
             trackerAdd: ['http://tracker1.com', 'http://tracker2.com'],
             trackerRemove: [1, 2],
@@ -237,7 +237,7 @@ void testTorrentSetRequestArgs() => group("test TorrentSetRequestArgs", () {
           expect(args.getValueByArgument(TorrentSetArgument.seedRatioLimit),
               equals(2));
           expect(args.getValueByArgument(TorrentSetArgument.seedRatioMode),
-              equals(1));
+              equals(RatioLimitMode.single));
           expect(args.getValueByArgument(TorrentSetArgument.sequentialDownload),
               equals(true));
           expect(args.getValueByArgument(TorrentSetArgument.trackerAdd),
@@ -335,7 +335,7 @@ void testTorrentSetRequestArgs() => group("test TorrentSetRequestArgs", () {
           seedIdleLimit: 10,
           seedIdleMode: IdleLimitMode.global,
           seedRatioLimit: 2,
-          seedRatioMode: 1,
+          seedRatioMode: RatioLimitMode.single,
           sequentialDownload: true,
           trackerAdd: ['http://tracker1.com', 'http://tracker2.com'],
           trackerRemove: [1, 2],

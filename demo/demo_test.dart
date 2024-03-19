@@ -228,17 +228,20 @@ Future<void> testTorrentSet({TransmissionRpcClient? c}) async {
   print(r1.param!.torrents[0].name);
   print(r1.param!.torrents[0].labels);
   print(r1.param!.torrents[0].seedIdleMode);
+  print(r1.param!.torrents[0].seedRatioMode);
   final r2 = await client.torrentSet(const TorrentSetRequestArgs(
     // ids: TorrentIds.torrentSetForAll(),
     // ids: TorrentIds([TorrentId(id: 2)]),
     ids: TorrentIds.empty(),
     labels: ["test", "foo", "bar", "new"],
     seedIdleMode: IdleLimitMode.single,
+    seedRatioMode: RatioLimitMode.unlimited,
   ));
   print(r2.result);
   final r3 = await client.torrentGetAll(const TorrentIds.empty());
   print(r3.param!.torrents[0].labels);
   print(r3.param!.torrents[0].seedIdleMode);
+  print(r3.param!.torrents[0].seedRatioMode);
 }
 
 Future<void> testTorrentRemove({TransmissionRpcClient? c}) async {

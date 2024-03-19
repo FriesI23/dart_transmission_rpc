@@ -133,8 +133,7 @@ mixin TorrentSetRequestArgsDefine {
   num? get seedIdleLimit;
   IdleLimitMode? get seedIdleMode;
   num? get seedRatioLimit;
-  // TODO: replace with enum
-  num? get seedRatioMode;
+  RatioLimitMode? get seedRatioMode;
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   List<String>? get trackerAdd;
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
@@ -238,7 +237,7 @@ class TorrentSetRequestArgs with TorrentSetRequestArgsDefine {
   @override
   final num? seedRatioLimit;
   @override
-  final num? seedRatioMode;
+  final RatioLimitMode? seedRatioMode;
   @override
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
   final List<String>? trackerAdd;
@@ -351,7 +350,7 @@ abstract class TorrentSetRequestParam
   num? get seedRatioLimit => _args.seedRatioLimit;
 
   @override
-  num? get seedRatioMode => _args.seedRatioMode;
+  RatioLimitMode? get seedRatioMode => _args.seedRatioMode;
 
   @override
   @Deprecated("Deprecated rpc-version>=17, use \"trackerList\" instead")
@@ -481,6 +480,10 @@ class _TorrentSetRequestParam extends TorrentSetRequestParam {
       case TorrentSetArgument.seedIdleMode:
         if (seedIdleMode != null && seedIdleMode != IdleLimitMode.unknown) {
           result[f.argName] = seedIdleMode!.code;
+        }
+      case TorrentSetArgument.seedRatioMode:
+        if (seedRatioMode != null && seedRatioMode != RatioLimitMode.unknown) {
+          result[f.argName] = seedRatioMode!.code;
         }
       default:
         return false;
