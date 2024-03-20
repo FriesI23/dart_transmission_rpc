@@ -40,6 +40,15 @@ enum TransmissionRpcRetryReason { csrf }
 /// A Transmission RPC client implemented in Dart, visit
 /// [rpc-spec.md](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md)
 /// obtain more information.
+///
+/// usage example:
+/// ```dart
+/// void main() async {
+///   final client = TransmissionRpcClient();
+///   await client.init();
+///   assert(client.isInited(), true);
+/// }
+/// ```
 abstract interface class TransmissionRpcClient {
   Uri get url;
   String? get username;
