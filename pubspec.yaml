@@ -24,6 +24,6 @@ dev_dependencies:
 funding:
   - https://www.buymeacoffee.com/d49cb87qgww
 
-topice:
+topics:
   - transmission
   - rpc
