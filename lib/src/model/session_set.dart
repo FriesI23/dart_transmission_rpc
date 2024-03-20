@@ -3,6 +3,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import '../request.dart';
 import '../response.dart';
 import '../typedef.dart';

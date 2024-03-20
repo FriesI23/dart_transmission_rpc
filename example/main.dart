@@ -358,7 +358,7 @@ Future<void> testSessionClose() async {
 
 void main() async {
   Logger("TransmissionRpcClient", showLevel: LogLevel.debug);
-  // await testSessionGet();
+  await testSessionGet();
   // await testSessionSet();
   // await testSessionStats();
   // await testBlocklistUpdate();
