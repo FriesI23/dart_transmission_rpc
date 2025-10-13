@@ -795,7 +795,7 @@ class _TransmissionRpcClient implements TransmissionRpcClient {
   Future<TorrentRemoveResponse> torrentRemove(TorrentIds<TorrentId> ids,
           {bool? deleteLocalData, RpcTag? tag, int? timeout}) =>
       checkAndCallApi(
-        TorrentRemoveRequestParam.build(version: serverRpcVersion, ids: ids),
+        TorrentRemoveRequestParam.build(version: serverRpcVersion, ids: ids, deleteLocalData: deleteLocalData),
         method: TransmissionRpcMethod.torrentRemove,
         tag: tag,
         timeout: timeout,
