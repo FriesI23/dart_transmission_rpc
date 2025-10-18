@@ -6,9 +6,14 @@
 browser="Google Chrome"
 
 cd "$(dirname "$0")"/..
+rm -fr coverage
 dart run coverage:test_with_coverage --branch-coverage --function-coverage
+dart run coverage:format_coverage \
+  --lcov --in=coverage/coverage.json --out=coverage/lcov.info --report-on=lib --base-directory=.
 mkdir coverage/html
-genhtml coverage/lcov.info -o coverage/html
+echo "use genhtml"
+genhtml coverage/lcov.info -o coverage/html --ignore-errors category
+
 [ -z "$SKIP_OPENURL" ] && (
     command -v xdg-open &>/dev/null &&
         xdg-open coverage/html/index.html ||

@@ -5,13 +5,14 @@
   "licenser.license": "MIT",
   "debug.openDebug": "openOnDebugBreak",
   "debug.internalConsoleOptions": "openOnSessionStart",
-  "dart.flutterSdkPath": ".fvm/flutter_sdk",
-  "dart.flutterSdkPaths": [
-    ".fvm/flutter_sdk",
-  ],
+  "dart.sdkPath": ".dart_sdk/3.9.4",
   "dart.analysisExcludedFolders": [
-    ".fvm",
+    ".dart_sdk"
   ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.dart_sdk": true
+  },
   "dartImport.fixOnSave": true,
   "search.exclude": {
     "**/.fvm": true,
