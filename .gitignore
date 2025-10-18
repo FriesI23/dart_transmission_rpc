@@ -57,4 +57,6 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 
 # dark sdk
+.dart_sdk
 .dart_sdk/
+.tool-versions
